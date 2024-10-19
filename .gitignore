@@ -1,0 +1,65 @@
+# Archivos y carpetas comunes a ignorar en Java y Spring Boot
+target/
+bin/
+out/
+build/
+application.properties
+
+# Dependencias de Maven o Gradle
+.mvn/
+.gradle/
+mvnw*
+gradlew*
+!gradle/wrapper/gradle-wrapper.jar
+
+# Archivos de logs
+*.log
+*.log.*
+
+# Archivos de configuración del IDE
+*.iml
+*.ipr
+*.iws
+.idea/
+.vscode/
+
+# Configuración del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos de compilación
+*.class
+*.jar
+*.war
+*.ear
+
+# Archivos de configuración de sistema o entorno
+*.env
+*.properties
+
+# Archivos de caché
+*.cache
+*.temp
+
+# Archivos de configuración de IntelliJ IDEA o Eclipse
+*.class
+*.project
+*.classpath
+.settings/
+
+# Archivos del JDK
+*.jar
+*.war
+*.ear
+
+# Archivos de cobertura de pruebas
+*.exec
+*.ec
+*.testResults
+*.jacoco/
+*.coverage
+*.cobertura
+
+# Archivos específicos de Docker
+docker-compose.override.yml
+
