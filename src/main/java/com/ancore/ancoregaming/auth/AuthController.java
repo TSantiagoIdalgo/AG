@@ -5,6 +5,8 @@ import com.ancore.ancoregaming.auth.dtos.LoginDTO;
 import com.ancore.ancoregaming.common.ApiResponse;
 import com.ancore.ancoregaming.common.ResponseMessage;
 import com.ancore.ancoregaming.user.dtos.UserDTO;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -28,9 +30,25 @@ public class AuthController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<ApiResponse<JwtResponse>> login(@Valid @RequestBody final LoginDTO login) {
+  public ResponseEntity<ApiResponse<?>> login(HttpServletResponse res, @Valid @RequestBody final LoginDTO login) {
     JwtResponse loginResponse = authService.login(login);
-    ApiResponse<JwtResponse> response = new ApiResponse<>(ResponseMessage.OK, loginResponse, null);
+    Cookie jwtCookie = getCookie("access_token", loginResponse.access_token());
+    Cookie refreshJwtCookie = getCookie("refresh_token", loginResponse.refresh_token());
+
+    res.addCookie(jwtCookie);
+    res.addCookie(refreshJwtCookie);
+
+    ApiResponse response = new ApiResponse<>(ResponseMessage.OK, null, null);
     return ResponseEntity.status(200).body(response);
+  }
+
+  private Cookie getCookie(String key, String value) {
+    Cookie cookie = new Cookie(key, value);
+    cookie.setHttpOnly(true); // Aumenta la seguridad evitando acceso desde JavaScript
+    cookie.setSecure(true); // Solo se enviará por HTTPS
+    cookie.setMaxAge(24 * 60 * 60); // Duración de 1 día
+    cookie.setPath("/");
+
+    return cookie;
   }
 }

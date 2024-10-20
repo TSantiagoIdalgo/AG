@@ -52,12 +52,11 @@ public class AuthService {
 
   }
 
-  public JwtResponse refresh(final String token) {
-    if (token == null || !token.toLowerCase().startsWith("bearer ")) {
+  public JwtResponse refresh(final String refreshToken) {
+    if (refreshToken == null) {
       throw new IllegalArgumentException("Invalid bearer token");
     }
 
-    String refreshToken = token.substring(7);
     String email = jwtService.extractUsername(refreshToken);
     if (email == null) {
       throw new IllegalArgumentException("Invalid refresh token");

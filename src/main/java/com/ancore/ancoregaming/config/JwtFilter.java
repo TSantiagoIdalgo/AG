@@ -9,12 +9,13 @@ import com.ancore.ancoregaming.user.IUserRepository;
 import com.ancore.ancoregaming.user.model.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -35,6 +36,7 @@ public class JwtFilter extends OncePerRequestFilter {
   private final IUserRepository userRepo;
   private final UserDetailsService userDeailsService;
 
+  @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
           throws ServletException, IOException {
     if (request.getServletPath().contains("/auth")) {
@@ -42,19 +44,23 @@ public class JwtFilter extends OncePerRequestFilter {
       return;
     }
 
-    String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-    if (authHeader == null || !authHeader.toLowerCase().startsWith("bearer ")) {
+    Cookie[] cookies = request.getCookies();
+    Optional<Cookie> cookieJwt = cookies != null
+            ? Arrays.stream(cookies)
+                    .filter(cookie -> "access_token".equals(cookie.getName()))
+                    .findFirst()
+            : Optional.empty();
+    if (cookieJwt.isEmpty()) {
       chain.doFilter(request, response);
       return;
     }
 
-    final String jwtToken = authHeader.substring(7);
+    String jwtToken = cookieJwt.get().getValue();
     final String username = jwtService.extractUsername(jwtToken);
     if (username == null || SecurityContextHolder.getContext().getAuthentication() != null) {
       chain.doFilter(request, response);
       return;
     }
-
     UserDetails userDetails = this.userDeailsService.loadUserByUsername(username);
     Optional<User> user = userRepo.findById(userDetails.getUsername());
 
