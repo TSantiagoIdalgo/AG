@@ -45,7 +45,7 @@ public class SecurityConfig {
 
   @Bean
   public UserDetailsService userDetailsService() throws EntityNotFoundException {
-    return userEmail -> {
+    return (String userEmail) -> {
       User user = userRepo.findById(userEmail).orElseThrow(() -> new EntityNotFoundException("User not found"));
 
       List<GrantedAuthority> authorities = user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());

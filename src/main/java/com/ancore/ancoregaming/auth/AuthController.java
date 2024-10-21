@@ -5,6 +5,7 @@ import com.ancore.ancoregaming.auth.dtos.LoginDTO;
 import com.ancore.ancoregaming.common.ApiResponse;
 import com.ancore.ancoregaming.common.ResponseMessage;
 import com.ancore.ancoregaming.user.dtos.UserDTO;
+import com.ancore.ancoregaming.user.model.User;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -23,9 +24,9 @@ public class AuthController {
   private AuthService authService;
 
   @PostMapping("/register")
-  public ResponseEntity<ApiResponse<JwtResponse>> register(@Valid @RequestBody final UserDTO user) {
-    JwtResponse tokenResponse = authService.createUser(user);
-    ApiResponse<JwtResponse> response = new ApiResponse<>(ResponseMessage.CREATED, tokenResponse, null);
+  public ResponseEntity<ApiResponse<User>> register(@Valid @RequestBody UserDTO user) {
+    User userResponse = authService.createUser(user);
+    ApiResponse<User> response = new ApiResponse<>(ResponseMessage.CREATED, userResponse, null);
     return ResponseEntity.status(201).body(response);
   }
 

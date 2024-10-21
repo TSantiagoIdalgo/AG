@@ -26,20 +26,17 @@ public class AuthService {
   private final JwtService jwtService;
   private final AuthenticationManager authManager;
 
-  public JwtResponse createUser(UserDTO user) {
-    String passwordHash = passwordEncoder.encode(user.password);
+  public User createUser(UserDTO user) {
+    String passwordHash = passwordEncoder.encode(user.getPassword());
     List<Role> roles = new ArrayList<>();
     Role role = new Role("USER");
     this.roleRepository.save(role);
     roles.add(role);
-    User newUser = new User(user.username, user.email, passwordHash, false, roles);
+    User newUser = new User(user.getUsername(), user.getEmail(), passwordHash, false, roles);
     // Send email to user
     this.userRepository.save(newUser);
 
-    String jwtToken = jwtService.generateToken(newUser);
-    String refreshToken = jwtService.generateRefreshToken(newUser);
-
-    return new JwtResponse(jwtToken, refreshToken);
+    return newUser;
   }
 
   public JwtResponse login(LoginDTO login) throws EntityNotFoundException {
