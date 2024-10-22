@@ -29,7 +29,7 @@ public class AuthService {
   public User createUser(UserDTO user) {
     String passwordHash = passwordEncoder.encode(user.getPassword());
     List<Role> roles = new ArrayList<>();
-    Role role = new Role("USER");
+    Role role = new Role("ROLE_ADMIN");
     this.roleRepository.save(role);
     roles.add(role);
     User newUser = new User(user.getUsername(), user.getEmail(), passwordHash, false, roles);
@@ -68,4 +68,5 @@ public class AuthService {
     final String accessToken = jwtService.generateToken(user);
     return new JwtResponse(accessToken, refreshToken);
   }
+
 }

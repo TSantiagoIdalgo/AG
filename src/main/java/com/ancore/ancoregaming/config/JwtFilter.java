@@ -20,6 +20,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+// Filtro para authenticar al usuario con un json web token
 @Component
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {

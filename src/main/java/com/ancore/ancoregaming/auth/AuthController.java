@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +39,24 @@ public class AuthController {
 
     res.addCookie(jwtCookie);
     res.addCookie(refreshJwtCookie);
+
+    ApiResponse response = new ApiResponse<>(ResponseMessage.OK, null, null);
+    return ResponseEntity.status(200).body(response);
+  }
+
+  @PostMapping("/logout")
+  public ResponseEntity<ApiResponse<?>> logout(HttpServletResponse res) {
+    String[] cookiesToRemove = {"access_token", "refresh_token"};
+
+    for (String cookieName : cookiesToRemove) {
+      Cookie cookie = new Cookie(cookieName, null);
+      cookie.setHttpOnly(true);
+      cookie.setSecure(true);
+      cookie.setPath("/");
+      cookie.setMaxAge(0);
+      res.addCookie(cookie);
+    }
+    SecurityContextHolder.clearContext();
 
     ApiResponse response = new ApiResponse<>(ResponseMessage.OK, null, null);
     return ResponseEntity.status(200).body(response);
