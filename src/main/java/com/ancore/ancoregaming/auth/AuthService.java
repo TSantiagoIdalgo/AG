@@ -2,8 +2,8 @@ package com.ancore.ancoregaming.auth;
 
 import com.ancore.ancoregaming.auth.dtos.JwtResponse;
 import com.ancore.ancoregaming.auth.dtos.LoginDTO;
-import com.ancore.ancoregaming.user.IRoleRepository;
-import com.ancore.ancoregaming.user.IUserRepository;
+import com.ancore.ancoregaming.user.repositories.IRoleRepository;
+import com.ancore.ancoregaming.user.repositories.IUserRepository;
 import com.ancore.ancoregaming.user.dtos.UserDTO;
 import com.ancore.ancoregaming.user.model.Role;
 import com.ancore.ancoregaming.user.model.User;

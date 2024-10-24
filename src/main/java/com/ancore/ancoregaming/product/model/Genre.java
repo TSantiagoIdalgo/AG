@@ -1,6 +1,5 @@
 package com.ancore.ancoregaming.product.model;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.Getter;
@@ -13,12 +12,17 @@ public class Genre {
 
   @Id
   private String name;
-  @Column
-  private int recommendedAge;
 
-  public Genre(String name, int recommendedAge) {
+  public Genre() {
+  }
+
+  public Genre(String name) {
     this.name = name;
-    this.recommendedAge = recommendedAge;
+  }
+
+  @Override
+  public String toString() {
+    return "Genre{" + "name=" + name + '}';
   }
 
 }

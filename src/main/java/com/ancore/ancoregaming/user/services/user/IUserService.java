@@ -1,4 +1,4 @@
-package com.ancore.ancoregaming.user;
+package com.ancore.ancoregaming.user.services.user;
 
 import com.ancore.ancoregaming.user.model.User;
 import java.util.List;

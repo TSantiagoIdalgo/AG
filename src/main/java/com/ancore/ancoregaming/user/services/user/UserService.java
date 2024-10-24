@@ -1,5 +1,6 @@
-package com.ancore.ancoregaming.user;
+package com.ancore.ancoregaming.user.services.user;
 
+import com.ancore.ancoregaming.user.repositories.IUserRepository;
 import com.ancore.ancoregaming.auth.JwtService;
 import com.ancore.ancoregaming.user.model.User;
 import io.jsonwebtoken.JwtException;

@@ -1,8 +1,8 @@
-package com.ancore.ancoregaming.config;
+package com.ancore.ancoregaming.config.filters;
 
 import com.ancore.ancoregaming.auth.JwtService;
-import com.ancore.ancoregaming.user.IUserRepository;
 import com.ancore.ancoregaming.user.model.User;
+import com.ancore.ancoregaming.user.repositories.IUserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -42,12 +42,10 @@ public class JwtFilter extends OncePerRequestFilter {
             .flatMap(Arrays::stream)
             .filter(cookie -> "access_token".equals(cookie.getName()))
             .findFirst();
-
     if (cookieJwt.isEmpty()) {
       chain.doFilter(request, response);
       return;
     }
-
     final String jwtToken = cookieJwt.get().getValue();
     String username = jwtService.extractUsername(jwtToken);
 

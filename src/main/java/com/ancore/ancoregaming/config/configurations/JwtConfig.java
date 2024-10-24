@@ -1,5 +1,6 @@
-package com.ancore.ancoregaming.config;
+package com.ancore.ancoregaming.config.configurations;
 
+import com.ancore.ancoregaming.config.filters.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,20 +21,20 @@ public class JwtConfig {
 
   private final AuthenticationProvider authenticationProvider;
   private final JwtFilter jwtFilter;
+  private final UnauthenticateConfig unauthenticateConfig;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(req
-                    -> req.requestMatchers("/auth/**")
-                    .permitAll()
-                    .anyRequest()
-                    .authenticated()
+                    -> req.requestMatchers("/auth/**").permitAll()
+                    .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authenticationProvider(authenticationProvider)
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+            .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthenticateConfig));
 
     return http.build();
   }

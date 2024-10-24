@@ -15,7 +15,6 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,6 +30,9 @@ public class Product {
 
   @Column(length = 128)
   private String name;
+
+  @Column
+  private String description;
 
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
@@ -64,6 +66,9 @@ public class Product {
   private String mainImage;
 
   @Column
+  String trailer;
+
+  @Column
   private String backgroundImage;
 
   @ElementCollection(fetch = FetchType.LAZY)
@@ -79,89 +84,114 @@ public class Product {
   public Product() {
   }
 
-  public Product(UUID id, String name, List<Platform> platforms, String developer, List<Genre> genres, boolean disabled, int stock, BigDecimal price, String mainImage, String backgroundImage, List<String> images, BigDecimal discount) {
+  private Product(Builder builder) {
     this.id = UUID.randomUUID();
-    this.name = name;
-    this.platforms = platforms;
-    this.developer = developer;
-    this.genres = genres;
-    this.disabled = disabled;
-    this.stock = stock;
-    this.price = price;
-    this.mainImage = mainImage;
-    this.backgroundImage = backgroundImage;
-    this.images = images;
-    this.discount = discount;
+    this.name = builder.name;
+    this.description = builder.description;
+    this.platforms = builder.platforms;
+    this.developer = builder.developer;
+    this.genres = builder.genres;
+    this.disabled = builder.disabled;
+    this.stock = builder.stock;
+    this.price = builder.price;
+    this.mainImage = builder.mainImage;
+    this.trailer = builder.trailer;
+    this.backgroundImage = builder.backgroundImage;
+    this.images = builder.images;
+    this.discount = builder.discount;
+    this.reviews = builder.reviews;
   }
 
-  @Override
-  public int hashCode() {
-    int hash = 7;
-    hash = 11 * hash + Objects.hashCode(this.id);
-    hash = 11 * hash + Objects.hashCode(this.name);
-    hash = 11 * hash + Objects.hashCode(this.platforms);
-    hash = 11 * hash + Objects.hashCode(this.developer);
-    hash = 11 * hash + Objects.hashCode(this.genres);
-    hash = 11 * hash + (this.disabled ? 1 : 0);
-    hash = 11 * hash + this.stock;
-    hash = 11 * hash + Objects.hashCode(this.price);
-    hash = 11 * hash + Objects.hashCode(this.mainImage);
-    hash = 11 * hash + Objects.hashCode(this.backgroundImage);
-    hash = 11 * hash + Objects.hashCode(this.images);
-    hash = 11 * hash + Objects.hashCode(this.discount);
-    hash = 11 * hash + Objects.hashCode(this.reviews);
-    return hash;
-  }
+  public static class Builder {
 
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
+    private String name;
+    private String description;
+    private List<Platform> platforms;
+    private String developer;
+    private List<Genre> genres;
+    private boolean disabled;
+    private int stock;
+    private BigDecimal price;
+    private String mainImage;
+    private String trailer;
+    private String backgroundImage;
+    private List<String> images;
+    private BigDecimal discount;
+    private List<Review> reviews;
+
+    public Builder setName(String name) {
+      this.name = name;
+      return this;
     }
-    if (obj == null) {
-      return false;
+
+    public Builder setDescription(String description) {
+      this.description = description;
+      return this;
     }
-    if (getClass() != obj.getClass()) {
-      return false;
+
+    public Builder setPlatforms(List<Platform> platforms) {
+      this.platforms = platforms;
+      return this;
     }
-    final Product other = (Product) obj;
-    if (this.disabled != other.disabled) {
-      return false;
+
+    public Builder setDeveloper(String developer) {
+      this.developer = developer;
+      return this;
     }
-    if (this.stock != other.stock) {
-      return false;
+
+    public Builder setGenres(List<Genre> genres) {
+      this.genres = genres;
+      return this;
     }
-    if (!Objects.equals(this.name, other.name)) {
-      return false;
+
+    public Builder setDisabled(boolean disabled) {
+      this.disabled = disabled;
+      return this;
     }
-    if (!Objects.equals(this.developer, other.developer)) {
-      return false;
+
+    public Builder setStock(int stock) {
+      this.stock = stock;
+      return this;
     }
-    if (!Objects.equals(this.mainImage, other.mainImage)) {
-      return false;
+
+    public Builder setPrice(BigDecimal price) {
+      this.price = price;
+      return this;
     }
-    if (!Objects.equals(this.backgroundImage, other.backgroundImage)) {
-      return false;
+
+    public Builder setMainImage(String mainImage) {
+      this.mainImage = mainImage;
+      return this;
     }
-    if (!Objects.equals(this.id, other.id)) {
-      return false;
+
+    public Builder setTrailer(String trailerUrl) {
+      this.trailer = trailerUrl;
+      return this;
     }
-    if (!Objects.equals(this.platforms, other.platforms)) {
-      return false;
+
+    public Builder setBackgroundImage(String backgroundImage) {
+      this.backgroundImage = backgroundImage;
+      return this;
     }
-    if (!Objects.equals(this.genres, other.genres)) {
-      return false;
+
+    public Builder setImages(List<String> images) {
+      this.images = images;
+      return this;
     }
-    if (!Objects.equals(this.price, other.price)) {
-      return false;
+
+    public Builder setDiscount(BigDecimal discount) {
+      this.discount = discount;
+      return this;
     }
-    if (!Objects.equals(this.images, other.images)) {
-      return false;
+
+    public Builder setReviews(List<Review> reviews) {
+      this.reviews = reviews;
+      return this;
     }
-    if (!Objects.equals(this.discount, other.discount)) {
-      return false;
+
+    public Product build() {
+      return new Product(this);
     }
-    return Objects.equals(this.reviews, other.reviews);
   }
 
   @Override

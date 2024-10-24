@@ -1,7 +1,8 @@
-package com.ancore.ancoregaming.user;
+package com.ancore.ancoregaming.user.controllers;
 
 import com.ancore.ancoregaming.common.ApiResponse;
 import com.ancore.ancoregaming.common.ResponseMessage;
+import com.ancore.ancoregaming.user.services.user.IUserService;
 import com.ancore.ancoregaming.user.model.User;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;

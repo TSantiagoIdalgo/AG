@@ -51,7 +51,7 @@ public class AuthController {
     for (String cookieName : cookiesToRemove) {
       Cookie cookie = new Cookie(cookieName, null);
       cookie.setHttpOnly(true);
-      cookie.setSecure(true);
+      cookie.setSecure(false);
       cookie.setPath("/");
       cookie.setMaxAge(0);
       res.addCookie(cookie);
@@ -65,7 +65,7 @@ public class AuthController {
   private Cookie getCookie(String key, String value) {
     Cookie cookie = new Cookie(key, value);
     cookie.setHttpOnly(true); // Aumenta la seguridad evitando acceso desde JavaScript
-    cookie.setSecure(true); // Solo se enviará por HTTPS
+    cookie.setSecure(false); // Solo se enviará por HTTPS
     cookie.setMaxAge(24 * 60 * 60); // Duración de 1 día
     cookie.setPath("/");
 

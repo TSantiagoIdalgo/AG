@@ -1,4 +1,4 @@
-package com.ancore.ancoregaming.config;
+package com.ancore.ancoregaming.config.filters;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,6 +24,7 @@ public class UserAuthorizationFilter extends OncePerRequestFilter {
       chain.doFilter(request, response);
       return;
     }
+
     String requestPath = request.getRequestURI();
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     if (authentication != null && authentication.isAuthenticated() && requestPath.contains("user")) {

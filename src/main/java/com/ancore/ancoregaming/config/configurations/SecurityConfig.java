@@ -1,7 +1,8 @@
-package com.ancore.ancoregaming.config;
+package com.ancore.ancoregaming.config.configurations;
 
-import com.ancore.ancoregaming.user.IUserRepository;
+import com.ancore.ancoregaming.config.filters.UserAuthorizationFilter;
 import com.ancore.ancoregaming.user.model.User;
+import com.ancore.ancoregaming.user.repositories.IUserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
