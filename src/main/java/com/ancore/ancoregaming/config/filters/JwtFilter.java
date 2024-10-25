@@ -46,6 +46,7 @@ public class JwtFilter extends OncePerRequestFilter {
       chain.doFilter(request, response);
       return;
     }
+
     final String jwtToken = cookieJwt.get().getValue();
     String username = jwtService.extractUsername(jwtToken);
 
@@ -59,6 +60,7 @@ public class JwtFilter extends OncePerRequestFilter {
       chain.doFilter(request, response);
       return;
     }
+
     UserDetails userDetails = this.userDeailsService.loadUserByUsername(username);
     setAuthentication(userDetails, request);
 

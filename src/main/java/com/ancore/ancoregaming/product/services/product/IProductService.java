@@ -8,11 +8,9 @@ import java.util.UUID;
 
 public interface IProductService {
 
-  public Product createProduct(ProductDTO product);
+  public Product createProduct(ProductDTO product, FilesDTO filesDTO);
 
   public List<Product> findAll();
-
-  public Product uploadProductFiles(UUID productId, FilesDTO filesDTO);
 
   public Product findProduct(UUID productId);
 }

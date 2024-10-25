@@ -4,6 +4,7 @@ import com.ancore.ancoregaming.product.model.Genre;
 import com.ancore.ancoregaming.product.repositories.IGenreRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,10 @@ public class GenreService implements IGenreService {
 
   @Override
   public Genre createGenre(String genreName) {
+    Optional<Genre> genreFound = this.genreRepository.findById(genreName);
+    if (genreFound.isPresent()) {
+      return genreFound.get();
+    }
     Genre genre = new Genre(genreName);
     this.genreRepository.save(genre);
     return genre;

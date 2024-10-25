@@ -10,8 +10,6 @@ import com.ancore.ancoregaming.product.services.upload.UploadService;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,9 +26,7 @@ public class ProductService implements IProductService {
   private UploadService uploadService;
 
   @Override
-  public Product createProduct(ProductDTO product) {
-    System.out.println("DTO: " + product.toString());
-
+  public Product createProduct(ProductDTO product, FilesDTO filesDTO) {
     Product newProduct = new Product.Builder()
             .setName(product.name)
             .setDescription(product.description)
@@ -43,8 +39,8 @@ public class ProductService implements IProductService {
             .setDiscount(product.discount)
             .build();
     this.productRepository.save(newProduct);
-
-    return newProduct;
+    Product productWithFiles = this.uploadProductFiles(newProduct, filesDTO);
+    return productWithFiles;
   }
 
   @Override
@@ -52,16 +48,20 @@ public class ProductService implements IProductService {
     return this.productRepository.findAll();
   }
 
-  public Product uploadProductFiles(UUID productId, FilesDTO filesDTO) {
-    Product product = this.findProduct(productId);
+  @Override
+  public Product findProduct(UUID productId) {
+    return this.productRepository.findById(productId).orElseThrow(() -> new EntityNotFoundException("Product not found"));
+  }
+
+  private Product uploadProductFiles(Product product, FilesDTO filesDTO) {
     try {
-      String mainImageUrl = this.uploadService.uploadFile(filesDTO.getMainImage());
+      String mainImageUrl = this.uploadService.uploadImage(filesDTO.getMainImage());
       product.setMainImage(mainImageUrl);
 
-      String bgImageUrl = this.uploadService.uploadFile(filesDTO.getBackgroundImage());
+      String bgImageUrl = this.uploadService.uploadImage(filesDTO.getBackgroundImage());
       product.setBackgroundImage(bgImageUrl);
 
-      String trailerUrl = this.uploadService.uploadFile(filesDTO.getTrailer());
+      String trailerUrl = this.uploadService.uploadVideo(filesDTO.getTrailer());
       product.setTrailer(trailerUrl);
 
       List<String> imagesUrls = this.uploadService.bulkUploadFiles(filesDTO.getImages());
@@ -70,14 +70,8 @@ public class ProductService implements IProductService {
       this.productRepository.save(product);
       return product;
     } catch (Exception ex) {
-      Logger.getLogger(ProductService.class.getName()).log(Level.SEVERE, null, ex);
       this.productRepository.save(product);
       return product;
     }
-  }
-
-  @Override
-  public Product findProduct(UUID productId) {
-    return this.productRepository.findById(productId).orElseThrow(() -> new EntityNotFoundException("Product not found"));
   }
 }

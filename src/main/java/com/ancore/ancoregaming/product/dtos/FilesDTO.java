@@ -17,7 +17,7 @@ public class FilesDTO {
   public FilesDTO() {
   }
 
-  public FilesDTO(MultipartFile mainImage, MultipartFile trailer, MultipartFile backgroundImage, List<MultipartFile> images) {
+  public FilesDTO(MultipartFile mainImage, MultipartFile trailer, MultipartFile backgroundImage, List<MultipartFile> images, String product) {
     this.mainImage = mainImage;
     this.trailer = trailer;
     this.backgroundImage = backgroundImage;

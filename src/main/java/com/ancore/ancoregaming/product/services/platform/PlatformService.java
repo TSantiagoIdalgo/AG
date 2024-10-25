@@ -1,10 +1,10 @@
 package com.ancore.ancoregaming.product.services.platform;
 
-import com.ancore.ancoregaming.product.services.platform.IPlatformService;
 import com.ancore.ancoregaming.product.model.Platform;
 import com.ancore.ancoregaming.product.repositories.IPlatformRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +16,12 @@ public class PlatformService implements IPlatformService {
 
   @Override
   public Platform createPlatform(Platform platform) {
-    Platform newPlatform = new Platform(platform.getName(), platform.isDisabled());
+    Optional<Platform> platformFound = this.platformRepository.findById(platform.getName());
+    if (platformFound.isPresent()) {
+      return platformFound.get();
+    }
+
+    Platform newPlatform = new Platform(platform.getName(), platform.isDisabled() || false);
     this.platformRepository.save(newPlatform);
     return newPlatform;
   }
