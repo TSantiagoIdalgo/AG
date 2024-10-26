@@ -31,7 +31,7 @@ public class Product {
   @Column(length = 128)
   private String name;
 
-  @Column
+  @Column//(columnDefinition = "TEXT")
   private String description;
 
   @ManyToMany(fetch = FetchType.LAZY)
@@ -85,7 +85,6 @@ public class Product {
   }
 
   private Product(Builder builder) {
-    this.id = UUID.randomUUID();
     this.name = builder.name;
     this.description = builder.description;
     this.platforms = builder.platforms;

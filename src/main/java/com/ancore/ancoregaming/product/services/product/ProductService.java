@@ -1,7 +1,7 @@
 package com.ancore.ancoregaming.product.services.product;
 
+import com.ancore.ancoregaming.product.dtos.CreateProductDTO;
 import com.ancore.ancoregaming.product.dtos.FilesDTO;
-import com.ancore.ancoregaming.product.dtos.ProductDTO;
 import com.ancore.ancoregaming.product.model.Product;
 import com.ancore.ancoregaming.product.repositories.IProductRepository;
 import com.ancore.ancoregaming.product.services.genre.GenreService;
@@ -26,7 +26,7 @@ public class ProductService implements IProductService {
   private UploadService uploadService;
 
   @Override
-  public Product createProduct(ProductDTO product, FilesDTO filesDTO) {
+  public Product createProduct(CreateProductDTO product, FilesDTO filesDTO) {
     Product newProduct = new Product.Builder()
             .setName(product.name)
             .setDescription(product.description)
@@ -38,7 +38,6 @@ public class ProductService implements IProductService {
             .setDisabled(product.disabled || false)
             .setDiscount(product.discount)
             .build();
-    this.productRepository.save(newProduct);
     Product productWithFiles = this.uploadProductFiles(newProduct, filesDTO);
     return productWithFiles;
   }
@@ -49,8 +48,35 @@ public class ProductService implements IProductService {
   }
 
   @Override
-  public Product findProduct(UUID productId) {
-    return this.productRepository.findById(productId).orElseThrow(() -> new EntityNotFoundException("Product not found"));
+  public Product findProduct(String productId) {
+    return this.productRepository.findById(UUID.fromString(productId)).orElseThrow(() -> new EntityNotFoundException("Product not found"));
+  }
+
+  @Override
+  public void destroyProduct(String productId) {
+    Product product = this.findProduct(productId);
+    try {
+      this.uploadService.deleteImage(product.getMainImage());
+      product.setMainImage(null);
+
+      this.uploadService.deleteImage(product.getBackgroundImage());
+      product.setBackgroundImage(null);
+
+      this.uploadService.deleteVideo(product.getTrailer());
+      product.setTrailer(null);
+
+      this.uploadService.bulkDeleteFiles(product.getImages());
+      product.getImages().clear();
+
+      this.productRepository.delete(product);
+    } catch (Exception ex) {
+      this.productRepository.save(product);
+    }
+  }
+
+  @Override
+  public Product updateProduct(String productId) {
+    throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
   }
 
   private Product uploadProductFiles(Product product, FilesDTO filesDTO) {
@@ -74,4 +100,5 @@ public class ProductService implements IProductService {
       return product;
     }
   }
+
 }

@@ -3,6 +3,7 @@ package com.ancore.ancoregaming.product.services.upload;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,4 +58,46 @@ public class UploadService {
     return urls;
   }
 
+  public void bulkDeleteFiles(List<String> urls) throws Exception {
+    if (urls.isEmpty()) {
+      return;
+    }
+    for (String url : urls) {
+      this.deleteImage(url);
+    }
+  }
+
+  public void deleteVideo(String url) throws Exception {
+    if (url == null) {
+      return;
+    }
+    String publicId = extractPublicId(url);
+    Cloudinary cloudinary = new Cloudinary(cloudinaryUrl);
+    cloudinary.api().deleteResources(Arrays.asList(publicId),
+            ObjectUtils.asMap("type", "upload", "resource_type", "video"));
+  }
+
+  public void deleteImage(String url) throws Exception {
+    if (url == null) {
+      return;
+    }
+    String publicId = extractPublicId(url);
+    Cloudinary cloudinary = new Cloudinary(cloudinaryUrl);
+    cloudinary.api().deleteResources(Arrays.asList(publicId),
+            ObjectUtils.asMap("type", "upload", "resource_type", "image"));
+  }
+
+  private String extractPublicId(String url) {
+    String baseUrl = "image/upload/";
+    int start = url.indexOf(baseUrl) + baseUrl.length();
+
+    if (start <= baseUrl.length()) {
+      start = url.indexOf("video/upload/") + baseUrl.length();
+    }
+
+    String pathWithVersion = url.substring(start);
+    pathWithVersion = pathWithVersion.replaceFirst("v\\d+/", "");
+    int end = pathWithVersion.lastIndexOf(".");
+    return (end == -1) ? pathWithVersion : pathWithVersion.substring(0, end);
+  }
 }
