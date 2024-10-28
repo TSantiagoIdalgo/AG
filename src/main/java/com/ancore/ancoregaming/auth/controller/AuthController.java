@@ -1,15 +1,16 @@
-package com.ancore.ancoregaming.auth;
+package com.ancore.ancoregaming.auth.controller;
 
+import com.ancore.ancoregaming.auth.services.AuthService;
 import com.ancore.ancoregaming.auth.dtos.JwtResponse;
 import com.ancore.ancoregaming.auth.dtos.LoginDTO;
 import com.ancore.ancoregaming.common.ApiResponse;
-import com.ancore.ancoregaming.common.ResponseMessage;
-import com.ancore.ancoregaming.user.dtos.UserDTO;
+import com.ancore.ancoregaming.user.dtos.CreateUserDTO;
 import com.ancore.ancoregaming.user.model.User;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,9 +26,9 @@ public class AuthController {
   private AuthService authService;
 
   @PostMapping("/register")
-  public ResponseEntity<ApiResponse<User>> register(@Valid @RequestBody UserDTO user) {
+  public ResponseEntity<ApiResponse<User>> register(@Valid @RequestBody CreateUserDTO user) {
     User userResponse = authService.createUser(user);
-    ApiResponse<User> response = new ApiResponse<>(ResponseMessage.CREATED, userResponse, null);
+    ApiResponse<User> response = new ApiResponse<>(HttpStatus.CREATED, userResponse, null);
     return ResponseEntity.status(201).body(response);
   }
 
@@ -40,7 +41,7 @@ public class AuthController {
     res.addCookie(jwtCookie);
     res.addCookie(refreshJwtCookie);
 
-    ApiResponse response = new ApiResponse<>(ResponseMessage.OK, null, null);
+    ApiResponse response = new ApiResponse<>(HttpStatus.OK, null, null);
     return ResponseEntity.status(200).body(response);
   }
 
@@ -58,7 +59,7 @@ public class AuthController {
     }
     SecurityContextHolder.clearContext();
 
-    ApiResponse response = new ApiResponse<>(ResponseMessage.OK, null, null);
+    ApiResponse response = new ApiResponse<>(HttpStatus.OK, null, null);
     return ResponseEntity.status(200).body(response);
   }
 

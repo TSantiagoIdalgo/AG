@@ -1,6 +1,6 @@
 package com.ancore.ancoregaming.config.filters;
 
-import com.ancore.ancoregaming.auth.JwtService;
+import com.ancore.ancoregaming.auth.services.JwtService;
 import com.ancore.ancoregaming.user.model.User;
 import com.ancore.ancoregaming.user.repositories.IUserRepository;
 import jakarta.servlet.FilterChain;

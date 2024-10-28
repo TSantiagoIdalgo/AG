@@ -18,6 +18,7 @@ public class ProductDTO {
   public List<Platform> platforms;
   public String developer;
   public List<Genre> genres;
+  public List<String> tags;
   public boolean disabled;
   public int stock;
   public BigDecimal price;

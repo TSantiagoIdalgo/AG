@@ -1,8 +1,9 @@
 package com.ancore.ancoregaming.user.services.user;
 
-import com.ancore.ancoregaming.user.repositories.IUserRepository;
-import com.ancore.ancoregaming.auth.JwtService;
+import com.ancore.ancoregaming.auth.services.JwtService;
+import com.ancore.ancoregaming.user.dtos.UpdateUserDTO;
 import com.ancore.ancoregaming.user.model.User;
+import com.ancore.ancoregaming.user.repositories.IUserRepository;
 import io.jsonwebtoken.JwtException;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
@@ -47,13 +48,13 @@ public class UserService implements IUserService {
   }
 
   @Override
-  public User updateUser(String userId, User user) {
+  public User updateUser(String userId, UpdateUserDTO updateUser) {
     User userFound = this.findUser(userId);
-    if (user.getUsername() != null) {
-      userFound.setUsername(user.getUsername());
+    if (updateUser.getUsername().isPresent()) {
+      userFound.setUsername(updateUser.getUsername().get());
     }
-    if (user.getEmail() != null) {
-      userFound.setEmail(user.getEmail());
+    if (updateUser.getEmail().isPresent()) {
+      userFound.setEmail(updateUser.getEmail().get());
     }
     this.userRepository.save(userFound);
 

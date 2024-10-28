@@ -31,7 +31,7 @@ public class Product {
   @Column(length = 128)
   private String name;
 
-  @Column//(columnDefinition = "TEXT")
+  @Column(columnDefinition = "TEXT")
   private String description;
 
   @ManyToMany(fetch = FetchType.LAZY)
@@ -52,6 +52,10 @@ public class Product {
           inverseJoinColumns = @JoinColumn(name = "genre_name")
   )
   private List<Genre> genres;
+
+  @ElementCollection
+  @CollectionTable(name = "product_tags", joinColumns = @JoinColumn(name = "product_id"))
+  private List<String> tags;
 
   @Column
   private boolean disabled;
@@ -90,6 +94,7 @@ public class Product {
     this.platforms = builder.platforms;
     this.developer = builder.developer;
     this.genres = builder.genres;
+    this.tags = builder.tags;
     this.disabled = builder.disabled;
     this.stock = builder.stock;
     this.price = builder.price;
@@ -108,6 +113,7 @@ public class Product {
     private List<Platform> platforms;
     private String developer;
     private List<Genre> genres;
+    private List<String> tags;
     private boolean disabled;
     private int stock;
     private BigDecimal price;
@@ -188,14 +194,24 @@ public class Product {
       return this;
     }
 
+    public List<String> getTags() {
+      return tags;
+    }
+
+    public Builder setTags(List<String> tags) {
+      this.tags = tags;
+      return this;
+    }
+
     public Product build() {
       return new Product(this);
     }
+
   }
 
   @Override
   public String toString() {
-    return "Product{" + "id=" + id + ", name=" + name + ", platforms=" + platforms + ", developer=" + developer + ", genres=" + genres + ", disabled=" + disabled + ", stock=" + stock + ", price=" + price + ", mainImage=" + mainImage + ", backgroundImage=" + backgroundImage + ", images=" + images + ", discount=" + discount + ", reviews=" + reviews + '}';
+    return "Product{" + "id=" + id + ", name=" + name + ", description=" + description + ", platforms=" + platforms + ", developer=" + developer + ", genres=" + genres + ", tags=" + tags + ", disabled=" + disabled + ", stock=" + stock + ", price=" + price + ", mainImage=" + mainImage + ", trailer=" + trailer + ", backgroundImage=" + backgroundImage + ", images=" + images + ", discount=" + discount + ", reviews=" + reviews + '}';
   }
 
 }

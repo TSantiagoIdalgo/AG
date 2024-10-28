@@ -33,6 +33,7 @@ public class ProductService implements IProductService {
             .setPlatforms(this.platformService.bulkCreatePlatforms(product.platforms))
             .setDeveloper(product.developer)
             .setGenres(this.genreService.bulkCreateGenres(product.genres))
+            .setTags(product.tags)
             .setStock(product.stock)
             .setPrice(product.price)
             .setDisabled(product.disabled || false)

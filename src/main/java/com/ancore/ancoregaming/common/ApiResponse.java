@@ -1,24 +1,24 @@
 package com.ancore.ancoregaming.common;
 
-import java.util.Map;
+import org.springframework.http.HttpStatus;
 
 public class ApiResponse<T> {
 
-  private ResponseMessage responseMsg;
+  private HttpStatus responseMsg;
   private T data;
-  private Map<String, String> errors;
+  private ExceptionResponse error;
 
-  public ApiResponse(ResponseMessage responseMsg, T data, Map<String, String> errors) {
+  public ApiResponse(HttpStatus responseMsg, T data, ExceptionResponse error) {
     this.responseMsg = responseMsg;
     this.data = data;
-    this.errors = errors;
+    this.error = error;
   }
 
-  public ResponseMessage getResponseMsg() {
+  public HttpStatus getResponseMsg() {
     return responseMsg;
   }
 
-  public void setResponseMsg(ResponseMessage responseMsg) {
+  public void setResponseMsg(HttpStatus responseMsg) {
     this.responseMsg = responseMsg;
   }
 
@@ -30,12 +30,12 @@ public class ApiResponse<T> {
     this.data = data;
   }
 
-  public Map<String, String> getErrors() {
-    return errors;
+  public ExceptionResponse getError() {
+    return error;
   }
 
-  public void setErrors(Map<String, String> errors) {
-    this.errors = errors;
+  public void setError(ExceptionResponse error) {
+    this.error = error;
   }
 
 }

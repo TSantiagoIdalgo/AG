@@ -27,6 +27,10 @@ public class CreateProductDTO {
   @Size(min = 1)
   public List<Genre> genres;
 
+  @NotNull(message = "The product must have at least one tag")
+  @Size(min = 1)
+  public List<String> tags;
+
   public boolean disabled;
 
   @NotNull(message = "Product stock is required")
@@ -42,7 +46,7 @@ public class CreateProductDTO {
 
   @Override
   public String toString() {
-    return "ProductDTO{" + "name=" + name + ", platforms=" + platforms + ", developer=" + developer + ", genres=" + genres + ", disabled=" + disabled + ", stock=" + stock + ", price=" + price + ", discount=" + discount + '}';
+    return "CreateProductDTO{" + "name=" + name + ", description=" + description + ", platforms=" + platforms + ", developer=" + developer + ", genres=" + genres + ", tags=" + tags + ", disabled=" + disabled + ", stock=" + stock + ", price=" + price + ", discount=" + discount + '}';
   }
 
 }

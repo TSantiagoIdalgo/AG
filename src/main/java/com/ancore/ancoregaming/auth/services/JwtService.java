@@ -1,4 +1,4 @@
-package com.ancore.ancoregaming.auth;
+package com.ancore.ancoregaming.auth.services;
 
 import com.ancore.ancoregaming.user.model.User;
 import io.jsonwebtoken.Claims;

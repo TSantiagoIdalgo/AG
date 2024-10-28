@@ -1,8 +1,8 @@
-package com.ancore.ancoregaming.auth;
+package com.ancore.ancoregaming.auth.services;
 
 import com.ancore.ancoregaming.auth.dtos.JwtResponse;
 import com.ancore.ancoregaming.auth.dtos.LoginDTO;
-import com.ancore.ancoregaming.user.dtos.UserDTO;
+import com.ancore.ancoregaming.user.dtos.CreateUserDTO;
 import com.ancore.ancoregaming.user.model.Role;
 import com.ancore.ancoregaming.user.model.User;
 import com.ancore.ancoregaming.user.repositories.IUserRepository;
@@ -26,14 +26,14 @@ public class AuthService {
   private final JwtService jwtService;
   private final AuthenticationManager authManager;
 
-  public User createUser(UserDTO user) {
+  public User createUser(CreateUserDTO user) {
     String passwordHash = passwordEncoder.encode(user.getPassword());
     List<Role> roles = new ArrayList<>();
-    Role role = roleService.findRoleByName("ROLE_USER");
+    Role role = roleService.findRoleByName("ROLE_ADMIN");
     if (role == null) {
-      roleService.createRole("ROLE_USER");
+      Role newRole = roleService.createRole("ROLE_ADMIN");
+      roles.add(newRole);
     }
-    roles.add(role);
     User newUser = new User(user.getUsername(), user.getEmail(), passwordHash, false, roles);
     this.userRepository.save(newUser);
 
