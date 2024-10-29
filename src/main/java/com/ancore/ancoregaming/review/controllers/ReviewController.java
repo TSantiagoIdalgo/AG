@@ -42,6 +42,17 @@ public class ReviewController {
     return ResponseEntity.status(200).body(response);
   }
 
+  @GetMapping("/product/{productId}")
+  public ResponseEntity<ApiResponse<List<ReviewDTO>>> getAllProductReviews(@PathVariable String productId) {
+    List<Review> reviews = this.reviewService.findProductReviews(productId);
+    List<ReviewDTO> reviewsDTO = modelMapper.map(
+            reviews,
+            new TypeToken<List<ReviewDTO>>() {
+            }.getType());
+    ApiResponse<List<ReviewDTO>> response = new ApiResponse<>(HttpStatus.OK, reviewsDTO, null);
+    return ResponseEntity.status(200).body(response);
+  }
+
   @GetMapping("/{reviewId}")
   public ResponseEntity<ApiResponse<ReviewDTO>> getReview(@PathVariable String reviewId) {
     Review review = this.reviewService.findReview(reviewId);

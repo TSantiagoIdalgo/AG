@@ -16,7 +16,9 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ReviewService implements IReviewService {
 
   @Autowired
@@ -49,7 +51,12 @@ public class ReviewService implements IReviewService {
 
   @Override
   public List<Review> findProductReviews(String productId) {
-    return null;
+    List<Review> reviews = this.reviewRepository.findByProductId(UUID.fromString(productId));
+    if (reviews.isEmpty()) {
+      throw new EntityNotFoundException("The product has no reviews");
+    }
+
+    return reviews;
   }
 
   @Override
@@ -63,7 +70,7 @@ public class ReviewService implements IReviewService {
             .setProduct(product)
             .setUser(user)
             .build();
-
+    this.reviewRepository.save(review);
     return review;
   }
 

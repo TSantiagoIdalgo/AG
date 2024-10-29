@@ -27,9 +27,6 @@ public class Cart {
   @Column
   private BigDecimal total;
 
-  @Column
-  private boolean cartIsPaid = false;
-
   @OneToOne
   private User user;
 
@@ -39,11 +36,36 @@ public class Cart {
   public Cart() {
   }
 
-  public Cart(UUID id, BigDecimal total, User user, List<CartItem> items) {
-    this.id = UUID.randomUUID();
-    this.total = total;
-    this.user = user;
-    this.items = items;
+  private Cart(Builder builder) {
+    this.total = builder.total;
+    this.user = builder.user;
+    this.items = builder.items;
   }
 
+  public static class Builder {
+
+    private BigDecimal total;
+    private User user;
+    private List<CartItem> items;
+
+    public Builder setTotal(BigDecimal total) {
+      this.total = total;
+      return this;
+    }
+
+    public Builder setUser(User user) {
+      this.user = user;
+      return this;
+    }
+
+    public Builder setItems(List<CartItem> items) {
+      this.items = items;
+      return this;
+    }
+
+    public Cart build() {
+      return new Cart(this);
+    }
+
+  }
 }
