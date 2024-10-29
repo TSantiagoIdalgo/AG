@@ -2,16 +2,28 @@ package com.ancore.ancoregaming.product.services.product;
 
 import com.ancore.ancoregaming.product.dtos.CreateProductDTO;
 import com.ancore.ancoregaming.product.dtos.FilesDTO;
+import com.ancore.ancoregaming.product.dtos.UpdateProductDTO;
+import com.ancore.ancoregaming.product.model.Genre;
+import com.ancore.ancoregaming.product.model.Platform;
 import com.ancore.ancoregaming.product.model.Product;
 import com.ancore.ancoregaming.product.repositories.IProductRepository;
 import com.ancore.ancoregaming.product.services.genre.GenreService;
 import com.ancore.ancoregaming.product.services.platform.PlatformService;
 import com.ancore.ancoregaming.product.services.upload.UploadService;
 import jakarta.persistence.EntityNotFoundException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class ProductService implements IProductService {
@@ -39,13 +51,14 @@ public class ProductService implements IProductService {
             .setDisabled(product.disabled || false)
             .setDiscount(product.discount)
             .build();
-    Product productWithFiles = this.uploadProductFiles(newProduct, filesDTO);
+    Product productWithFiles = this.uploadProductFiles(newProduct, filesDTO, null);
     return productWithFiles;
   }
 
   @Override
-  public List<Product> findAll() {
-    return this.productRepository.findAll();
+  public Page<Product> findAll(int page, int size) {
+    Pageable pageable = PageRequest.of(page, size);
+    return productRepository.findAll(pageable);
   }
 
   @Override
@@ -72,34 +85,104 @@ public class ProductService implements IProductService {
       this.productRepository.delete(product);
     } catch (Exception ex) {
       this.productRepository.save(product);
+      throw new DataIntegrityViolationException("Error deleting entity: " + ex.getMessage());
     }
   }
 
   @Override
-  public Product updateProduct(String productId) {
-    throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+  public Product updateProductFields(String productId, UpdateProductDTO updateProduct, FilesDTO filesDTO) {
+    Product product = this.findProduct(productId);
+    for (Method method : updateProduct.getClass().getMethods()) {
+      if (method.getName().startsWith("get") && method.getReturnType().equals(Optional.class)) {
+        try {
+          Optional<?> value = (Optional<?>) method.invoke(updateProduct);
+          if (value != null) {
+            value.ifPresent(val -> setProductField(product, method.getName().substring(3), val));
+          }
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+          throw new RuntimeException("Error actualizando campos del producto: " + e.getMessage());
+        }
+      }
+    }
+
+    // Actualización explícita de las listas si están presentes
+    updateProduct.getTags().ifPresent(product::setTags);
+    updateProduct.getPlatforms().ifPresent(platforms -> {
+      List<Platform> platform = this.platformService.bulkCreatePlatforms(platforms);
+      product.setPlatforms(platform);
+    });
+    updateProduct.getGenres().ifPresent(genres -> {
+      List<Genre> genre = this.genreService.bulkCreateGenres(genres);
+      product.setGenres(genre);
+    });
+    Product productWithFilesUpdated = this.uploadProductFiles(product, filesDTO, updateProduct.getImages());
+    return productWithFilesUpdated;
   }
 
-  private Product uploadProductFiles(Product product, FilesDTO filesDTO) {
+  private void setProductField(Product product, String fieldName, Object value) {
     try {
-      String mainImageUrl = this.uploadService.uploadImage(filesDTO.getMainImage());
-      product.setMainImage(mainImageUrl);
-
-      String bgImageUrl = this.uploadService.uploadImage(filesDTO.getBackgroundImage());
-      product.setBackgroundImage(bgImageUrl);
-
-      String trailerUrl = this.uploadService.uploadVideo(filesDTO.getTrailer());
-      product.setTrailer(trailerUrl);
-
-      List<String> imagesUrls = this.uploadService.bulkUploadFiles(filesDTO.getImages());
-      product.setImages(imagesUrls);
-
-      this.productRepository.save(product);
-      return product;
-    } catch (Exception ex) {
-      this.productRepository.save(product);
-      return product;
+      if (value instanceof List || value == null) {
+        return;
+      }
+      Method setter = product.getClass().getMethod("set" + fieldName, value.getClass());
+      setter.invoke(product, value);
+    } catch (IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException | InvocationTargetException e) {
+      throw new RuntimeException("Error asignando el campo " + fieldName + "  " + e.getMessage());
     }
   }
 
+  private Product uploadProductFiles(Product product, FilesDTO filesDTO, Optional<List<String>> images) {
+    try {
+      product.setMainImage(updateMediaField(product.getMainImage(), filesDTO.getMainImage(), true));
+      product.setBackgroundImage(updateMediaField(product.getBackgroundImage(), filesDTO.getBackgroundImage(), true));
+      product.setTrailer(updateMediaField(product.getTrailer(), filesDTO.getTrailer(), false));
+      if (images.isPresent()) {
+        updateProductImages(product, filesDTO, images.get());
+      }
+
+      return this.productRepository.save(product);
+    } catch (Exception ex) {
+      System.out.println("ERROR: " + ex.getMessage());
+      return this.productRepository.save(product);
+    }
+  }
+
+  private void updateProductImages(Product product, FilesDTO filesDTO, List<String> images) throws Exception {
+    List<String> currentImages = product.getImages();
+    if (filesDTO.getImages() == null) {
+      return; // No images to upload
+    }
+    if (images == null) {
+      product.setImages(this.uploadService.bulkUploadFiles(filesDTO.getImages()));
+      return;
+    }
+
+    // Find missing images to delete and update product images
+    List<String> missingImages = new ArrayList<>(currentImages);
+    missingImages.removeAll(images);
+    this.uploadService.bulkDeleteFiles(missingImages);
+
+    List<String> updatedImages = new ArrayList<>(images);
+    List<String> newImagesUrls = this.uploadService.bulkUploadFiles(filesDTO.getImages());
+    updatedImages.addAll(newImagesUrls);
+
+    product.setImages(updatedImages);
+  }
+
+  private String updateMediaField(String currentMediaUrl, MultipartFile newMediaFile, boolean isImage) throws Exception {
+    if (newMediaFile != null) {
+      // Si hay una imagen actual, la elimina
+      if (currentMediaUrl != null) {
+        if (isImage) {
+          this.uploadService.deleteImage(currentMediaUrl);
+        } else {
+          this.uploadService.deleteVideo(currentMediaUrl);
+        }
+      }
+      // Sube el nuevo archivo según el tipo (imagen o video)
+      return isImage ? uploadService.uploadImage(newMediaFile) : uploadService.uploadVideo(newMediaFile);
+    }
+    // Si no hay nuevo archivo, conserva el existente
+    return currentMediaUrl;
+  }
 }

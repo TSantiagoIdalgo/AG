@@ -1,27 +1,27 @@
 package com.ancore.ancoregaming.product.dtos;
 
-import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 public class FilesDTO {
 
-  @NotNull
   private MultipartFile mainImage;
   private MultipartFile trailer;
-  @NotNull
   private MultipartFile backgroundImage;
-  @NotNull
   private List<MultipartFile> images;
 
   public FilesDTO() {
   }
 
-  public FilesDTO(MultipartFile mainImage, MultipartFile trailer, MultipartFile backgroundImage, List<MultipartFile> images, String product) {
+  public FilesDTO(MultipartFile mainImage, MultipartFile trailer, MultipartFile backgroundImage, List<MultipartFile> images) {
     this.mainImage = mainImage;
     this.trailer = trailer;
     this.backgroundImage = backgroundImage;
     this.images = images;
+  }
+
+  public boolean hasNonNullFields() {
+    return mainImage != null || trailer != null || backgroundImage != null || (images instanceof List && !images.isEmpty());
   }
 
   public MultipartFile getMainImage() {

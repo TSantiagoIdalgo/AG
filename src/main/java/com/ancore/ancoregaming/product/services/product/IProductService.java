@@ -2,18 +2,19 @@ package com.ancore.ancoregaming.product.services.product;
 
 import com.ancore.ancoregaming.product.dtos.CreateProductDTO;
 import com.ancore.ancoregaming.product.dtos.FilesDTO;
+import com.ancore.ancoregaming.product.dtos.UpdateProductDTO;
 import com.ancore.ancoregaming.product.model.Product;
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface IProductService {
 
   public Product createProduct(CreateProductDTO product, FilesDTO filesDTO);
 
-  public List<Product> findAll();
+  public Page<Product> findAll(int page, int size);
 
   public Product findProduct(String productId);
 
   public void destroyProduct(String productId);
 
-  public Product updateProduct(String productId);
+  public Product updateProductFields(String productId, UpdateProductDTO updateProduct, FilesDTO filesDTO);
 }

@@ -33,6 +33,8 @@ public class AuthService {
     if (role == null) {
       Role newRole = roleService.createRole("ROLE_ADMIN");
       roles.add(newRole);
+    } else {
+      roles.add(role);
     }
     User newUser = new User(user.getUsername(), user.getEmail(), passwordHash, false, roles);
     this.userRepository.save(newUser);

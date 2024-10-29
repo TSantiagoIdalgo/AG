@@ -17,6 +17,9 @@ public class UploadService {
   private String cloudinaryUrl;
 
   public String uploadImage(MultipartFile file) throws Exception {
+    if (file == null) {
+      throw new Exception("File must not be empty");
+    }
     if (file.isEmpty()) {
       throw new Exception("File must not be empty");
     }
@@ -30,6 +33,9 @@ public class UploadService {
   }
 
   public String uploadVideo(MultipartFile video) throws Exception {
+    if (video == null) {
+      throw new Exception("File must not be empty");
+    }
     if (video.isEmpty()) {
       throw new Exception("File must not be empty");
     }
@@ -46,6 +52,9 @@ public class UploadService {
 
   public List<String> bulkUploadFiles(List<MultipartFile> files) {
     List<String> urls = new ArrayList<>();
+    if (files == null || !(files instanceof List)) {
+      return urls;
+    }
     try {
       for (MultipartFile file : files) {
         String url = this.uploadImage(file);
