@@ -26,7 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-@Configuration // Configuration es una annotation que indica que esta clase va a tener metodos que van a retornar un Bean, es decir, el resultado de los metodos Spring los guardara en su Context
+@Configuration
 @EnableWebSecurity // Habilita Spring Security en el proyecto
 @RequiredArgsConstructor
 @EnableMethodSecurity
@@ -35,7 +35,7 @@ public class SecurityConfig {
   private final IUserRepository userRepo;
   private final UserAuthorizationFilter userAuthorizationFilter;
 
-  @Bean // Este annotation le indica a Spring que la instancia que devuelve el metodo, la guarde en su context
+  @Bean // Este annotation le indica a Spring que la instancia que devuelve el metodo la guarde en su contexto
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http
             .csrf(AbstractHttpConfigurer::disable)

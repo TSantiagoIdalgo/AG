@@ -38,12 +38,49 @@ public class Review {
   public Review() {
   }
 
-  public Review(UUID id, String title, String comment, double rating, Product product) {
-    this.id = UUID.randomUUID();
-    this.title = title;
-    this.comment = comment;
-    this.rating = rating;
-    this.product = product;
+  private Review(Builder builder) {
+    this.title = builder.title;
+    this.comment = builder.comment;
+    this.rating = builder.rating;
+    this.product = builder.product;
+    this.user = builder.user;
   }
 
+  public static class Builder {
+
+    private String title;
+    private String comment;
+    private double rating;
+    private Product product;
+    private User user;
+
+    public Builder setTitle(String title) {
+      this.title = title;
+      return this;
+    }
+
+    public Builder setComment(String comment) {
+      this.comment = comment;
+      return this;
+    }
+
+    public Builder setRating(double rating) {
+      this.rating = rating;
+      return this;
+    }
+
+    public Builder setProduct(Product product) {
+      this.product = product;
+      return this;
+    }
+
+    public Builder setUser(User user) {
+      this.user = user;
+      return this;
+    }
+
+    public Review build() {
+      return new Review(this);
+    }
+  }
 }

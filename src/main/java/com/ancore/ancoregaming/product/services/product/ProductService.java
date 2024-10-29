@@ -142,7 +142,6 @@ public class ProductService implements IProductService {
 
       return this.productRepository.save(product);
     } catch (Exception ex) {
-      System.out.println("ERROR: " + ex.getMessage());
       return this.productRepository.save(product);
     }
   }
