@@ -13,20 +13,22 @@ public class CartItemDTO {
   private ProductDTO product;
   private int cuantity;
   private double price;
+  private boolean itemIsPaid;
 
   public CartItemDTO() {
   }
 
-  public CartItemDTO(UUID id, ProductDTO product, int cuantity, double price) {
+  public CartItemDTO(UUID id, ProductDTO product, int cuantity, double price, boolean itemIsPaid) {
     this.id = id;
     this.product = product;
     this.cuantity = cuantity;
     this.price = price;
+    this.itemIsPaid = itemIsPaid;
   }
 
   @Override
   public String toString() {
-    return "CartItemDTO{" + "id=" + id + ", product=" + product + ", cuantity=" + cuantity + ", price=" + price + '}';
+    return "CartItemDTO{" + "id=" + id + ", product=" + product + ", cuantity=" + cuantity + ", price=" + price + ", itemIsPaid=" + itemIsPaid + '}';
   }
 
 }

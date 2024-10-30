@@ -12,12 +12,11 @@ public class UserCartDTO {
 
   private UUID id;
   private BigDecimal total;
-  private boolean cartIsPaid;
   private List<CartItemDTO> items;
 
   @Override
   public String toString() {
-    return "UserCartDTO{" + "id=" + id + ", total=" + total + ", cartIsPaid=" + cartIsPaid + ", items=" + items + '}';
+    return "UserCartDTO{" + "id=" + id + ", total=" + total + ", items=" + items + '}';
   }
 
 }

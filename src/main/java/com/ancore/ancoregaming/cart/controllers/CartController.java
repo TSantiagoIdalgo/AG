@@ -35,30 +35,34 @@ public class CartController {
   }
 
   @GetMapping("/paid")
-  public ResponseEntity<ApiResponse<Cart>> getUserPaidProducts(@AuthenticationPrincipal UserDetails user) {
+  public ResponseEntity<ApiResponse<UserCartDTO>> getUserPaidProducts(@AuthenticationPrincipal UserDetails user) {
     Cart cart = this.cartService.getUserPaidProducts(user);
-    ApiResponse<Cart> response = new ApiResponse<>(HttpStatus.OK, cart, null);
+    UserCartDTO userCartDTO = modelMapper.map(cart, UserCartDTO.class);
+    ApiResponse<UserCartDTO> response = new ApiResponse<>(HttpStatus.OK, userCartDTO, null);
     return ResponseEntity.status(200).body(response);
   }
 
   @PostMapping("/increase/{productId}")
-  public ResponseEntity<ApiResponse<Cart>> increaseProductCart(@PathVariable String productId, @AuthenticationPrincipal UserDetails user) {
+  public ResponseEntity<ApiResponse<UserCartDTO>> increaseProductCart(@PathVariable String productId, @AuthenticationPrincipal UserDetails user) {
     Cart cart = this.cartService.increaseProducts(user, productId);
-    ApiResponse<Cart> response = new ApiResponse<>(HttpStatus.OK, cart, null);
+    UserCartDTO userCartDTO = modelMapper.map(cart, UserCartDTO.class);
+    ApiResponse<UserCartDTO> response = new ApiResponse<>(HttpStatus.OK, userCartDTO, null);
     return ResponseEntity.status(200).body(response);
   }
 
   @PostMapping("/decrease/{productId}")
-  public ResponseEntity<ApiResponse<Cart>> decreaseProductCart(@PathVariable String productId, @AuthenticationPrincipal UserDetails user) {
+  public ResponseEntity<ApiResponse<UserCartDTO>> decreaseProductCart(@PathVariable String productId, @AuthenticationPrincipal UserDetails user) {
     Cart cart = this.cartService.decreaseProduct(user, productId);
-    ApiResponse<Cart> response = new ApiResponse<>(HttpStatus.OK, cart, null);
+    UserCartDTO userCartDTO = modelMapper.map(cart, UserCartDTO.class);
+    ApiResponse<UserCartDTO> response = new ApiResponse<>(HttpStatus.OK, userCartDTO, null);
     return ResponseEntity.status(200).body(response);
   }
 
   @DeleteMapping("/delete/{productId}")
-  public ResponseEntity<ApiResponse<Cart>> deleteProductCart(@PathVariable String productId, @AuthenticationPrincipal UserDetails user) {
+  public ResponseEntity<ApiResponse<UserCartDTO>> deleteProductCart(@PathVariable String productId, @AuthenticationPrincipal UserDetails user) {
     Cart cart = this.cartService.removeProduct(user, productId);
-    ApiResponse<Cart> response = new ApiResponse<>(HttpStatus.OK, cart, null);
+    UserCartDTO userCartDTO = modelMapper.map(cart, UserCartDTO.class);
+    ApiResponse<UserCartDTO> response = new ApiResponse<>(HttpStatus.OK, userCartDTO, null);
     return ResponseEntity.status(200).body(response);
   }
 }

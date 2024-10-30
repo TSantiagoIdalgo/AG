@@ -21,9 +21,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CartService implements ICartService {
 
-  // TODOS
-  // ARREGLAR EL INCREASE: No suma el total al cart y agrega dos veces el CartItem cuando no hay cart
-  // ARREGLAR EL DECREASE: No resta el total al cart y si es 1 no borra el CartItem
   private final ICartRepository cartRepository;
   private final ICartItemRepository cartItemRepository;
   private final IUserService userService;
@@ -38,7 +35,7 @@ public class CartService implements ICartService {
     }
     Optional<Cart> cart = this.cartRepository.findUserCart(userCart.getId());
     if (cart.isEmpty()) {
-      throw new EntityNotFoundException("The user has no paid products");
+      throw new EntityNotFoundException("The user has no products");
     }
 
     return cart.get();
@@ -52,8 +49,8 @@ public class CartService implements ICartService {
 
     Cart userCart = findOrCreateUserCart(userEmail, user);
     CartItem cartItem = findOrCreateCartItem(userCart, product);
-    incrementCartItem(cartItem, product);
-    this.cartItemRepository.save(cartItem);
+    incrementCartItem(userCart, cartItem, product);
+
     return userCart;
   }
 
@@ -66,9 +63,8 @@ public class CartService implements ICartService {
     if (userCart == null) {
       throw new EntityNotFoundException("User cart not found");
     }
-    CartItem cartItem = findOrCreateCartItem(userCart, product);
-    decreaseCartItem(cartItem, product);
-    this.cartItemRepository.save(cartItem);
+    CartItem cartItem = this.findOrCreateCartItem(userCart, product);
+    this.decreaseCartItem(userCart, cartItem, product);
 
     return userCart;
   }
@@ -87,9 +83,10 @@ public class CartService implements ICartService {
       throw new EntityNotFoundException("Cart item not found");
     }
 
+    userCart.setTotal(userCart.getTotal().subtract(cartItem.get().getPrice()));
     this.cartItemRepository.delete(cartItem.get());
 
-    return userCart;
+    return this.cartRepository.save(userCart);
   }
 
   private Cart findUserCart(String userEmail) {
@@ -115,15 +112,13 @@ public class CartService implements ICartService {
   private CartItem createItem(Cart userCart, Product product) {
     CartItem newCartItem = new CartItem.Builder()
             .setCart(userCart)
-            .setCuantity(1)
-            .setPrice(product.getPrice())
+            .setCuantity(0)
+            .setPrice(BigDecimal.ZERO)
             .setProduct(product)
             .setItemIsPaid(false)
             .build();
     this.cartItemRepository.save(newCartItem);
     userCart.getItems().add(newCartItem);
-    userCart.getTotal().add(newCartItem.getPrice());
-    this.cartRepository.save(userCart);
 
     return newCartItem;
   }
@@ -151,19 +146,28 @@ public class CartService implements ICartService {
             .orElseGet(() -> createItem(cart, product)); // Crea el item si no existe
   }
 
-  private void incrementCartItem(CartItem item, Product product) {
+  private void incrementCartItem(Cart cart, CartItem item, Product product) {
     item.setCuantity(item.getCuantity() + 1);
     item.setPrice(item.getPrice().add(product.getPrice()));
+    cart.setTotal(cart.getTotal().add(product.getPrice()));
+
+    this.cartItemRepository.save(item);
+    this.cartRepository.save(cart);
   }
 
-  private void decreaseCartItem(CartItem item, Product product) {
+  private void decreaseCartItem(Cart cart, CartItem item, Product product) {
     int newQuantity = item.getCuantity() - 1;
 
     if (newQuantity <= 0) {
-      cartItemRepository.delete(item);
+      cart.setTotal(cart.getTotal().subtract(product.getPrice()));
+      this.cartItemRepository.delete(item);
+      this.cartRepository.save(cart);
     } else {
       item.setCuantity(newQuantity);
       item.setPrice(item.getPrice().subtract(product.getPrice()));
+      cart.setTotal(cart.getTotal().subtract(product.getPrice()));
+      this.cartItemRepository.save(item);
+      this.cartRepository.save(cart);
     }
   }
 
