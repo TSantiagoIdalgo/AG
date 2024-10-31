@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/whitelist")
 public class WhitelistController {
 
+  // TODOS
+  // Crear DTOs para reducir la cantidad de informacion que se envia al cliente
   @Autowired
   private IWhiteListService whitelistService;
   private final ModelMapper modelMapper = new ModelMapper();
@@ -37,6 +39,15 @@ public class WhitelistController {
     return ResponseEntity.status(200).body(response);
   }
 
+  @GetMapping("/product/{productId}")
+  public ResponseEntity<ApiResponse<WhiteListDTO>> findWhiteListByProduct(@AuthenticationPrincipal UserDetails user, @PathVariable String productId) {
+    Whitelist userWhiteList = this.whitelistService.findByUserAndProduct(user.getUsername(), productId);
+    WhiteListDTO userWhitelistDTO = modelMapper.map(userWhiteList, WhiteListDTO.class);
+    ApiResponse<WhiteListDTO> response = new ApiResponse<>(HttpStatus.OK, userWhitelistDTO, null);
+
+    return ResponseEntity.status(200).body(response);
+  }
+
   @GetMapping("/user")
   public ResponseEntity<ApiResponse<WhiteListDTO>> findWhiteListByUser(@AuthenticationPrincipal UserDetails user) {
     Whitelist userWhiteList = this.whitelistService.findUserWhiteList(user.getUsername());
@@ -47,7 +58,7 @@ public class WhitelistController {
   }
 
   @PostMapping("/{productId}")
-  public ResponseEntity<ApiResponse<WhiteListDTO>> addProduct(@AuthenticationPrincipal UserDetails user, @PathVariable String productId) {
+  public ResponseEntity<ApiResponse<WhiteListDTO>> addProduct(@AuthenticationPrincipal UserDetails user, @PathVariable String productId) throws Exception {
     Whitelist userWhiteList = this.whitelistService.addProductToWhitelist(user.getUsername(), productId);
     WhiteListDTO userWhitelistDTO = modelMapper.map(userWhiteList, WhiteListDTO.class);
     ApiResponse<WhiteListDTO> response = new ApiResponse<>(HttpStatus.OK, userWhitelistDTO, null);

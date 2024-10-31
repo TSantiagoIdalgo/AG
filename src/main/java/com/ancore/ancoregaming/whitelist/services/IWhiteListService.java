@@ -9,7 +9,9 @@ public interface IWhiteListService {
 
   public Whitelist findUserWhiteList(String userId);
 
-  public Whitelist addProductToWhitelist(String userId, String productId);
+  public Whitelist findByUserAndProduct(String userId, String productId);
+
+  public Whitelist addProductToWhitelist(String userId, String productId) throws Exception;
 
   public Whitelist removeProductFromWhitelist(String userId, String productId);
 }
