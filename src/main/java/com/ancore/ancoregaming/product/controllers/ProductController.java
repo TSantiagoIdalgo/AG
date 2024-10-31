@@ -38,7 +38,6 @@ public class ProductController {
   @GetMapping("/")
   public ResponseEntity<ApiResponse<Page<Product>>> findProducts(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
     Page<Product> products = this.productService.findAll(page, size);
-
     ApiResponse<Page<Product>> response = new ApiResponse<>(HttpStatus.OK, products, null);
     return ResponseEntity.status(200).body(response);
   }
