@@ -23,8 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/whitelist")
 public class WhitelistController {
 
-  // TODOS
-  // Crear DTOs para reducir la cantidad de informacion que se envia al cliente
   @Autowired
   private IWhiteListService whitelistService;
   private final ModelMapper modelMapper = new ModelMapper();
