@@ -13,5 +13,7 @@ public interface ICartService {
 
   public Cart getUserPaidProducts(UserDetails userDetails);
 
+  public Cart getCartById(String cartId);
+
   public Cart getUserCart(UserDetails userDetails);
 }

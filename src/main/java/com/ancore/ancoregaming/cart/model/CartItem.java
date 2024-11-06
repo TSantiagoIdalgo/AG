@@ -85,4 +85,10 @@ public class CartItem {
       return new CartItem(this);
     }
   }
+
+  @Override
+  public String toString() {
+    return "CartItem{" + "id=" + id + ", cuantity=" + cuantity + ", price=" + price + ", itemIsPaid=" + itemIsPaid + '}';
+  }
+
 }

@@ -9,11 +9,14 @@ import org.springframework.data.repository.query.Param;
 
 public interface ICartRepository extends JpaRepository<Cart, UUID> {
 
-  public Cart findByUserEmail(String userEmail);
+  public Optional<Cart> findByUserEmail(@Param("userEmail") String userEmail);
 
-  @Query("SELECT c FROM Cart c LEFT JOIN FETCH c.items i WHERE c.id = :cartId AND i.itemIsPaid = true")
-  public Optional<Cart> findByIdWithPaidItems(@Param("cartId") UUID cartId);
+  @Query("SELECT c FROM Cart c LEFT JOIN FETCH c.items i WHERE c.user.email = :userEmail AND i.itemIsPaid = false")
+  public Cart findByUserEmailAndUnpaidItems(@Param("userEmail") String userEmail);
+
+  @Query("SELECT c FROM Cart c LEFT JOIN FETCH c.items i WHERE c.user.email = :userEmail AND i.itemIsPaid = true")
+  public Optional<Cart> findByUserEmailWithPaidItems(@Param("userEmail") String userEmail);
 
   @Query("SELECT c FROM Cart c LEFT JOIN FETCH c.items i WHERE c.id = :cartId AND i.itemIsPaid = false")
-  public Optional<Cart> findUserCart(@Param("cartId") UUID cartId);
+  public Optional<Cart> findCartByIdWithoutItemsUnpaid(@Param("cartId") UUID cartId);
 }

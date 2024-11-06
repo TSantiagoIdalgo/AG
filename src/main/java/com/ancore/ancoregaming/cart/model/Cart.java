@@ -68,4 +68,10 @@ public class Cart {
     }
 
   }
+
+  @Override
+  public String toString() {
+    return "Cart{" + "id=" + id + ", total=" + total + ", user=" + user + ", items=" + items + '}';
+  }
+
 }
