@@ -3,6 +3,8 @@ package com.ancore.ancoregaming.payment.services;
 import com.ancore.ancoregaming.cart.model.Cart;
 import com.ancore.ancoregaming.cart.model.CartItem;
 import com.ancore.ancoregaming.cart.repositories.ICartRepository;
+import com.ancore.ancoregaming.payment.model.Payment;
+import com.ancore.ancoregaming.payment.repositories.IPaymentRepository;
 import com.ancore.ancoregaming.product.model.Product;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -28,6 +30,8 @@ public class CheckoutService {
 
   @Autowired
   private ICartRepository cartRepository;
+  @Autowired
+  private IPaymentRepository paymentRepository;
 
   public Session createCheckoutSession(UserDetails userDetails) throws StripeException {
     Cart userCart = this.cartRepository.findByUserEmailAndUnpaidItems(userDetails.getUsername());
@@ -79,10 +83,29 @@ public class CheckoutService {
           item.setItemIsPaid(true);
 
         });
+        this.generatePaymentReceipt(sessionNode, userCart);
         userCart.setTotal(BigDecimal.ZERO);
+        userCart.setSubtotal(BigDecimal.ZERO);
         System.out.println("PAGO EXITOSO CON SESSIONID: " + sessionId);
       }
     }
+  }
+
+  private Payment generatePaymentReceipt(JsonNode sessionNode, Cart userCart) {
+    String stripePaymentId = sessionNode.get("id").asText();
+    String status = sessionNode.get("payment_status").asText();
+    String currency = sessionNode.get("currency").asText();
+
+    Payment payment = new Payment.Builder(stripePaymentId)
+            .setUserEmail(userCart.getUser().getEmail())
+            .setPaymentStatus(status)
+            .setCartId(userCart.getId())
+            .setCurrency(currency)
+            .setTotal(userCart.getTotal())
+            .setSubtotal(userCart.getSubtotal())
+            .build();
+
+    return this.paymentRepository.save(payment);
   }
 
   private Map getProductData(Product product, int cuantity) {

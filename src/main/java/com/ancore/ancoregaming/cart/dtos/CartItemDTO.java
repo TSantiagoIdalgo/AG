@@ -1,6 +1,7 @@
 package com.ancore.ancoregaming.cart.dtos;
 
 import com.ancore.ancoregaming.product.dtos.ProductDTO;
+import java.math.BigDecimal;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,23 +13,26 @@ public class CartItemDTO {
   private UUID id;
   private ProductDTO product;
   private int cuantity;
-  private double price;
+  private BigDecimal total;
+
+  private BigDecimal subtotal;
   private boolean itemIsPaid;
 
   public CartItemDTO() {
   }
 
-  public CartItemDTO(UUID id, ProductDTO product, int cuantity, double price, boolean itemIsPaid) {
+  public CartItemDTO(UUID id, ProductDTO product, int cuantity, BigDecimal total, BigDecimal subtotal, boolean itemIsPaid) {
     this.id = id;
     this.product = product;
     this.cuantity = cuantity;
-    this.price = price;
+    this.total = total;
+    this.subtotal = subtotal;
     this.itemIsPaid = itemIsPaid;
   }
 
   @Override
   public String toString() {
-    return "CartItemDTO{" + "id=" + id + ", product=" + product + ", cuantity=" + cuantity + ", price=" + price + ", itemIsPaid=" + itemIsPaid + '}';
+    return "CartItemDTO{" + "id=" + id + ", product=" + product + ", cuantity=" + cuantity + ", total=" + total + ", subtotal=" + subtotal + ", itemIsPaid=" + itemIsPaid + '}';
   }
 
 }

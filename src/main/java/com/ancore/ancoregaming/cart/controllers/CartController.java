@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/cart")
 public class CartController {
 
-  // Mapear todos los controllers a UserCartDTO
   @Autowired
   private ICartService cartService;
   private final ModelMapper modelMapper = new ModelMapper();
@@ -58,7 +57,7 @@ public class CartController {
     return ResponseEntity.status(200).body(response);
   }
 
-  @DeleteMapping("/delete/{productId}")
+  @DeleteMapping("/remove/{productId}")
   public ResponseEntity<ApiResponse<UserCartDTO>> deleteProductCart(@PathVariable String productId, @AuthenticationPrincipal UserDetails user) {
     Cart cart = this.cartService.removeProduct(user, productId);
     UserCartDTO userCartDTO = modelMapper.map(cart, UserCartDTO.class);

@@ -27,6 +27,8 @@ public class Cart {
   @Column
   private BigDecimal total;
 
+  @Column
+  private BigDecimal subtotal;
   @OneToOne
   private User user;
 
@@ -38,6 +40,7 @@ public class Cart {
 
   private Cart(Builder builder) {
     this.total = builder.total;
+    this.subtotal = builder.subtotal;
     this.user = builder.user;
     this.items = builder.items;
   }
@@ -45,11 +48,17 @@ public class Cart {
   public static class Builder {
 
     private BigDecimal total;
+    private BigDecimal subtotal;
     private User user;
     private List<CartItem> items;
 
     public Builder setTotal(BigDecimal total) {
       this.total = total;
+      return this;
+    }
+
+    public Builder setSubtotal(BigDecimal subtotal) {
+      this.subtotal = subtotal;
       return this;
     }
 
@@ -71,7 +80,7 @@ public class Cart {
 
   @Override
   public String toString() {
-    return "Cart{" + "id=" + id + ", total=" + total + ", user=" + user + ", items=" + items + '}';
+    return "Cart{" + "id=" + id + ", total=" + total + ", subtotal=" + subtotal + ", items=" + items + '}';
   }
 
 }

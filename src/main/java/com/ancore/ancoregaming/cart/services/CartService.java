@@ -91,7 +91,8 @@ public class CartService implements ICartService {
     }
 
     userCart.getItems().remove(cartItem.get());  // Elimina el CartItem del Cart
-    userCart.setTotal(userCart.getTotal().subtract(cartItem.get().getPrice()));
+    userCart.setSubtotal(userCart.getSubtotal().subtract(cartItem.get().getSubtotal()));
+    userCart.setTotal(userCart.getTotal().subtract(cartItem.get().getTotal()));
     this.cartItemRepository.deleteById(cartItem.get().getId());
 
     return userCart;
@@ -132,7 +133,8 @@ public class CartService implements ICartService {
     CartItem newCartItem = new CartItem.Builder()
             .setCart(userCart)
             .setCuantity(0)
-            .setPrice(BigDecimal.ZERO)
+            .setTotal(BigDecimal.ZERO)
+            .setSubtotal(BigDecimal.ZERO)
             .setProduct(product)
             .setItemIsPaid(false)
             .build();
@@ -145,6 +147,7 @@ public class CartService implements ICartService {
     List<CartItem> cartItems = new ArrayList<>();
     Cart userCart = new Cart.Builder()
             .setTotal(BigDecimal.ZERO)
+            .setSubtotal(BigDecimal.ZERO)
             .setItems(cartItems)
             .setUser(user)
             .build();
@@ -168,8 +171,12 @@ public class CartService implements ICartService {
 
   private void incrementCartItem(Cart cart, CartItem item, Product product) {
     item.setCuantity(item.getCuantity() + 1);
-    item.setPrice(item.getPrice().add(product.getPrice()));
-    cart.setTotal(cart.getTotal().add(product.getPrice()));
+
+    item.setSubtotal(item.getSubtotal().add(product.getPrice()));
+    item.setTotal(item.getTotal().add(getFinalPrice(product.getPrice(), product.getDiscount())));
+
+    cart.setSubtotal(cart.getSubtotal().add(product.getPrice()));
+    cart.setTotal(cart.getTotal().add(getFinalPrice(product.getPrice(), product.getDiscount())));
   }
 
   private void decreaseCartItem(Cart cart, CartItem item, Product product) {
@@ -177,13 +184,22 @@ public class CartService implements ICartService {
 
     if (newQuantity <= 0) {
       cart.getItems().remove(item);  // Elimina el CartItem del Cart
-      cart.setTotal(cart.getTotal().subtract(product.getPrice()));
+      cart.setSubtotal(cart.getSubtotal().subtract(product.getPrice()));
+      cart.setTotal(cart.getTotal().subtract(getFinalPrice(product.getPrice(), product.getDiscount())));
       this.cartItemRepository.deleteById(item.getId());
     } else {
       item.setCuantity(newQuantity);
-      item.setPrice(item.getPrice().subtract(product.getPrice()));
-      cart.setTotal(cart.getTotal().subtract(product.getPrice()));
+      item.setSubtotal(item.getSubtotal().subtract(product.getPrice()));
+      item.setTotal(item.getTotal().subtract(getFinalPrice(product.getPrice(), product.getDiscount())));
+
+      cart.setSubtotal(cart.getSubtotal().subtract(product.getPrice()));
+      cart.setTotal(cart.getTotal().subtract(getFinalPrice(product.getPrice(), product.getDiscount())));
     }
   }
 
+  private BigDecimal getFinalPrice(BigDecimal amount, BigDecimal d) {
+    BigDecimal percentage = new BigDecimal("100");
+    BigDecimal discount = percentage.subtract(d), multiplyAmount = amount.multiply(discount);
+    return multiplyAmount.divide(percentage);
+  }
 }

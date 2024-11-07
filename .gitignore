@@ -1,5 +1,6 @@
 # Archivos y carpetas comunes a ignorar en Java y Spring Boot
 target/
+uploads/
 bin/
 out/
 build/
@@ -11,7 +12,6 @@ application.properties
 mvnw*
 gradlew*
 !gradle/wrapper/gradle-wrapper.jar
-
 # Archivos de logs
 *.log
 *.log.*

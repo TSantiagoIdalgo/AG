@@ -33,7 +33,9 @@ public class CartItem {
   @Column
   private int cuantity;
   @Column
-  private BigDecimal price;
+  private BigDecimal total;
+  @Column
+  private BigDecimal subtotal;
   @Column
   private boolean itemIsPaid;
 
@@ -44,7 +46,8 @@ public class CartItem {
     this.cart = builder.cart;
     this.product = builder.product;
     this.cuantity = builder.cuantity;
-    this.price = builder.price;
+    this.total = builder.total;
+    this.subtotal = builder.subtotal;
     this.itemIsPaid = builder.itemIsPaid;
   }
 
@@ -53,7 +56,8 @@ public class CartItem {
     private Cart cart;
     private Product product;
     private int cuantity;
-    private BigDecimal price;
+    private BigDecimal total;
+    private BigDecimal subtotal;
     private boolean itemIsPaid;
 
     public Builder setCart(Cart cart) {
@@ -71,8 +75,13 @@ public class CartItem {
       return this;
     }
 
-    public Builder setPrice(BigDecimal price) {
-      this.price = price;
+    public Builder setTotal(BigDecimal total) {
+      this.total = total;
+      return this;
+    }
+
+    public Builder setSubtotal(BigDecimal subtotal) {
+      this.subtotal = subtotal;
       return this;
     }
 
@@ -88,7 +97,7 @@ public class CartItem {
 
   @Override
   public String toString() {
-    return "CartItem{" + "id=" + id + ", cuantity=" + cuantity + ", price=" + price + ", itemIsPaid=" + itemIsPaid + '}';
+    return "CartItem{" + "id=" + id + ", product=" + product + ", cuantity=" + cuantity + ", total=" + total + ", subtotal=" + subtotal + ", itemIsPaid=" + itemIsPaid + '}';
   }
 
 }
