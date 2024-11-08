@@ -1,4 +1,4 @@
-package com.ancore.ancoregaming.payment.model;
+package com.ancore.ancoregaming.checkout.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,7 +16,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-public class Payment {
+public class Checkout {
 
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
@@ -38,7 +38,7 @@ public class Payment {
   @Temporal(TemporalType.TIMESTAMP)
   private Date createdAt;
 
-  private Payment(Builder builder) {
+  private Checkout(Builder builder) {
     this.stripePaymentId = builder.stripePaymentId;
     this.total = builder.total;
     this.subTotal = builder.subtotal;
@@ -93,8 +93,8 @@ public class Payment {
       return this;
     }
 
-    public Payment build() {
-      return new Payment(this);
+    public Checkout build() {
+      return new Checkout(this);
     }
   }
 }

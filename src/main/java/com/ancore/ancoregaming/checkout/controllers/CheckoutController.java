@@ -1,9 +1,9 @@
-package com.ancore.ancoregaming.payment.controllers;
+package com.ancore.ancoregaming.checkout.controllers;
 
+import com.ancore.ancoregaming.checkout.dtos.CheckoutSessionDTO;
+import com.ancore.ancoregaming.checkout.services.CheckoutService;
 import com.ancore.ancoregaming.common.ApiResponse;
 import com.ancore.ancoregaming.common.ExceptionResponse;
-import com.ancore.ancoregaming.payment.dtos.CheckoutSessionDTO;
-import com.ancore.ancoregaming.payment.services.CheckoutService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/checkout")
-public class PaymentController {
+public class CheckoutController {
 
   @Autowired
   private CheckoutService checkoutService;
@@ -39,7 +39,7 @@ public class PaymentController {
   }
 
   @PostMapping("/webhook")
-  public ResponseEntity<ApiResponse<?>> handleStripeWebhook(@RequestBody String payload, @RequestHeader("Stripe-Signature") String sigHeader) {
+  public ResponseEntity<ApiResponse<?>> handleStripeWebhook(@RequestBody String payload, @RequestHeader("Stripe-Signature") String sigHeader) throws JsonProcessingException {
     Event event;
     try {
       event = Webhook.constructEvent(payload, sigHeader, endpointSecret);

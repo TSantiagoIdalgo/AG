@@ -66,7 +66,7 @@ public class ReviewService implements IReviewService {
     Review review = new Review.Builder()
             .setTitle(reviewDTO.getTitle())
             .setComment(reviewDTO.getComment())
-            .setRating(reviewDTO.getRating())
+            .setRating(reviewDTO.isRecommended())
             .setProduct(product)
             .setUser(user)
             .build();

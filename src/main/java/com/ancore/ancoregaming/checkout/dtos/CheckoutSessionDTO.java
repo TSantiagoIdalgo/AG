@@ -1,4 +1,4 @@
-package com.ancore.ancoregaming.payment.dtos;
+package com.ancore.ancoregaming.checkout.dtos;
 
 public class CheckoutSessionDTO {
 

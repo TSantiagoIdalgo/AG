@@ -17,22 +17,22 @@ public class ReviewDTO {
   private String comment;
   @NotNull
   @Positive
-  private double rating;
+  private boolean recommended;
   private UserDTO user;
 
   public ReviewDTO() {
   }
 
-  public ReviewDTO(String title, String comment, double rating, UserDTO user) {
+  public ReviewDTO(String title, String comment, boolean recommended, UserDTO user) {
     this.title = title;
     this.comment = comment;
-    this.rating = rating;
+    this.recommended = recommended;
     this.user = user;
   }
 
   @Override
   public String toString() {
-    return "ReviewDTO{" + ", title=" + title + ", comment=" + comment + ", rating=" + rating + ", user=" + user + '}';
+    return "ReviewDTO{" + ", title=" + title + ", comment=" + comment + ", recommended=" + recommended + ", user=" + user + '}';
   }
 
 }

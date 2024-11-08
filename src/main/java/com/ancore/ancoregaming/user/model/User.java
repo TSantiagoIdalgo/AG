@@ -1,6 +1,7 @@
 package com.ancore.ancoregaming.user.model;
 
 import com.ancore.ancoregaming.cart.model.Cart;
+import com.ancore.ancoregaming.checkout.model.StockReservation;
 import com.ancore.ancoregaming.whitelist.model.Whitelist;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -10,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.List;
@@ -47,6 +49,9 @@ public class User {
 
   @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
   private Cart cart;
+
+  @OneToMany(mappedBy = "user")
+  private List<StockReservation> stockReservation;
 
   public User() {
   }

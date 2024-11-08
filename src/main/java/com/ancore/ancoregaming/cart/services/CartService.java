@@ -98,20 +98,6 @@ public class CartService implements ICartService {
     return userCart;
   }
 
-  private Optional<Cart> findUserCart(String userEmail) {
-    Optional<Cart> cartFound = this.cartRepository.findByUserEmail(userEmail);
-
-    cartFound.ifPresent(cart -> {
-      List<CartItem> unpaidItems = cart.getItems()
-              .stream()
-              .filter(item -> !item.isItemIsPaid())
-              .collect(Collectors.toList());
-      cart.setItems(unpaidItems);
-    });
-
-    return cartFound;
-  }
-
   @Override
   public Cart getUserPaidProducts(UserDetails userDetails) {
     String userEmail = userDetails.getUsername();
@@ -127,6 +113,20 @@ public class CartService implements ICartService {
   public Cart getCartById(String cartId) {
     return this.cartRepository.findById(UUID.fromString(cartId))
             .orElseThrow(() -> new EntityNotFoundException("User cart not found"));
+  }
+
+  private Optional<Cart> findUserCart(String userEmail) {
+    Optional<Cart> cartFound = this.cartRepository.findByUserEmail(userEmail);
+
+    cartFound.ifPresent(cart -> {
+      List<CartItem> unpaidItems = cart.getItems()
+              .stream()
+              .filter(item -> !item.isItemIsPaid())
+              .collect(Collectors.toList());
+      cart.setItems(unpaidItems);
+    });
+
+    return cartFound;
   }
 
   private CartItem createItem(Cart userCart, Product product) {

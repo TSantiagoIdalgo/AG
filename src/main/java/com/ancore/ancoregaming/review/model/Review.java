@@ -24,10 +24,10 @@ public class Review {
   private UUID id;
   @Column(length = 64)
   private String title;
-  @Column
+  @Column(columnDefinition = "TEXT")
   private String comment;
   @Column
-  private double rating;
+  private boolean recommended;
 
   @ManyToOne
   private Product product;
@@ -41,7 +41,7 @@ public class Review {
   private Review(Builder builder) {
     this.title = builder.title;
     this.comment = builder.comment;
-    this.rating = builder.rating;
+    this.recommended = builder.recommended;
     this.product = builder.product;
     this.user = builder.user;
   }
@@ -50,7 +50,7 @@ public class Review {
 
     private String title;
     private String comment;
-    private double rating;
+    private boolean recommended;
     private Product product;
     private User user;
 
@@ -64,8 +64,8 @@ public class Review {
       return this;
     }
 
-    public Builder setRating(double rating) {
-      this.rating = rating;
+    public Builder setRating(boolean recommended) {
+      this.recommended = recommended;
       return this;
     }
 

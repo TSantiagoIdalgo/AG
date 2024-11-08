@@ -1,5 +1,6 @@
 package com.ancore.ancoregaming.product.model;
 
+import com.ancore.ancoregaming.checkout.model.StockReservation;
 import com.ancore.ancoregaming.review.model.Review;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -84,6 +85,9 @@ public class Product {
 
   @OneToMany(mappedBy = "product")
   private List<Review> reviews;
+
+  @OneToMany(mappedBy = "product")
+  private List<StockReservation> stockReservation;
 
   public Product() {
   }
