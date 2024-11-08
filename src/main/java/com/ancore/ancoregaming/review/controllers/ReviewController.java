@@ -2,6 +2,7 @@ package com.ancore.ancoregaming.review.controllers;
 
 import com.ancore.ancoregaming.common.ApiResponse;
 import com.ancore.ancoregaming.review.dtos.ReviewDTO;
+import com.ancore.ancoregaming.review.dtos.ReactionRequestDTO;
 import com.ancore.ancoregaming.review.dtos.UpdateReviewDTO;
 import com.ancore.ancoregaming.review.model.Review;
 import com.ancore.ancoregaming.review.services.IReviewService;
@@ -62,10 +63,7 @@ public class ReviewController {
   }
 
   @PostMapping("/{productId}")
-  public ResponseEntity<ApiResponse<ReviewDTO>> createReview(
-          @PathVariable String productId,
-          @Valid @RequestBody ReviewDTO reviewDTO,
-          @AuthenticationPrincipal UserDetails user) {
+  public ResponseEntity<ApiResponse<ReviewDTO>> createReview(@PathVariable String productId, @Valid @RequestBody ReviewDTO reviewDTO, @AuthenticationPrincipal UserDetails user) {
     Review newReview = this.reviewService.createReview(productId, reviewDTO, user);
     ReviewDTO newReviewDTO = modelMapper.map(newReview, ReviewDTO.class);
     ApiResponse<ReviewDTO> response = new ApiResponse<>(HttpStatus.OK, newReviewDTO, null);
@@ -87,5 +85,13 @@ public class ReviewController {
     ApiResponse<ReviewDTO> response = new ApiResponse<>(HttpStatus.OK, reviewDTO, null);
     return ResponseEntity.status(200).body(response);
 
+  }
+
+  @PostMapping("/reaction/")
+  public ResponseEntity<ApiResponse<ReviewDTO>> addReviewReaction(@RequestBody ReactionRequestDTO reviewReactionDTO, @AuthenticationPrincipal UserDetails user) {
+    Review review = this.reviewService.addReaction(user.getUsername(), reviewReactionDTO.getReviewId(), reviewReactionDTO.getReactionType());
+    ReviewDTO reviewDTO = modelMapper.map(review, ReviewDTO.class);
+    ApiResponse<ReviewDTO> response = new ApiResponse<>(HttpStatus.OK, reviewDTO, null);
+    return ResponseEntity.status(200).body(response);
   }
 }

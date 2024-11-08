@@ -73,7 +73,7 @@ public class RequirementsService implements IRequirementsService {
         try {
           Optional<?> value = (Optional<?>) method.invoke(requirementUpdate);
           if (value != null) {
-            value.ifPresent(val -> setProductField(requirement, method.getName().substring(3), val));
+            value.ifPresent(val -> setRequirementField(requirement, method.getName().substring(3), val));
           }
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
           throw new RuntimeException("Error actualizando campos del producto: " + e.getMessage());
@@ -92,7 +92,7 @@ public class RequirementsService implements IRequirementsService {
     return requirement;
   }
 
-  private void setProductField(Requirements requirement, String fieldName, Object value) {
+  private void setRequirementField(Requirements requirement, String fieldName, Object value) {
     try {
       if (value instanceof List || value == null) {
         return;

@@ -1,5 +1,6 @@
 package com.ancore.ancoregaming.review.services;
 
+import com.ancore.ancoregaming.review.dtos.ReactionType;
 import com.ancore.ancoregaming.review.dtos.ReviewDTO;
 import com.ancore.ancoregaming.review.dtos.UpdateReviewDTO;
 import com.ancore.ancoregaming.review.model.Review;
@@ -19,4 +20,6 @@ public interface IReviewService {
   public Review updateReview(String reviewId, UpdateReviewDTO updateReviewDTO);
 
   public Review deleteReview(String reviewId);
+
+  public Review addReaction(String userId, String reviewId, ReactionType reactionType);
 }

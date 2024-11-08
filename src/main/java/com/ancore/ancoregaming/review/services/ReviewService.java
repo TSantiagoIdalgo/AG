@@ -2,9 +2,12 @@ package com.ancore.ancoregaming.review.services;
 
 import com.ancore.ancoregaming.product.model.Product;
 import com.ancore.ancoregaming.product.services.product.IProductService;
+import com.ancore.ancoregaming.review.dtos.ReactionType;
 import com.ancore.ancoregaming.review.dtos.ReviewDTO;
 import com.ancore.ancoregaming.review.dtos.UpdateReviewDTO;
 import com.ancore.ancoregaming.review.model.Review;
+import com.ancore.ancoregaming.review.model.ReviewReaction;
+import com.ancore.ancoregaming.review.repositories.IReviewReactionRepository;
 import com.ancore.ancoregaming.review.repositories.IReviewRepository;
 import com.ancore.ancoregaming.user.model.User;
 import com.ancore.ancoregaming.user.services.user.IUserService;
@@ -27,6 +30,8 @@ public class ReviewService implements IReviewService {
   private IProductService productService;
   @Autowired
   private IUserService userService;
+  @Autowired
+  private IReviewReactionRepository reviewReactionRepository;
 
   @Override
   public List<Review> findAllReviews() {
@@ -90,6 +95,22 @@ public class ReviewService implements IReviewService {
       }
     }
     return this.reviewRepository.save(review);
+  }
+
+  @Override
+  public Review addReaction(String userId, String reviewId, ReactionType reactionType) {
+    Optional<ReviewReaction> existingReaction = reviewReactionRepository.findByUserEmailAndReviewId(userId, UUID.fromString(reviewId));
+    if (existingReaction.isPresent()) {
+      throw new IllegalStateException("User has already reacted to this review");
+    }
+
+    User user = this.userService.findUser(userId);
+    Review review = this.findReview(reviewId);
+
+    ReviewReaction reaction = new ReviewReaction(user, review, reactionType);
+
+    this.reviewReactionRepository.save(reaction);
+    return review;
   }
 
   @Override
