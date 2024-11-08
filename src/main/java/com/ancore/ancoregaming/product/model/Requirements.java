@@ -7,8 +7,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -35,11 +33,68 @@ public class Requirements {
   @Column
   private double storage;
 
-  @ManyToOne
-  @JoinColumn(name = "product_id")
-  private Product product;
-
   @Enumerated(EnumType.STRING)
   private RequirementType type;
+
+  public Requirements() {
+  }
+
+  private Requirements(Builder builder) {
+    this.OS = builder.OS;
+    this.memory = builder.memory;
+    this.graphics = builder.graphics;
+    this.Directx_v = builder.Directx_v;
+    this.storage = builder.storage;
+    this.type = builder.type;
+  }
+
+  public static class Builder {
+
+    private String OS;
+    private double memory;
+    private String graphics;
+    private double Directx_v;
+    private double storage;
+    private RequirementType type;
+
+    public Builder setOS(String OS) {
+      this.OS = OS;
+      return this;
+    }
+
+    public Builder setMemory(double memory) {
+      this.memory = memory;
+      return this;
+    }
+
+    public Builder setGraphics(String graphics) {
+      this.graphics = graphics;
+      return this;
+    }
+
+    public Builder setDirectx_v(double Directx_v) {
+      this.Directx_v = Directx_v;
+      return this;
+    }
+
+    public Builder setStorage(double storage) {
+      this.storage = storage;
+      return this;
+    }
+
+    public Builder setType(RequirementType type) {
+      this.type = type;
+      return this;
+    }
+
+    public Requirements build() {
+      return new Requirements(this);
+    }
+  }
+
+  @Override
+  public String toString() {
+    return "Requirements{" + "id=" + id + ", OS=" + OS + ", memory=" + memory + ", graphics=" + graphics + ", Directx_v=" + Directx_v + ", storage=" + storage + ", type=" + type + '}';
+  }
 
 }

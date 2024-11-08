@@ -9,6 +9,7 @@ import com.ancore.ancoregaming.product.model.Product;
 import com.ancore.ancoregaming.product.repositories.IProductRepository;
 import com.ancore.ancoregaming.product.services.genre.GenreService;
 import com.ancore.ancoregaming.product.services.platform.PlatformService;
+import com.ancore.ancoregaming.product.services.requirements.RequirementsService;
 import com.ancore.ancoregaming.product.services.upload.UploadService;
 import jakarta.persistence.EntityNotFoundException;
 import java.lang.reflect.InvocationTargetException;
@@ -36,6 +37,8 @@ public class ProductService implements IProductService {
   private IProductRepository productRepository;
   @Autowired
   private UploadService uploadService;
+  @Autowired
+  private RequirementsService requirementService;
 
   @Override
   public Product createProduct(CreateProductDTO product, FilesDTO filesDTO) {
@@ -45,7 +48,7 @@ public class ProductService implements IProductService {
             .setPlatforms(this.platformService.bulkCreatePlatforms(product.platforms))
             .setDeveloper(product.developer)
             .setFranchise(product.franchise)
-            // .setRequirements(product.requirements)
+            .setRequirements(this.requirementService.bulkCreateRequirements(product.requirements))
             .setGenres(this.genreService.bulkCreateGenres(product.genres))
             .setTags(product.tags)
             .setStock(product.stock)

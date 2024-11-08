@@ -5,6 +5,7 @@ import com.ancore.ancoregaming.product.repositories.IPlatformRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,8 +29,10 @@ public class PlatformService implements IPlatformService {
 
   @Override
   public List<Platform> bulkCreatePlatforms(List<Platform> platforms) {
-    platforms.forEach(platform -> this.createPlatform(platform));
-    return platforms;
+    return platforms
+            .stream()
+            .map((platform) -> this.createPlatform(platform))
+            .collect(Collectors.toList());
   }
 
   @Override

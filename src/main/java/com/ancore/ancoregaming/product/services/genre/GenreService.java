@@ -5,6 +5,7 @@ import com.ancore.ancoregaming.product.repositories.IGenreRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,8 +28,10 @@ public class GenreService implements IGenreService {
 
   @Override
   public List<Genre> bulkCreateGenres(List<Genre> genres) {
-    genres.forEach(genre -> this.createGenre(genre.getName()));
-    return genres;
+    return genres
+            .stream()
+            .map((genre) -> this.createGenre(genre.getName()))
+            .collect(Collectors.toList());
   }
 
   @Override

@@ -59,7 +59,12 @@ public class Product {
   )
   private List<Genre> genres;
 
-  @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+          name = "product_requirements",
+          joinColumns = @JoinColumn(name = "product_id"),
+          inverseJoinColumns = @JoinColumn(name = "requirement_id")
+  )
   private List<Requirements> requirements;
 
   @ElementCollection
