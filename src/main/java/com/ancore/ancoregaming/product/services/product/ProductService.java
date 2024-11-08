@@ -44,11 +44,13 @@ public class ProductService implements IProductService {
             .setDescription(product.description)
             .setPlatforms(this.platformService.bulkCreatePlatforms(product.platforms))
             .setDeveloper(product.developer)
+            .setFranchise(product.franchise)
+            // .setRequirements(product.requirements)
             .setGenres(this.genreService.bulkCreateGenres(product.genres))
             .setTags(product.tags)
             .setStock(product.stock)
             .setPrice(product.price)
-            .setDisabled(product.disabled || false)
+            .setDisabled(product.disabled)
             .setDiscount(product.discount)
             .build();
     Product productWithFiles = this.uploadProductFiles(newProduct, filesDTO, null);

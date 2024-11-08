@@ -2,6 +2,7 @@ package com.ancore.ancoregaming.product.dtos;
 
 import com.ancore.ancoregaming.product.model.Genre;
 import com.ancore.ancoregaming.product.model.Platform;
+import com.ancore.ancoregaming.product.model.Requirements;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
@@ -23,9 +24,15 @@ public class CreateProductDTO {
   @NotNull(message = "Developer name is required")
   public String developer;
 
+  @NotNull(message = "Franchise is required")
+  public String franchise;
+
   @NotNull(message = "Product genres are required")
   @Size(min = 1)
   public List<Genre> genres;
+
+  @NotNull(message = "Product requirements are required")
+  public List<Requirements> requirements;
 
   @NotNull(message = "The product must have at least one tag")
   @Size(min = 1)

@@ -2,6 +2,7 @@ package com.ancore.ancoregaming.product.model;
 
 import com.ancore.ancoregaming.checkout.model.StockReservation;
 import com.ancore.ancoregaming.review.model.Review;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -14,6 +15,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Version;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
@@ -46,6 +48,9 @@ public class Product {
   @Column(length = 50, nullable = false)
   private String developer;
 
+  @Column
+  private String franchise;
+
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
           name = "product_genres",
@@ -53,6 +58,9 @@ public class Product {
           inverseJoinColumns = @JoinColumn(name = "genre_name")
   )
   private List<Genre> genres;
+
+  @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Requirements> requirements;
 
   @ElementCollection
   @CollectionTable(name = "product_tags", joinColumns = @JoinColumn(name = "product_id"))
@@ -86,8 +94,11 @@ public class Product {
   @OneToMany(mappedBy = "product")
   private List<Review> reviews;
 
-  @OneToMany(mappedBy = "product")
+  @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
   private List<StockReservation> stockReservation;
+
+  @Version
+  private Long version;
 
   public Product() {
   }
@@ -97,7 +108,9 @@ public class Product {
     this.description = builder.description;
     this.platforms = builder.platforms;
     this.developer = builder.developer;
+    this.franchise = builder.franchise;
     this.genres = builder.genres;
+    this.requirements = builder.requirements;
     this.tags = builder.tags;
     this.disabled = builder.disabled;
     this.stock = builder.stock;
@@ -116,7 +129,9 @@ public class Product {
     private String description;
     private List<Platform> platforms;
     private String developer;
+    private String franchise;
     private List<Genre> genres;
+    private List<Requirements> requirements;
     private List<String> tags;
     private boolean disabled;
     private int stock;
@@ -145,6 +160,16 @@ public class Product {
 
     public Builder setDeveloper(String developer) {
       this.developer = developer;
+      return this;
+    }
+
+    public Builder setRequirements(List<Requirements> requirements) {
+      this.requirements = requirements;
+      return this;
+    }
+
+    public Builder setFranchise(String franchise) {
+      this.franchise = franchise;
       return this;
     }
 

@@ -23,7 +23,7 @@ public class StockReservationService {
   @Autowired
   private IProductRepository productRepository;
 
-  @Scheduled(cron = "0 */1 * * * *") // Cada 5 minutos
+  @Scheduled(cron = "0 */1 * * * *")
   @Transactional
   public void releaseExpiredReservations() {
     Instant now = Instant.now();
