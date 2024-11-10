@@ -22,4 +22,6 @@ public interface IReviewService {
   public Review deleteReview(String reviewId);
 
   public Review addReaction(String userId, String reviewId, ReactionType reactionType);
+
+  public Double getRecommendationPercentage(String productId);
 }

@@ -141,8 +141,10 @@ public class ProductService implements IProductService {
       product.setMainImage(updateMediaField(product.getMainImage(), filesDTO.getMainImage(), true));
       product.setBackgroundImage(updateMediaField(product.getBackgroundImage(), filesDTO.getBackgroundImage(), true));
       product.setTrailer(updateMediaField(product.getTrailer(), filesDTO.getTrailer(), false));
-      if (images.isPresent()) {
+      if (images != null) {
         updateProductImages(product, filesDTO, images.get());
+      } else if (filesDTO.hasNonNullFields()) {
+        updateProductImages(product, filesDTO, null);
       }
 
       return this.productRepository.save(product);

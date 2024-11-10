@@ -120,6 +120,11 @@ public class ReviewService implements IReviewService {
     return review;
   }
 
+  @Override
+  public Double getRecommendationPercentage(String productId) {
+    return this.reviewRepository.findRecommendationPercentageByProductId(UUID.fromString(productId));
+  }
+
   private void setReviewField(Review review, String fieldName, Object value) {
     try {
       if (value instanceof List || value == null) {
@@ -131,4 +136,5 @@ public class ReviewService implements IReviewService {
       throw new RuntimeException("Error asignando el campo " + fieldName + "  " + e.getMessage());
     }
   }
+
 }

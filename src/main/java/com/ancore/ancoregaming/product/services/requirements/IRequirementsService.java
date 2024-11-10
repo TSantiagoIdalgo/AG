@@ -1,13 +1,14 @@
 package com.ancore.ancoregaming.product.services.requirements;
 
+import com.ancore.ancoregaming.product.dtos.RequirementsDTO;
 import com.ancore.ancoregaming.product.model.Requirements;
 import java.util.List;
 
 public interface IRequirementsService {
 
-  public Requirements createRequirement(Requirements requirement);
+  public Requirements createRequirement(RequirementsDTO requirement);
 
-  public List<Requirements> bulkCreateRequirements(List<Requirements> requirements);
+  public List<Requirements> bulkCreateRequirements(List<RequirementsDTO> requirements);
 
   public List<Requirements> findAllRequirements();
 

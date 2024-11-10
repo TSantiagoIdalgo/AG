@@ -1,5 +1,6 @@
 package com.ancore.ancoregaming.product.services.requirements;
 
+import com.ancore.ancoregaming.product.dtos.RequirementsDTO;
 import com.ancore.ancoregaming.product.model.Requirements;
 import com.ancore.ancoregaming.product.repositories.IRequirementsRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -18,12 +19,13 @@ public class RequirementsService implements IRequirementsService {
   private IRequirementsRepository requirementsRepository;
 
   @Override
-  public Requirements createRequirement(Requirements requirement) {
-    Optional<Requirements> requirementFound = this.requirementsRepository.findById(requirement.getId());
-    if (requirementFound.isPresent()) {
-      return requirementFound.get();
+  public Requirements createRequirement(RequirementsDTO requirement) {
+    if (requirement.getId() != null) {
+      Optional<Requirements> requirementFound = this.requirementsRepository.findById(requirement.getId());
+      if (requirementFound.isPresent()) {
+        return requirementFound.get();
+      }
     }
-
     Requirements newRequirement = new Requirements.Builder()
             .setType(requirement.getType())
             .setStorage(requirement.getStorage())
@@ -31,12 +33,13 @@ public class RequirementsService implements IRequirementsService {
             .setMemory(requirement.getMemory())
             .setGraphics(requirement.getGraphics())
             .setDirectx_v(requirement.getDirectx_v())
+            .setProcessor(requirement.getProcessor())
             .build();
     return this.requirementsRepository.save(newRequirement);
   }
 
   @Override
-  public List<Requirements> bulkCreateRequirements(List<Requirements> requirements) {
+  public List<Requirements> bulkCreateRequirements(List<RequirementsDTO> requirements) {
     return requirements
             .stream()
             .map((requirement) -> this.createRequirement(requirement))

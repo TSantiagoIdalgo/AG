@@ -32,6 +32,8 @@ public class Requirements {
   private double Directx_v;
   @Column
   private double storage;
+  @Column
+  private String processor;
 
   @Enumerated(EnumType.STRING)
   private RequirementType type;
@@ -46,6 +48,7 @@ public class Requirements {
     this.Directx_v = builder.Directx_v;
     this.storage = builder.storage;
     this.type = builder.type;
+    this.processor = builder.processor;
   }
 
   public static class Builder {
@@ -56,6 +59,7 @@ public class Requirements {
     private double Directx_v;
     private double storage;
     private RequirementType type;
+    private String processor;
 
     public Builder setOS(String OS) {
       this.OS = OS;
@@ -69,6 +73,11 @@ public class Requirements {
 
     public Builder setGraphics(String graphics) {
       this.graphics = graphics;
+      return this;
+    }
+
+    public Builder setProcessor(String processor) {
+      this.processor = processor;
       return this;
     }
 

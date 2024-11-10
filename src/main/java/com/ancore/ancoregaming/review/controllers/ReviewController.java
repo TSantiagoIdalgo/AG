@@ -1,8 +1,9 @@
 package com.ancore.ancoregaming.review.controllers;
 
 import com.ancore.ancoregaming.common.ApiResponse;
-import com.ancore.ancoregaming.review.dtos.ReviewDTO;
 import com.ancore.ancoregaming.review.dtos.ReactionRequestDTO;
+import com.ancore.ancoregaming.review.dtos.ReviewDTO;
+import com.ancore.ancoregaming.review.dtos.ReviewRecommendationDTO;
 import com.ancore.ancoregaming.review.dtos.UpdateReviewDTO;
 import com.ancore.ancoregaming.review.model.Review;
 import com.ancore.ancoregaming.review.services.IReviewService;
@@ -59,6 +60,14 @@ public class ReviewController {
     Review review = this.reviewService.findReview(reviewId);
     ReviewDTO reviewDTO = modelMapper.map(review, ReviewDTO.class);
     ApiResponse<ReviewDTO> response = new ApiResponse<>(HttpStatus.OK, reviewDTO, null);
+    return ResponseEntity.status(200).body(response);
+  }
+
+  @GetMapping("/recommendation/{productId}")
+  public ResponseEntity<ApiResponse<ReviewRecommendationDTO>> getReviewRecommendation(@PathVariable String productId) {
+    double percentage = this.reviewService.getRecommendationPercentage(productId);
+    ReviewRecommendationDTO reviewRecommendationDTO = new ReviewRecommendationDTO(productId, percentage);
+    ApiResponse<ReviewRecommendationDTO> response = new ApiResponse<>(HttpStatus.OK, reviewRecommendationDTO, null);
     return ResponseEntity.status(200).body(response);
   }
 
