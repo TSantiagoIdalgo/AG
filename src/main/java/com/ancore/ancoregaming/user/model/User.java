@@ -1,6 +1,7 @@
 package com.ancore.ancoregaming.user.model;
 
 import com.ancore.ancoregaming.cart.model.Cart;
+import com.ancore.ancoregaming.checkout.model.Checkout;
 import com.ancore.ancoregaming.checkout.model.StockReservation;
 import com.ancore.ancoregaming.whitelist.model.Whitelist;
 import jakarta.persistence.CascadeType;
@@ -38,10 +39,7 @@ public class User {
   @Column
   private boolean verify;
   @ManyToMany(fetch = FetchType.EAGER)
-  @JoinTable(
-          name = "user_roles",
-          joinColumns = @JoinColumn(name = "user_id"),
-          inverseJoinColumns = @JoinColumn(name = "role_id"))
+  @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
   private List<Role> roles;
 
   @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -52,6 +50,9 @@ public class User {
 
   @OneToMany(mappedBy = "user")
   private List<StockReservation> stockReservation;
+
+  @OneToMany(mappedBy = "user")
+  private List<Checkout> checkouts;
 
   public User() {
   }
@@ -104,7 +105,8 @@ public class User {
 
   @Override
   public String toString() {
-    return "User{" + "username=" + username + ", email=" + email + ", password=" + password + ", verify=" + verify + ", role=" + roles + '}';
+    return "User{" + "username=" + username + ", email=" + email + ", password=" + password + ", verify=" + verify
+        + ", role=" + roles + '}';
   }
 
 }

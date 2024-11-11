@@ -60,21 +60,9 @@ public class Review {
     private boolean recommended;
     private Product product;
     private User user;
-    private int likes;
-    private int dislikes;
 
     public Builder setTitle(String title) {
       this.title = title;
-      return this;
-    }
-
-    public Builder setLikes(int likes) {
-      this.likes = likes;
-      return this;
-    }
-
-    public Builder setDislikes(int dislikes) {
-      this.dislikes = dislikes;
       return this;
     }
 

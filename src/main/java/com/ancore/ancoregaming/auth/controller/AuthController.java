@@ -41,13 +41,13 @@ public class AuthController {
     res.addCookie(jwtCookie);
     res.addCookie(refreshJwtCookie);
 
-    ApiResponse response = new ApiResponse<>(HttpStatus.OK, null, null);
+    ApiResponse<?> response = new ApiResponse<>(HttpStatus.OK, null, null);
     return ResponseEntity.status(200).body(response);
   }
 
   @PostMapping("/logout")
   public ResponseEntity<ApiResponse<?>> logout(HttpServletResponse res) {
-    String[] cookiesToRemove = {"access_token", "refresh_token"};
+    String[] cookiesToRemove = { "access_token", "refresh_token" };
 
     for (String cookieName : cookiesToRemove) {
       Cookie cookie = new Cookie(cookieName, null);
@@ -59,7 +59,7 @@ public class AuthController {
     }
     SecurityContextHolder.clearContext();
 
-    ApiResponse response = new ApiResponse<>(HttpStatus.OK, null, null);
+    ApiResponse<?> response = new ApiResponse<>(HttpStatus.OK, null, null);
     return ResponseEntity.status(200).body(response);
   }
 

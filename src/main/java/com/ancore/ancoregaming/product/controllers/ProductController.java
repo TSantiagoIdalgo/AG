@@ -36,15 +36,20 @@ public class ProductController {
   private IProductService productService;
 
   @GetMapping("/")
-  public ResponseEntity<ApiResponse<Page<Product>>> findProducts(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+  public ResponseEntity<ApiResponse<Page<ProductDTO>>> findProducts(
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size) {
     Page<Product> products = this.productService.findAll(page, size);
-    ApiResponse<Page<Product>> response = new ApiResponse<>(HttpStatus.OK, products, null);
+    Page<ProductDTO> productsDTO = products.map((product) -> modelMapper.map(product, ProductDTO.class));
+
+    ApiResponse<Page<ProductDTO>> response = new ApiResponse<>(HttpStatus.OK, productsDTO, null);
     return ResponseEntity.status(200).body(response);
   }
 
   @Secured("ROLE_ADMIN")
   @PostMapping("/create")
-  public ResponseEntity<ApiResponse<ProductDTO>> createProduct(@Valid @RequestPart("product") CreateProductDTO product, @Valid @ModelAttribute FilesDTO filesDTO) {
+  public ResponseEntity<ApiResponse<ProductDTO>> createProduct(@Valid @RequestPart("product") CreateProductDTO product,
+      @Valid @ModelAttribute FilesDTO filesDTO) {
     Product newProduct = this.productService.createProduct(product, filesDTO);
     ProductDTO productDTO = modelMapper.map(newProduct, ProductDTO.class);
     ApiResponse<ProductDTO> response = new ApiResponse<>(HttpStatus.OK, productDTO, null);
@@ -63,21 +68,20 @@ public class ProductController {
   @DeleteMapping("/{productId}")
   public ResponseEntity<ApiResponse<?>> deleteProduct(@PathVariable String productId) {
     this.productService.destroyProduct(productId);
-    ApiResponse response = new ApiResponse<>(HttpStatus.OK, null, null);
+    ApiResponse<?> response = new ApiResponse<>(HttpStatus.OK, null, null);
     return ResponseEntity.status(200).body(response);
   }
 
   @Secured("ROLE_ADMIN")
   @PatchMapping("/update/{productId}")
   public ResponseEntity<ApiResponse<ProductDTO>> patchProductFields(
-          @PathVariable String productId,
-          @RequestPart(value = "product", required = false) UpdateProductDTO updateProductDTO,
-          @RequestPart(value = "images", required = false) List<MultipartFile> images,
-          @RequestPart(value = "backgroundImage", required = false) MultipartFile backgroundImage,
-          @RequestPart(value = "mainImage", required = false) MultipartFile mainImage,
-          @RequestPart(value = "trailer", required = false) MultipartFile trailer) {
+      @PathVariable String productId,
+      @RequestPart(value = "product", required = false) UpdateProductDTO updateProductDTO,
+      @RequestPart(value = "images", required = false) List<MultipartFile> images,
+      @RequestPart(value = "backgroundImage", required = false) MultipartFile backgroundImage,
+      @RequestPart(value = "mainImage", required = false) MultipartFile mainImage,
+      @RequestPart(value = "trailer", required = false) MultipartFile trailer) {
     FilesDTO filesDTO = new FilesDTO(mainImage, trailer, backgroundImage, images);
-
     Product product = this.productService.updateProductFields(productId, updateProductDTO, filesDTO);
     ProductDTO productDTO = modelMapper.map(product, ProductDTO.class);
     ApiResponse<ProductDTO> response = new ApiResponse<>(HttpStatus.OK, productDTO, null);

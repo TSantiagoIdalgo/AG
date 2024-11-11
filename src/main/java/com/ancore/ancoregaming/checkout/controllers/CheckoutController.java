@@ -45,7 +45,7 @@ public class CheckoutController {
       event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
     } catch (SignatureVerificationException e) {
       ExceptionResponse error = new ExceptionResponse(400, "Error verifying webhook", e.getMessage());
-      ApiResponse response = new ApiResponse<>(HttpStatus.BAD_REQUEST, null, error);
+      ApiResponse<ExceptionResponse> response = new ApiResponse<>(HttpStatus.BAD_REQUEST, null, error);
       return ResponseEntity.status(400).body(response);
     }
 

@@ -24,7 +24,8 @@ public class UploadService {
       throw new Exception("File must not be empty");
     }
     Cloudinary cloudinary = new Cloudinary(cloudinaryUrl);
-    Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("folder", "uploads/images"));
+
+    Map<?, ?> uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("folder", "uploads/images"));
 
     String imageUrl = uploadResult.get("url").toString();
 
@@ -40,7 +41,7 @@ public class UploadService {
       throw new Exception("File must not be empty");
     }
     Cloudinary cloudinary = new Cloudinary(cloudinaryUrl);
-    Map uploadResult = cloudinary.uploader().upload(video.getBytes(), ObjectUtils.asMap(
+    Map<?, ?> uploadResult = cloudinary.uploader().upload(video.getBytes(), ObjectUtils.asMap(
             "folder", "uploads/video",
             "resource_type", "video"
     ));

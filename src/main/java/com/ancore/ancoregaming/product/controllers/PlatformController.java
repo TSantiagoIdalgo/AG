@@ -19,7 +19,7 @@ public class PlatformController {
 
   public ResponseEntity<ApiResponse<List<Platform>>> getAllPlatforms() {
     List<Platform> platforms = this.platformService.findAllPlatforms();
-    ApiResponse response = new ApiResponse(HttpStatus.OK, platforms, null);
+    ApiResponse<List<Platform>> response = new ApiResponse<>(HttpStatus.OK, platforms, null);
     return ResponseEntity.status(200).body(response);
   }
 }

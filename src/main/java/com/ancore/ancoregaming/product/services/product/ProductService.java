@@ -43,19 +43,19 @@ public class ProductService implements IProductService {
   @Override
   public Product createProduct(CreateProductDTO product, FilesDTO filesDTO) {
     Product newProduct = new Product.Builder()
-            .setName(product.name)
-            .setDescription(product.description)
-            .setPlatforms(this.platformService.bulkCreatePlatforms(product.platforms))
-            .setDeveloper(product.developer)
-            .setFranchise(product.franchise)
-            .setRequirements(this.requirementService.bulkCreateRequirements(product.requirements))
-            .setGenres(this.genreService.bulkCreateGenres(product.genres))
-            .setTags(product.tags)
-            .setStock(product.stock)
-            .setPrice(product.price)
-            .setDisabled(product.disabled)
-            .setDiscount(product.discount)
-            .build();
+        .setName(product.name)
+        .setDescription(product.description)
+        .setPlatforms(this.platformService.bulkCreatePlatforms(product.platforms))
+        .setDeveloper(product.developer)
+        .setFranchise(product.franchise)
+        .setRequirements(this.requirementService.bulkCreateRequirements(product.requirements))
+        .setGenres(this.genreService.bulkCreateGenres(product.genres))
+        .setTags(product.tags)
+        .setStock(product.stock)
+        .setPrice(product.price)
+        .setDisabled(product.disabled)
+        .setDiscount(product.discount)
+        .build();
     Product productWithFiles = this.uploadProductFiles(newProduct, filesDTO, null);
     return productWithFiles;
   }
@@ -68,7 +68,8 @@ public class ProductService implements IProductService {
 
   @Override
   public Product findProduct(String productId) {
-    return this.productRepository.findById(UUID.fromString(productId)).orElseThrow(() -> new EntityNotFoundException("Product not found"));
+    return this.productRepository.findById(UUID.fromString(productId))
+        .orElseThrow(() -> new EntityNotFoundException("Product not found"));
   }
 
   @Override
@@ -131,7 +132,8 @@ public class ProductService implements IProductService {
       }
       Method setter = product.getClass().getMethod("set" + fieldName, value.getClass());
       setter.invoke(product, value);
-    } catch (IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException | InvocationTargetException e) {
+    } catch (IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException
+        | InvocationTargetException e) {
       throw new RuntimeException("Error asignando el campo " + fieldName + "  " + e.getMessage());
     }
   }
@@ -175,7 +177,8 @@ public class ProductService implements IProductService {
     product.setImages(updatedImages);
   }
 
-  private String updateMediaField(String currentMediaUrl, MultipartFile newMediaFile, boolean isImage) throws Exception {
+  private String updateMediaField(String currentMediaUrl, MultipartFile newMediaFile, boolean isImage)
+      throws Exception {
     if (newMediaFile != null) {
       // Si hay una imagen actual, la elimina
       if (currentMediaUrl != null) {

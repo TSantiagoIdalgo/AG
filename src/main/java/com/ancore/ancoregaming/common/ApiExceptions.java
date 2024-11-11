@@ -24,21 +24,21 @@ public class ApiExceptions {
             ex.getMessage(),
             "General Error"
     );
-    ApiResponse response = new ApiResponse<>(HttpStatus.BAD_REQUEST, null, error);
+    ApiResponse<ExceptionResponse> response = new ApiResponse<>(HttpStatus.BAD_REQUEST, null, error);
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
   }
 
   @ExceptionHandler(EntityNotFoundException.class)
   public ResponseEntity<ApiResponse<ExceptionResponse>> handleEntityNotFoundException(EntityNotFoundException ex) {
     ExceptionResponse error = new ExceptionResponse(404, ex.getMessage(), "NOT_FOUND");
-    ApiResponse response = new ApiResponse<>(HttpStatus.NOT_FOUND, null, error);
+    ApiResponse<ExceptionResponse> response = new ApiResponse<>(HttpStatus.NOT_FOUND, null, error);
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
   }
 
   @ExceptionHandler(BadRequestException.class)
   public ResponseEntity<ApiResponse<String>> handleBadRequestException(BadRequestException ex) {
     ExceptionResponse error = new ExceptionResponse(404, ex.getMessage(), "BAD_REQUEST");
-    ApiResponse response = new ApiResponse<>(HttpStatus.BAD_REQUEST, null, error);
+    ApiResponse<String> response = new ApiResponse<>(HttpStatus.BAD_REQUEST, null, error);
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
   }
 
@@ -56,7 +56,7 @@ public class ApiExceptions {
             "Validation Failed",
             errors.toString()
     );
-    ApiResponse response = new ApiResponse<>(HttpStatus.BAD_REQUEST, null, error);
+    ApiResponse<?> response = new ApiResponse<>(HttpStatus.BAD_REQUEST, null, error);
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
   }
 
@@ -68,7 +68,7 @@ public class ApiExceptions {
             ex.getRootCause().getMessage()
     );
 
-    ApiResponse response = new ApiResponse<>(HttpStatus.CONFLICT, null, error);
+    ApiResponse<ExceptionResponse> response = new ApiResponse<>(HttpStatus.CONFLICT, null, error);
     return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
   }
 
@@ -83,7 +83,7 @@ public class ApiExceptions {
             "Type Mismatch Error"
     );
 
-    ApiResponse response = new ApiResponse<>(HttpStatus.BAD_REQUEST, null, error);
+    ApiResponse<ExceptionResponse> response = new ApiResponse<>(HttpStatus.BAD_REQUEST, null, error);
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
   }
 }

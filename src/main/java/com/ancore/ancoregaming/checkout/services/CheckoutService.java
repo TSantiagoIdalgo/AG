@@ -4,7 +4,7 @@ import com.ancore.ancoregaming.cart.model.Cart;
 import com.ancore.ancoregaming.cart.model.CartItem;
 import com.ancore.ancoregaming.cart.repositories.ICartRepository;
 import com.ancore.ancoregaming.checkout.model.Checkout;
-import com.ancore.ancoregaming.checkout.repositories.IPaymentRepository;
+import com.ancore.ancoregaming.checkout.repositories.ICheckoutRepository;
 import com.ancore.ancoregaming.product.model.Product;
 import com.ancore.ancoregaming.user.model.User;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -34,7 +34,7 @@ public class CheckoutService {
   @Autowired
   private ICartRepository cartRepository;
   @Autowired
-  private IPaymentRepository paymentRepository;
+  private ICheckoutRepository paymentRepository;
   @Autowired
   private StockReservationService stockReservationService;
 
@@ -71,7 +71,7 @@ public class CheckoutService {
           String cartId = metadataNode.get("cartId").asText();
 
           Cart userCart = this.cartRepository.findCartByIdWithoutItemsUnpaid(UUID.fromString(cartId))
-                  .orElseThrow(() -> new EntityNotFoundException("User cart not found"));
+              .orElseThrow(() -> new EntityNotFoundException("User cart not found"));
           List<CartItem> cartItems = userCart.getItems();
 
           cartItems.forEach(item -> {
@@ -88,10 +88,12 @@ public class CheckoutService {
             item.setItemIsPaid(true);
 
           });
+
           this.generatePaymentReceipt(sessionNode, userCart);
           userCart.setTotal(BigDecimal.ZERO);
           userCart.setSubtotal(BigDecimal.ZERO);
-          userCart.getUser().getStockReservation().forEach((reservation) -> this.stockReservationService.confirmPayment(reservation.getId()));
+          userCart.getUser().getStockReservation()
+              .forEach((reservation) -> this.stockReservationService.confirmPayment(reservation.getId()));
         }
       }
     } catch (OptimisticLockException e) {
@@ -104,31 +106,28 @@ public class CheckoutService {
     String status = sessionNode.get("payment_status").asText();
     String currency = sessionNode.get("currency").asText();
 
-    Checkout payment = new Checkout.Builder(stripePaymentId)
-            .setUserEmail(userCart.getUser().getEmail())
-            .setPaymentStatus(status)
-            .setCartId(userCart.getId())
-            .setCurrency(currency)
-            .setTotal(userCart.getTotal())
-            .setSubtotal(userCart.getSubtotal())
-            .build();
+    Checkout checkout = new Checkout.Builder(stripePaymentId)
+        .setTotal(userCart.getTotal())
+        .setSubtotal(userCart.getSubtotal())
+        .setCurrency(currency)
+        .setPaymentStatus(status)
+        .setUser(userCart.getUser())
+        .setItems(new ArrayList<>(userCart.getItems()))
+        .build();
 
-    return this.paymentRepository.save(payment);
+    return this.paymentRepository.save(checkout);
   }
 
-  private Map getProductData(User user, Product product, int cuantity) {
+  private Map<String, Object> getProductData(User user, Product product, int cuantity) {
     Map<String, Object> lineItem = Map.of(
-            "price_data", Map.of(
-                    "currency", "usd",
-                    "product_data", Map.of(
-                            "name", product.getName(),
-                            "images", Arrays.asList(product.getMainImage()),
-                            "description", product.getDescription()
-                    ),
-                    "unit_amount", this.getFinalPrice(product.getPrice(), product.getDiscount())
-            ),
-            "quantity", cuantity
-    );
+        "price_data", Map.of(
+            "currency", "usd",
+            "product_data", Map.of(
+                "name", product.getName(),
+                "images", Arrays.asList(product.getMainImage()),
+                "description", product.getDescription()),
+            "unit_amount", this.getFinalPrice(product.getPrice(), product.getDiscount())),
+        "quantity", cuantity);
 
     this.stockReservationService.createReservation(cuantity, user, product);
     return lineItem;

@@ -38,11 +38,7 @@ public class Product {
   private String description;
 
   @ManyToMany(fetch = FetchType.LAZY)
-  @JoinTable(
-          name = "product_platforms",
-          joinColumns = @JoinColumn(name = "product_id"),
-          inverseJoinColumns = @JoinColumn(name = "platform_name")
-  )
+  @JoinTable(name = "product_platforms", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "platform_name"))
   private List<Platform> platforms;
 
   @Column(length = 50, nullable = false)
@@ -52,19 +48,11 @@ public class Product {
   private String franchise;
 
   @ManyToMany(fetch = FetchType.LAZY)
-  @JoinTable(
-          name = "product_genres",
-          joinColumns = @JoinColumn(name = "product_id"),
-          inverseJoinColumns = @JoinColumn(name = "genre_name")
-  )
+  @JoinTable(name = "product_genres", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "genre_name"))
   private List<Genre> genres;
 
   @ManyToMany(fetch = FetchType.LAZY)
-  @JoinTable(
-          name = "product_requirements",
-          joinColumns = @JoinColumn(name = "product_id"),
-          inverseJoinColumns = @JoinColumn(name = "requirement_id")
-  )
+  @JoinTable(name = "product_requirements", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "requirement_id"))
   private List<Requirements> requirements;
 
   @ElementCollection
@@ -245,7 +233,10 @@ public class Product {
 
   @Override
   public String toString() {
-    return "Product{" + "id=" + id + ", name=" + name + ", description=" + description + ", platforms=" + platforms + ", developer=" + developer + ", genres=" + genres + ", tags=" + tags + ", disabled=" + disabled + ", stock=" + stock + ", price=" + price + ", mainImage=" + mainImage + ", trailer=" + trailer + ", backgroundImage=" + backgroundImage + ", images=" + images + ", discount=" + discount + ", reviews=" + reviews + '}';
+    return "Product{" + "id=" + id + ", name=" + name + ", description=" + description + ", platforms=" + platforms
+        + ", developer=" + developer + ", genres=" + genres + ", tags=" + tags + ", disabled=" + disabled + ", stock="
+        + stock + ", price=" + price + ", mainImage=" + mainImage + ", trailer=" + trailer + ", backgroundImage="
+        + backgroundImage + ", images=" + images + ", discount=" + discount + ", reviews=" + reviews + '}';
   }
 
 }

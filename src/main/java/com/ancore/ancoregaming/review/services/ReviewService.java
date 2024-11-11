@@ -69,12 +69,12 @@ public class ReviewService implements IReviewService {
     User user = this.userService.findUser(userDetails.getUsername());
     Product product = this.productService.findProduct(productId);
     Review review = new Review.Builder()
-            .setTitle(reviewDTO.getTitle())
-            .setComment(reviewDTO.getComment())
-            .setRating(reviewDTO.isRecommended())
-            .setProduct(product)
-            .setUser(user)
-            .build();
+        .setTitle(reviewDTO.getTitle())
+        .setComment(reviewDTO.getComment())
+        .setRating(reviewDTO.isRecommended())
+        .setProduct(product)
+        .setUser(user)
+        .build();
     this.reviewRepository.save(review);
     return review;
   }
@@ -99,7 +99,8 @@ public class ReviewService implements IReviewService {
 
   @Override
   public Review addReaction(String userId, String reviewId, ReactionType reactionType) {
-    Optional<ReviewReaction> existingReaction = reviewReactionRepository.findByUserEmailAndReviewId(userId, UUID.fromString(reviewId));
+    Optional<ReviewReaction> existingReaction = reviewReactionRepository.findByUserEmailAndReviewId(userId,
+        UUID.fromString(reviewId));
     if (existingReaction.isPresent()) {
       throw new IllegalStateException("User has already reacted to this review");
     }
@@ -132,7 +133,8 @@ public class ReviewService implements IReviewService {
       }
       Method setter = review.getClass().getMethod("set" + fieldName, value.getClass());
       setter.invoke(review, value);
-    } catch (IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException | InvocationTargetException e) {
+    } catch (IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException
+        | InvocationTargetException e) {
       throw new RuntimeException("Error asignando el campo " + fieldName + "  " + e.getMessage());
     }
   }
