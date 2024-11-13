@@ -1,5 +1,6 @@
 package com.ancore.ancoregaming.review.repositories;
 
+import com.ancore.ancoregaming.review.dtos.ReactionType;
 import com.ancore.ancoregaming.review.model.Review;
 import java.util.List;
 import java.util.UUID;
@@ -11,10 +12,20 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface IReviewRepository extends JpaRepository<Review, UUID> {
 
-  List<Review> findByProductId(UUID productId);
+    List<Review> findByProductId(UUID productId);
 
-  @Query("SELECT (COUNT(r) * 1.0) / (SELECT COUNT(r2) FROM Review r2 WHERE r2.product.id = :productId) "
-          + "FROM Review r "
-          + "WHERE r.product.id = :productId AND r.recommended = true")
-  Double findRecommendationPercentageByProductId(@Param("productId") UUID productId);
+    @Query("SELECT (COUNT(r) * 1.0) / (SELECT COUNT(r2) FROM Review r2 WHERE r2.product.id = :productId) "
+            + "FROM Review r "
+            + "WHERE r.product.id = :productId AND r.recommended = true")
+    Double findRecommendationPercentageByProductId(@Param("productId") UUID productId);
+
+    @Query("SELECT r FROM Review r " +
+            "LEFT JOIN r.reactions rr " +
+            "WHERE r.recommended = true " +
+            "GROUP BY r.id " +
+            "ORDER BY SUM(CASE WHEN rr.reactionType = 'LIKE' THEN 1 ELSE 0 END) DESC, " +
+            "         SUM(CASE WHEN rr.reactionType = 'DISLIKE' THEN 1 ELSE 0 END) ASC")
+    List<Review> findNotRecommendedReviewsOrderedByLikes(
+            @Param("reactionType") ReactionType type,
+            @Param("recommended") boolean recommended);
 }

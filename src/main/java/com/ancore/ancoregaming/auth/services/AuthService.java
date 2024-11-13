@@ -7,9 +7,13 @@ import com.ancore.ancoregaming.user.model.Role;
 import com.ancore.ancoregaming.user.model.User;
 import com.ancore.ancoregaming.user.repositories.IUserRepository;
 import com.ancore.ancoregaming.user.services.role.RoleService;
+
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,6 +31,10 @@ public class AuthService {
   private final AuthenticationManager authManager;
 
   public User createUser(CreateUserDTO user) {
+    Optional<User> userOptional = this.userRepository.findById(user.getEmail());
+    if (userOptional.isPresent()) {
+      throw new EntityExistsException("User already exist");
+    }
     String passwordHash = passwordEncoder.encode(user.getPassword());
     List<Role> roles = new ArrayList<>();
     Role role = roleService.findRoleByName("ROLE_ADMIN");

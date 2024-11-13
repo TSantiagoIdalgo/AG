@@ -20,10 +20,9 @@ public class ApiExceptions {
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ApiResponse<ExceptionResponse>> handleGeneralException(Exception ex, WebRequest request) {
     ExceptionResponse error = new ExceptionResponse(
-            HttpStatus.INTERNAL_SERVER_ERROR.value(),
-            ex.getMessage(),
-            "General Error"
-    );
+        HttpStatus.INTERNAL_SERVER_ERROR.value(),
+        ex.getMessage(),
+        "General Error");
     ApiResponse<ExceptionResponse> response = new ApiResponse<>(HttpStatus.BAD_REQUEST, null, error);
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
   }
@@ -52,36 +51,35 @@ public class ApiExceptions {
     });
 
     ExceptionResponse error = new ExceptionResponse(
-            HttpStatus.BAD_REQUEST.value(),
-            "Validation Failed",
-            errors.toString()
-    );
+        HttpStatus.BAD_REQUEST.value(),
+        "Validation Failed",
+        errors.toString());
     ApiResponse<?> response = new ApiResponse<>(HttpStatus.BAD_REQUEST, null, error);
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
   }
 
   @ExceptionHandler(DataIntegrityViolationException.class)
-  public ResponseEntity<ApiResponse<ExceptionResponse>> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+  public ResponseEntity<ApiResponse<ExceptionResponse>> handleDataIntegrityViolationException(
+      DataIntegrityViolationException ex) {
     ExceptionResponse error = new ExceptionResponse(
-            HttpStatus.CONFLICT.value(),
-            "Data Integrity Violation",
-            ex.getRootCause().getMessage()
-    );
+        HttpStatus.CONFLICT.value(),
+        "Data Integrity Violation",
+        ex.getMessage());
 
     ApiResponse<ExceptionResponse> response = new ApiResponse<>(HttpStatus.CONFLICT, null, error);
     return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
   }
 
   @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-  public ResponseEntity<ApiResponse<ExceptionResponse>> handleTypeMismatchException(MethodArgumentTypeMismatchException ex) {
+  public ResponseEntity<ApiResponse<ExceptionResponse>> handleTypeMismatchException(
+      MethodArgumentTypeMismatchException ex) {
     String message = String.format("The value '%s' is not valid for parameter '%s'",
-            ex.getValue(), ex.getName());
+        ex.getValue(), ex.getName());
 
     ExceptionResponse error = new ExceptionResponse(
-            HttpStatus.BAD_REQUEST.value(),
-            message,
-            "Type Mismatch Error"
-    );
+        HttpStatus.BAD_REQUEST.value(),
+        message,
+        "Type Mismatch Error");
 
     ApiResponse<ExceptionResponse> response = new ApiResponse<>(HttpStatus.BAD_REQUEST, null, error);
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);

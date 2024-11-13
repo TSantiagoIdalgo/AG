@@ -2,7 +2,6 @@ package com.ancore.ancoregaming.review.dtos;
 
 import com.ancore.ancoregaming.user.dtos.UserDTO;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +16,6 @@ public class ReviewDTO {
   @NotNull
   private String comment;
   @NotNull
-  @Positive
   private boolean recommended;
   private UserDTO user;
   private List<ReviewReactionDTO> reactions;
@@ -34,7 +32,8 @@ public class ReviewDTO {
 
   @Override
   public String toString() {
-    return "ReviewDTO{" + ", title=" + title + ", comment=" + comment + ", recommended=" + recommended + ", user=" + user + '}';
+    return "ReviewDTO{" + ", title=" + title + ", comment=" + comment + ", recommended=" + recommended + ", user="
+        + user + '}';
   }
 
 }

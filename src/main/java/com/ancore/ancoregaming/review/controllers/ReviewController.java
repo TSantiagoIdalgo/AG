@@ -2,6 +2,7 @@ package com.ancore.ancoregaming.review.controllers;
 
 import com.ancore.ancoregaming.common.ApiResponse;
 import com.ancore.ancoregaming.review.dtos.ReactionRequestDTO;
+import com.ancore.ancoregaming.review.dtos.ReactionType;
 import com.ancore.ancoregaming.review.dtos.ReviewDTO;
 import com.ancore.ancoregaming.review.dtos.ReviewRecommendationDTO;
 import com.ancore.ancoregaming.review.dtos.UpdateReviewDTO;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -34,12 +36,14 @@ public class ReviewController {
   private final ModelMapper modelMapper = new ModelMapper();
 
   @GetMapping("/")
-  public ResponseEntity<ApiResponse<List<ReviewDTO>>> getAllReviews() {
-    List<Review> reviews = this.reviewService.findAllReviews();
+  public ResponseEntity<ApiResponse<List<ReviewDTO>>> getAllReviews(
+      @RequestParam ReactionType type,
+      @RequestParam boolean recommended) {
+    List<Review> reviews = this.reviewService.findAllReviews(type, recommended);
     List<ReviewDTO> reviewsDTO = modelMapper.map(
-            reviews,
-            new TypeToken<List<ReviewDTO>>() {
-            }.getType());
+        reviews,
+        new TypeToken<List<ReviewDTO>>() {
+        }.getType());
     ApiResponse<List<ReviewDTO>> response = new ApiResponse<>(HttpStatus.OK, reviewsDTO, null);
     return ResponseEntity.status(200).body(response);
   }
@@ -48,9 +52,9 @@ public class ReviewController {
   public ResponseEntity<ApiResponse<List<ReviewDTO>>> getAllProductReviews(@PathVariable String productId) {
     List<Review> reviews = this.reviewService.findProductReviews(productId);
     List<ReviewDTO> reviewsDTO = modelMapper.map(
-            reviews,
-            new TypeToken<List<ReviewDTO>>() {
-            }.getType());
+        reviews,
+        new TypeToken<List<ReviewDTO>>() {
+        }.getType());
     ApiResponse<List<ReviewDTO>> response = new ApiResponse<>(HttpStatus.OK, reviewsDTO, null);
     return ResponseEntity.status(200).body(response);
   }
@@ -66,13 +70,14 @@ public class ReviewController {
   @GetMapping("/recommendation/{productId}")
   public ResponseEntity<ApiResponse<ReviewRecommendationDTO>> getReviewRecommendation(@PathVariable String productId) {
     double percentage = this.reviewService.getRecommendationPercentage(productId);
-    ReviewRecommendationDTO reviewRecommendationDTO = new ReviewRecommendationDTO(productId, percentage);
+    ReviewRecommendationDTO reviewRecommendationDTO = new ReviewRecommendationDTO(productId, (percentage * 100));
     ApiResponse<ReviewRecommendationDTO> response = new ApiResponse<>(HttpStatus.OK, reviewRecommendationDTO, null);
     return ResponseEntity.status(200).body(response);
   }
 
   @PostMapping("/{productId}")
-  public ResponseEntity<ApiResponse<ReviewDTO>> createReview(@PathVariable String productId, @Valid @RequestBody ReviewDTO reviewDTO, @AuthenticationPrincipal UserDetails user) {
+  public ResponseEntity<ApiResponse<ReviewDTO>> createReview(@PathVariable String productId,
+      @Valid @RequestBody ReviewDTO reviewDTO, @AuthenticationPrincipal UserDetails user) {
     Review newReview = this.reviewService.createReview(productId, reviewDTO, user);
     ReviewDTO newReviewDTO = modelMapper.map(newReview, ReviewDTO.class);
     ApiResponse<ReviewDTO> response = new ApiResponse<>(HttpStatus.OK, newReviewDTO, null);
@@ -80,7 +85,8 @@ public class ReviewController {
   }
 
   @PatchMapping("/{reviewId}")
-  public ResponseEntity<ApiResponse<ReviewDTO>> createReview(@PathVariable String reviewId, @RequestBody UpdateReviewDTO updateReviewDTO) {
+  public ResponseEntity<ApiResponse<ReviewDTO>> updateReview(@PathVariable String reviewId,
+      @RequestBody UpdateReviewDTO updateReviewDTO) {
     Review review = this.reviewService.updateReview(reviewId, updateReviewDTO);
     ReviewDTO reviewDTO = modelMapper.map(review, ReviewDTO.class);
     ApiResponse<ReviewDTO> response = new ApiResponse<>(HttpStatus.OK, reviewDTO, null);
@@ -97,8 +103,10 @@ public class ReviewController {
   }
 
   @PostMapping("/reaction/")
-  public ResponseEntity<ApiResponse<ReviewDTO>> addReviewReaction(@RequestBody ReactionRequestDTO reviewReactionDTO, @AuthenticationPrincipal UserDetails user) {
-    Review review = this.reviewService.addReaction(user.getUsername(), reviewReactionDTO.getReviewId(), reviewReactionDTO.getReactionType());
+  public ResponseEntity<ApiResponse<ReviewDTO>> addReviewReaction(@RequestBody ReactionRequestDTO reviewReactionDTO,
+      @AuthenticationPrincipal UserDetails user) {
+    Review review = this.reviewService.addReaction(user.getUsername(), reviewReactionDTO.getReviewId(),
+        reviewReactionDTO.getReactionType());
     ReviewDTO reviewDTO = modelMapper.map(review, ReviewDTO.class);
     ApiResponse<ReviewDTO> response = new ApiResponse<>(HttpStatus.OK, reviewDTO, null);
     return ResponseEntity.status(200).body(response);

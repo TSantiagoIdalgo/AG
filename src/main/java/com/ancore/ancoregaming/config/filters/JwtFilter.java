@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,18 +32,19 @@ public class JwtFilter extends OncePerRequestFilter {
   private final UserDetailsService userDeailsService;
 
   @Override
-  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-          throws ServletException, IOException {
+  protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
+      @NonNull FilterChain chain)
+      throws ServletException, IOException {
     if (request.getServletPath().contains("/auth")) {
       chain.doFilter(request, response);
       return;
     }
 
     Optional<Cookie> cookieJwt = Optional.ofNullable(request.getCookies())
-            .stream()
-            .flatMap(Arrays::stream)
-            .filter(cookie -> "access_token".equals(cookie.getName()))
-            .findFirst();
+        .stream()
+        .flatMap(Arrays::stream)
+        .filter(cookie -> "access_token".equals(cookie.getName()))
+        .findFirst();
     if (cookieJwt.isEmpty()) {
       chain.doFilter(request, response);
       return;
@@ -69,9 +72,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
   private void setAuthentication(UserDetails userDetails, HttpServletRequest request) {
     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-            userDetails,
-            null,
-            userDetails.getAuthorities());
+        userDetails,
+        null,
+        userDetails.getAuthorities());
 
     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 

@@ -9,7 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public interface IReviewService {
 
-  public List<Review> findAllReviews();
+  public List<Review> findAllReviews(ReactionType type, boolean recommendad);
 
   public Review findReview(String reviewId);
 

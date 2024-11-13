@@ -34,8 +34,8 @@ public class ReviewService implements IReviewService {
   private IReviewReactionRepository reviewReactionRepository;
 
   @Override
-  public List<Review> findAllReviews() {
-    List<Review> reviews = this.reviewRepository.findAll();
+  public List<Review> findAllReviews(ReactionType type, boolean recommendad) {
+    List<Review> reviews = this.reviewRepository.findNotRecommendedReviewsOrderedByLikes(type, recommendad);
 
     if (reviews.isEmpty()) {
       throw new EntityNotFoundException("Reviews are empty");
