@@ -2,7 +2,6 @@ package com.ancore.ancoregaming.review.controllers;
 
 import com.ancore.ancoregaming.common.ApiResponse;
 import com.ancore.ancoregaming.review.dtos.ReactionRequestDTO;
-import com.ancore.ancoregaming.review.dtos.ReactionType;
 import com.ancore.ancoregaming.review.dtos.ReviewDTO;
 import com.ancore.ancoregaming.review.dtos.ReviewRecommendationDTO;
 import com.ancore.ancoregaming.review.dtos.UpdateReviewDTO;
@@ -36,10 +35,8 @@ public class ReviewController {
   private final ModelMapper modelMapper = new ModelMapper();
 
   @GetMapping("/")
-  public ResponseEntity<ApiResponse<List<ReviewDTO>>> getAllReviews(
-      @RequestParam ReactionType type,
-      @RequestParam boolean recommended) {
-    List<Review> reviews = this.reviewService.findAllReviews(type, recommended);
+  public ResponseEntity<ApiResponse<List<ReviewDTO>>> getAllReviews(@RequestParam boolean recommended) {
+    List<Review> reviews = this.reviewService.findAllReviews(recommended);
     List<ReviewDTO> reviewsDTO = modelMapper.map(
         reviews,
         new TypeToken<List<ReviewDTO>>() {
