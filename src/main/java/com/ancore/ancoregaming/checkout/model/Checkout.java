@@ -2,22 +2,17 @@ package com.ancore.ancoregaming.checkout.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-
-import com.ancore.ancoregaming.cart.model.CartItem;
 import com.ancore.ancoregaming.user.model.User;
 
 import lombok.Getter;
@@ -44,10 +39,8 @@ public class Checkout {
   @ManyToOne
   private User user;
 
-  @ManyToMany(fetch = FetchType.LAZY)
-  @JoinTable(name = "checkout_items", joinColumns = @JoinColumn(name = "checkout_id"), inverseJoinColumns = @JoinColumn(name = "cartItem_id"))
-  private List<CartItem> items;
-
+  @OneToMany(mappedBy = "checkout")
+  private List<CheckoutItems> checkoutItems;
   @Temporal(TemporalType.TIMESTAMP)
   private Date createdAt;
 
@@ -58,7 +51,7 @@ public class Checkout {
     this.currency = builder.currency;
     this.paymentStatus = builder.paymentStatus;
     this.user = builder.user;
-    this.items = builder.items;
+    this.checkoutItems = builder.items;
     this.createdAt = new Date();
   }
 
@@ -70,7 +63,7 @@ public class Checkout {
     private String currency;
     private String paymentStatus;
     private User user;
-    private List<CartItem> items;
+    private List<CheckoutItems> items;
 
     public Builder(String stripePaymentId) {
       this.stripePaymentId = stripePaymentId;
@@ -101,7 +94,7 @@ public class Checkout {
       return this;
     }
 
-    public Builder setItems(List<CartItem> items) {
+    public Builder setItems(List<CheckoutItems> items) {
       this.items = items;
       return this;
     }

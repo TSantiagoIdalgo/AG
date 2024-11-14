@@ -7,11 +7,12 @@ import com.ancore.ancoregaming.product.dtos.ProductDTO;
 import com.ancore.ancoregaming.product.dtos.UpdateProductDTO;
 import com.ancore.ancoregaming.product.model.Product;
 import com.ancore.ancoregaming.product.services.product.IProductService;
+import com.nimbusds.jose.shaded.gson.reflect.TypeToken;
+
 import jakarta.validation.Valid;
 import java.util.List;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -36,13 +37,14 @@ public class ProductController {
   private IProductService productService;
 
   @GetMapping("/")
-  public ResponseEntity<ApiResponse<Page<ProductDTO>>> findProducts(
+  public ResponseEntity<ApiResponse<List<ProductDTO>>> findProducts(
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "10") int size) {
-    Page<Product> products = this.productService.findAll(page, size);
-    Page<ProductDTO> productsDTO = products.map((product) -> modelMapper.map(product, ProductDTO.class));
+    List<Product> products = this.productService.findAll(page, size);
+    List<ProductDTO> productsDTO = modelMapper.map(products, new TypeToken<List<ProductDTO>>() {
+    }.getType());
 
-    ApiResponse<Page<ProductDTO>> response = new ApiResponse<>(HttpStatus.OK, productsDTO, null);
+    ApiResponse<List<ProductDTO>> response = new ApiResponse<>(HttpStatus.OK, productsDTO, null);
     return ResponseEntity.status(200).body(response);
   }
 

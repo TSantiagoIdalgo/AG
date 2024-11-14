@@ -20,9 +20,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -61,9 +59,9 @@ public class ProductService implements IProductService {
   }
 
   @Override
-  public Page<Product> findAll(int page, int size) {
-    Pageable pageable = PageRequest.of(page, size);
-    return productRepository.findAll(pageable);
+  public List<Product> findAll(int page, int size) {
+    Specification<Product> spec = ProductSpecificationService.orderByCheckoutCount(true);
+    return productRepository.findAll(spec);
   }
 
   @Override

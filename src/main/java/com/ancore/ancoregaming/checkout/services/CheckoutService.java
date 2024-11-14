@@ -4,6 +4,8 @@ import com.ancore.ancoregaming.cart.model.Cart;
 import com.ancore.ancoregaming.cart.model.CartItem;
 import com.ancore.ancoregaming.cart.repositories.ICartRepository;
 import com.ancore.ancoregaming.checkout.model.Checkout;
+import com.ancore.ancoregaming.checkout.model.CheckoutItems;
+import com.ancore.ancoregaming.checkout.repositories.ICheckoutItemsRepository;
 import com.ancore.ancoregaming.checkout.repositories.ICheckoutRepository;
 import com.ancore.ancoregaming.product.model.Product;
 import com.ancore.ancoregaming.user.model.User;
@@ -23,6 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -37,6 +41,8 @@ public class CheckoutService {
   private ICheckoutRepository paymentRepository;
   @Autowired
   private StockReservationService stockReservationService;
+  @Autowired
+  private ICheckoutItemsRepository checkoutItemsRepository;
 
   @Transactional
   public Session createCheckoutSession(UserDetails userDetails) throws StripeException {
@@ -112,8 +118,15 @@ public class CheckoutService {
         .setCurrency(currency)
         .setPaymentStatus(status)
         .setUser(userCart.getUser())
-        .setItems(new ArrayList<>(userCart.getItems()))
+        .setItems(new ArrayList<>())
         .build();
+
+    this.paymentRepository.save(checkout);
+    List<CheckoutItems> checkoutItems = userCart.getItems()
+        .stream()
+        .map((item) -> this.checkoutItemsRepository.save(new CheckoutItems(item, checkout)))
+        .collect(Collectors.toList());
+    checkout.setCheckoutItems(checkoutItems);
 
     return this.paymentRepository.save(checkout);
   }

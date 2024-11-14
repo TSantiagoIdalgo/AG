@@ -4,13 +4,13 @@ import com.ancore.ancoregaming.product.dtos.CreateProductDTO;
 import com.ancore.ancoregaming.product.dtos.FilesDTO;
 import com.ancore.ancoregaming.product.dtos.UpdateProductDTO;
 import com.ancore.ancoregaming.product.model.Product;
-import org.springframework.data.domain.Page;
+import java.util.List;
 
 public interface IProductService {
 
   public Product createProduct(CreateProductDTO product, FilesDTO filesDTO);
 
-  public Page<Product> findAll(int page, int size);
+  public List<Product> findAll(int page, int size);
 
   public Product findProduct(String productId);
 

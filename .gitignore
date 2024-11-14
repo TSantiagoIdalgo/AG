@@ -15,7 +15,6 @@ gradlew*
 # Archivos de logs
 *.log
 *.log.*
-*.sql
 
 # Archivos de configuración del IDE
 *.iml
