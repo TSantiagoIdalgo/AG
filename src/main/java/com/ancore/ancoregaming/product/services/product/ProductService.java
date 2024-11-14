@@ -2,6 +2,7 @@ package com.ancore.ancoregaming.product.services.product;
 
 import com.ancore.ancoregaming.product.dtos.CreateProductDTO;
 import com.ancore.ancoregaming.product.dtos.FilesDTO;
+import com.ancore.ancoregaming.product.dtos.ProductFilterDTO;
 import com.ancore.ancoregaming.product.dtos.UpdateProductDTO;
 import com.ancore.ancoregaming.product.model.Genre;
 import com.ancore.ancoregaming.product.model.Platform;
@@ -18,6 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.domain.Specification;
@@ -59,9 +63,22 @@ public class ProductService implements IProductService {
   }
 
   @Override
-  public List<Product> findAll(int page, int size) {
-    Specification<Product> spec = ProductSpecificationService.orderByCheckoutCount(true);
-    return productRepository.findAll(spec);
+  public Page<Product> findAll(ProductFilterDTO filterDTO) {
+    Specification<Product> spec = ProductSpecificationService
+        .orderByCheckoutCount(filterDTO.isOrderByCheckoutCount())
+        .and(ProductSpecificationService.orderByRecommendationCount(filterDTO.isOrderByRecommendation()))
+        .and(ProductSpecificationService.hasDeveloper(filterDTO.getDeveloper()))
+        .and(ProductSpecificationService.hasPriceRange(filterDTO.getMinPrice(), filterDTO.getMaxPrice()))
+        .and(ProductSpecificationService.hasDiscountRange(filterDTO.getMinDiscount(), filterDTO.getMaxDiscount()))
+        .and(ProductSpecificationService.hasFranchise(filterDTO.getFranchise()))
+        .and(ProductSpecificationService.hasGenres(filterDTO.getGenres()))
+        .and(ProductSpecificationService.hasName(filterDTO.getName()))
+        .and(ProductSpecificationService.hasPlatform(filterDTO.getPlatform()))
+        .and(ProductSpecificationService.hasTags(filterDTO.getTags()));
+
+    Pageable pageable = PageRequest.of(filterDTO.getPageNumber(), filterDTO.getPageSize());
+    Page<Product> pagedResult = productRepository.findAll(spec, pageable);
+    return pagedResult;
   }
 
   @Override
