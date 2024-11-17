@@ -3,6 +3,7 @@ package com.ancore.ancoregaming.auth.controller;
 import com.ancore.ancoregaming.auth.services.AuthService;
 import com.ancore.ancoregaming.auth.dtos.JwtResponse;
 import com.ancore.ancoregaming.auth.dtos.LoginDTO;
+import com.ancore.ancoregaming.common.ApiEntityResponse;
 import com.ancore.ancoregaming.common.ApiResponse;
 import com.ancore.ancoregaming.user.dtos.CreateUserDTO;
 import com.ancore.ancoregaming.user.model.User;
@@ -11,7 +12,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,14 +26,14 @@ public class AuthController {
   private AuthService authService;
 
   @PostMapping("/register")
-  public ResponseEntity<ApiResponse<User>> register(@Valid @RequestBody CreateUserDTO user) {
+  public ApiEntityResponse<User> register(@Valid @RequestBody CreateUserDTO user) {
     User userResponse = authService.createUser(user);
     ApiResponse<User> response = new ApiResponse<>(HttpStatus.CREATED, userResponse, null);
-    return ResponseEntity.status(201).body(response);
+    return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 
   @PostMapping("/login")
-  public ResponseEntity<ApiResponse<?>> login(HttpServletResponse res, @Valid @RequestBody final LoginDTO login) {
+  public ApiEntityResponse<?> login(HttpServletResponse res, @Valid @RequestBody final LoginDTO login) {
     JwtResponse loginResponse = authService.login(login);
     Cookie jwtCookie = getCookie("access_token", loginResponse.access_token());
     Cookie refreshJwtCookie = getCookie("refresh_token", loginResponse.refresh_token());
@@ -42,11 +42,11 @@ public class AuthController {
     res.addCookie(refreshJwtCookie);
 
     ApiResponse<?> response = new ApiResponse<>(HttpStatus.OK, null, null);
-    return ResponseEntity.status(200).body(response);
+    return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 
   @PostMapping("/logout")
-  public ResponseEntity<ApiResponse<?>> logout(HttpServletResponse res) {
+  public ApiEntityResponse<?> logout(HttpServletResponse res) {
     String[] cookiesToRemove = { "access_token", "refresh_token" };
 
     for (String cookieName : cookiesToRemove) {
@@ -60,7 +60,7 @@ public class AuthController {
     SecurityContextHolder.clearContext();
 
     ApiResponse<?> response = new ApiResponse<>(HttpStatus.OK, null, null);
-    return ResponseEntity.status(200).body(response);
+    return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 
   private Cookie getCookie(String key, String value) {

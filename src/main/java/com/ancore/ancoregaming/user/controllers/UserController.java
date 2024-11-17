@@ -1,5 +1,6 @@
 package com.ancore.ancoregaming.user.controllers;
 
+import com.ancore.ancoregaming.common.ApiEntityResponse;
 import com.ancore.ancoregaming.common.ApiResponse;
 import com.ancore.ancoregaming.user.dtos.UpdateUserDTO;
 import com.ancore.ancoregaming.user.dtos.UserDTO;
@@ -10,7 +11,6 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,49 +31,49 @@ public class UserController {
 
   @Secured("ROLE_ADMIN")
   @GetMapping("/")
-  public ResponseEntity<ApiResponse<List<UserDTO>>> findAllUsers() {
+  public ApiEntityResponse<List<UserDTO>> findAllUsers() {
     List<User> users = this.userService.findUsers();
     List<UserDTO> usersDTO = modelMapper.map(
-            users,
-            new TypeToken<List<UserDTO>>() {
-            }.getType());
+        users,
+        new TypeToken<List<UserDTO>>() {
+        }.getType());
     ApiResponse<List<UserDTO>> response = new ApiResponse<>(HttpStatus.OK, usersDTO, null);
-    return ResponseEntity.status(200).body(response);
+    return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 
   @GetMapping("/{userId}")
-  public ResponseEntity<ApiResponse<UserDTO>> findUser(@PathVariable String userId) {
+  public ApiEntityResponse<UserDTO> findUser(@PathVariable String userId) {
     User userFound = this.userService.findUser(userId);
     UserDTO userDTO = modelMapper.map(userFound, UserDTO.class);
     ApiResponse<UserDTO> response = new ApiResponse<>(HttpStatus.OK, userDTO, null);
-
-    return ResponseEntity.status(200).body(response);
+    return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 
   @DeleteMapping("/{userId}")
-  public ResponseEntity<ApiResponse<UserDTO>> deleteUser(@PathVariable String userId) {
+  public ApiEntityResponse<UserDTO> deleteUser(@PathVariable String userId) {
     User userDeleted = this.userService.destroyUser(userId);
     UserDTO userDTO = modelMapper.map(userDeleted, UserDTO.class);
     ApiResponse<UserDTO> response = new ApiResponse<>(HttpStatus.OK, userDTO, null);
 
-    return ResponseEntity.status(200).body(response);
+    return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 
   @PutMapping("/{userId}")
-  public ResponseEntity<ApiResponse<UserDTO>> updateUser(@PathVariable String userId, @RequestBody UpdateUserDTO updateUser) {
+  public ApiEntityResponse<UserDTO> updateUser(@PathVariable String userId,
+      @RequestBody UpdateUserDTO updateUser) {
     User userUpdated = this.userService.updateUser(userId, updateUser);
     UserDTO userDTO = modelMapper.map(userUpdated, UserDTO.class);
     ApiResponse<UserDTO> response = new ApiResponse<>(HttpStatus.OK, userDTO, null);
 
-    return ResponseEntity.status(200).body(response);
+    return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 
   @GetMapping("/verify")
-  public ResponseEntity<ApiResponse<UserDTO>> verifyUser(@RequestParam String token) {
+  public ApiEntityResponse<UserDTO> verifyUser(@RequestParam String token) {
     User user = this.userService.verifyUser(token);
     UserDTO userDTO = modelMapper.map(user, UserDTO.class);
     ApiResponse<UserDTO> response = new ApiResponse<>(HttpStatus.OK, userDTO, null);
 
-    return ResponseEntity.status(200).body(response);
+    return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 }

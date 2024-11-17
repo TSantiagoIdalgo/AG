@@ -1,5 +1,6 @@
 package com.ancore.ancoregaming.product.controllers;
 
+import com.ancore.ancoregaming.common.ApiEntityResponse;
 import com.ancore.ancoregaming.common.ApiResponse;
 import com.ancore.ancoregaming.product.dtos.CreateProductDTO;
 import com.ancore.ancoregaming.product.dtos.FilesDTO;
@@ -14,7 +15,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,43 +36,43 @@ public class ProductController {
   private IProductService productService;
 
   @GetMapping("/")
-  public ResponseEntity<ApiResponse<Page<ProductDTO>>> findProducts(@ModelAttribute ProductFilterDTO filterDTO) {
+  public ApiEntityResponse<Page<ProductDTO>> findProducts(@ModelAttribute ProductFilterDTO filterDTO) {
     Page<Product> products = this.productService.findAll(filterDTO);
     Page<ProductDTO> productsDTO = products.map((product) -> modelMapper.map(product, ProductDTO.class));
 
     ApiResponse<Page<ProductDTO>> response = new ApiResponse<>(HttpStatus.OK, productsDTO, null);
-    return ResponseEntity.status(200).body(response);
+    return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 
   @Secured("ROLE_ADMIN")
   @PostMapping("/create")
-  public ResponseEntity<ApiResponse<ProductDTO>> createProduct(@Valid @RequestPart("product") CreateProductDTO product,
+  public ApiEntityResponse<ProductDTO> createProduct(@Valid @RequestPart("product") CreateProductDTO product,
       @Valid @ModelAttribute FilesDTO filesDTO) {
     Product newProduct = this.productService.createProduct(product, filesDTO);
     ProductDTO productDTO = modelMapper.map(newProduct, ProductDTO.class);
     ApiResponse<ProductDTO> response = new ApiResponse<>(HttpStatus.OK, productDTO, null);
-    return ResponseEntity.status(201).body(response);
+    return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 
   @GetMapping("/{productId}")
-  public ResponseEntity<ApiResponse<ProductDTO>> findProduct(@PathVariable String productId) {
+  public ApiEntityResponse<ProductDTO> findProduct(@PathVariable String productId) {
     Product product = this.productService.findProduct(productId);
     ProductDTO productDTO = modelMapper.map(product, ProductDTO.class);
     ApiResponse<ProductDTO> response = new ApiResponse<>(HttpStatus.OK, productDTO, null);
-    return ResponseEntity.status(200).body(response);
+    return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 
   @Secured("ROLE_ADMIN")
   @DeleteMapping("/{productId}")
-  public ResponseEntity<ApiResponse<?>> deleteProduct(@PathVariable String productId) {
+  public ApiEntityResponse<?> deleteProduct(@PathVariable String productId) {
     this.productService.destroyProduct(productId);
     ApiResponse<?> response = new ApiResponse<>(HttpStatus.OK, null, null);
-    return ResponseEntity.status(200).body(response);
+    return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 
   @Secured("ROLE_ADMIN")
   @PatchMapping("/update/{productId}")
-  public ResponseEntity<ApiResponse<ProductDTO>> patchProductFields(
+  public ApiEntityResponse<ProductDTO> patchProductFields(
       @PathVariable String productId,
       @RequestPart(value = "product", required = false) UpdateProductDTO updateProductDTO,
       @RequestPart(value = "images", required = false) List<MultipartFile> images,
@@ -83,6 +83,6 @@ public class ProductController {
     Product product = this.productService.updateProductFields(productId, updateProductDTO, filesDTO);
     ProductDTO productDTO = modelMapper.map(product, ProductDTO.class);
     ApiResponse<ProductDTO> response = new ApiResponse<>(HttpStatus.OK, productDTO, null);
-    return ResponseEntity.status(200).body(response);
+    return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 }

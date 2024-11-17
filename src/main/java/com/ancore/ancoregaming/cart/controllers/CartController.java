@@ -1,13 +1,17 @@
 package com.ancore.ancoregaming.cart.controllers;
 
+import com.ancore.ancoregaming.cart.components.AddProductCommand;
+import com.ancore.ancoregaming.cart.components.CommandFactory;
+import com.ancore.ancoregaming.cart.components.DecreaseProductCommand;
+import com.ancore.ancoregaming.cart.components.RemoveProductCommand;
 import com.ancore.ancoregaming.cart.dtos.UserCartDTO;
 import com.ancore.ancoregaming.cart.model.Cart;
 import com.ancore.ancoregaming.cart.services.ICartService;
+import com.ancore.ancoregaming.common.ApiEntityResponse;
 import com.ancore.ancoregaming.common.ApiResponse;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,47 +25,61 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/cart")
 public class CartController {
 
-  @Autowired
-  private ICartService cartService;
+  private final ICartService cartService;
+  private final CommandFactory commandFactory;
   private final ModelMapper modelMapper = new ModelMapper();
 
+  @Autowired
+  public CartController(CommandFactory commandFactory, ICartService cartService) {
+    this.commandFactory = commandFactory;
+    this.cartService = cartService;
+  }
+
   @GetMapping("/")
-  public ResponseEntity<ApiResponse<UserCartDTO>> getUserCart(@AuthenticationPrincipal UserDetails user) {
+  public ApiEntityResponse<UserCartDTO> getUserCart(@AuthenticationPrincipal UserDetails user) {
     Cart cart = this.cartService.getUserCart(user);
     UserCartDTO userCart = modelMapper.map(cart, UserCartDTO.class);
     ApiResponse<UserCartDTO> response = new ApiResponse<>(HttpStatus.OK, userCart, null);
-    return ResponseEntity.status(200).body(response);
+    return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 
   @GetMapping("/paid")
-  public ResponseEntity<ApiResponse<UserCartDTO>> getUserPaidProducts(@AuthenticationPrincipal UserDetails user) {
+  public ApiEntityResponse<UserCartDTO> getUserPaidProducts(@AuthenticationPrincipal UserDetails user) {
     Cart cart = this.cartService.getUserPaidProducts(user);
     UserCartDTO userCartDTO = modelMapper.map(cart, UserCartDTO.class);
     ApiResponse<UserCartDTO> response = new ApiResponse<>(HttpStatus.OK, userCartDTO, null);
-    return ResponseEntity.status(200).body(response);
+    return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 
   @PostMapping("/increase/{productId}")
-  public ResponseEntity<ApiResponse<UserCartDTO>> increaseProductCart(@PathVariable String productId, @AuthenticationPrincipal UserDetails user) {
-    Cart cart = this.cartService.increaseProducts(user, productId);
+  public ApiEntityResponse<UserCartDTO> increaseProductCart(@PathVariable String productId,
+      @AuthenticationPrincipal UserDetails user) {
+    AddProductCommand command = commandFactory.createAddProductCommand(productId, user);
+    Cart cart = command.execute();
     UserCartDTO userCartDTO = modelMapper.map(cart, UserCartDTO.class);
     ApiResponse<UserCartDTO> response = new ApiResponse<>(HttpStatus.OK, userCartDTO, null);
-    return ResponseEntity.status(200).body(response);
+    return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 
   @PostMapping("/decrease/{productId}")
-  public ResponseEntity<ApiResponse<UserCartDTO>> decreaseProductCart(@PathVariable String productId, @AuthenticationPrincipal UserDetails user) {
-    Cart cart = this.cartService.decreaseProduct(user, productId);
+  public ApiEntityResponse<UserCartDTO> decreaseProductCart(@PathVariable String productId,
+      @AuthenticationPrincipal UserDetails user) {
+    DecreaseProductCommand command = commandFactory.createDecreaseProductCommand(productId, user);
+    Cart cart = command.execute();
     UserCartDTO userCartDTO = modelMapper.map(cart, UserCartDTO.class);
     ApiResponse<UserCartDTO> response = new ApiResponse<>(HttpStatus.OK, userCartDTO, null);
-    return ResponseEntity.status(200).body(response);
+    return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 
   @DeleteMapping("/remove/{productId}")
-  public ResponseEntity<ApiResponse<UserCartDTO>> deleteProductCart(@PathVariable String productId, @AuthenticationPrincipal UserDetails user) {
-    Cart cart = this.cartService.removeProduct(user, productId);
+  public ApiEntityResponse<UserCartDTO> deleteProductCart(@PathVariable String productId,
+      @AuthenticationPrincipal UserDetails user) {
+    RemoveProductCommand command = commandFactory.createRemoveProductCommand(productId, user);
+    Cart cart = command.execute();
     UserCartDTO userCartDTO = modelMapper.map(cart, UserCartDTO.class);
     ApiResponse<UserCartDTO> response = new ApiResponse<>(HttpStatus.OK, userCartDTO, null);
-    return ResponseEntity.status(200).body(response);
+
+    return ApiEntityResponse.of(HttpStatus.OK, response);
   }
+
 }

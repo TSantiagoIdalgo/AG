@@ -2,6 +2,7 @@ package com.ancore.ancoregaming.checkout.controllers;
 
 import com.ancore.ancoregaming.checkout.dtos.CheckoutSessionDTO;
 import com.ancore.ancoregaming.checkout.services.CheckoutService;
+import com.ancore.ancoregaming.common.ApiEntityResponse;
 import com.ancore.ancoregaming.common.ApiResponse;
 import com.ancore.ancoregaming.common.ExceptionResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -32,21 +33,24 @@ public class CheckoutController {
   private String endpointSecret;
 
   @PostMapping("/create-checkout-session")
-  public ResponseEntity<ApiResponse<CheckoutSessionDTO>> createCheckoutSession(@AuthenticationPrincipal UserDetails user) throws StripeException {
+  public ApiEntityResponse<CheckoutSessionDTO> createCheckoutSession(@AuthenticationPrincipal UserDetails user)
+      throws StripeException {
     Session session = this.checkoutService.createCheckoutSession(user);
-    ApiResponse<CheckoutSessionDTO> response = new ApiResponse<>(HttpStatus.OK, new CheckoutSessionDTO(session.getUrl()), null);
-    return ResponseEntity.status(200).body(response);
+    ApiResponse<CheckoutSessionDTO> response = new ApiResponse<>(HttpStatus.OK,
+        new CheckoutSessionDTO(session.getUrl()), null);
+    return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 
   @PostMapping("/webhook")
-  public ResponseEntity<ApiResponse<?>> handleStripeWebhook(@RequestBody String payload, @RequestHeader("Stripe-Signature") String sigHeader) throws JsonProcessingException {
+  public ApiEntityResponse<?> handleStripeWebhook(@RequestBody String payload,
+      @RequestHeader("Stripe-Signature") String sigHeader) throws JsonProcessingException {
     Event event;
     try {
       event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
     } catch (SignatureVerificationException e) {
       ExceptionResponse error = new ExceptionResponse(400, "Error verifying webhook", e.getMessage());
       ApiResponse<ExceptionResponse> response = new ApiResponse<>(HttpStatus.BAD_REQUEST, null, error);
-      return ResponseEntity.status(400).body(response);
+      return ApiEntityResponse.of(HttpStatus.OK, response);
     }
 
     try {
@@ -57,20 +61,16 @@ public class CheckoutController {
           createErrorResponse("Invalid event type in webhook", HttpStatus.BAD_REQUEST);
       }
     } catch (JsonProcessingException e) {
-      return createErrorResponse("Error processing JSON payload", HttpStatus.BAD_REQUEST, e);
+      ExceptionResponse error = new ExceptionResponse(400, "Error verifying webhook", e.getMessage());
+      ApiResponse<ExceptionResponse> response = new ApiResponse<>(HttpStatus.BAD_REQUEST, null, error);
+      return ApiEntityResponse.of(HttpStatus.BAD_REQUEST, response);
     }
 
-    return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK, null, null));
+    return ApiEntityResponse.of(HttpStatus.OK, new ApiResponse<>(HttpStatus.OK, null, null));
   }
 
   private ResponseEntity<ApiResponse<?>> createErrorResponse(String message, HttpStatus status) {
     ExceptionResponse error = new ExceptionResponse(status.value(), message, null);
-    ApiResponse<ExceptionResponse> response = new ApiResponse<>(status, null, error);
-    return ResponseEntity.status(status).body(response);
-  }
-
-  private ResponseEntity<ApiResponse<?>> createErrorResponse(String message, HttpStatus status, Exception e) {
-    ExceptionResponse error = new ExceptionResponse(status.value(), message, e.getMessage());
     ApiResponse<ExceptionResponse> response = new ApiResponse<>(status, null, error);
     return ResponseEntity.status(status).body(response);
   }
