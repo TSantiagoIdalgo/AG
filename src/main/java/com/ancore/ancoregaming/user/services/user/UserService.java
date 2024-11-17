@@ -73,9 +73,7 @@ public class UserService implements IUserService {
     }
 
     user.setVerify(true);
-    this.userRepository.save(user);
-
-    return user;
+    return this.userRepository.save(user);
   }
 
 }

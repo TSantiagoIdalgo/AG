@@ -35,38 +35,40 @@ public class SecurityConfig {
   private final IUserRepository userRepo;
   private final UserAuthorizationFilter userAuthorizationFilter;
 
-  @Bean // Este annotation le indica a Spring que la instancia que devuelve el metodo la guarde en su contexto
+  @Bean // Este annotation le indica a Spring que la instancia que devuelve el metodo la
+        // guarde en su contexto
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http
-            .csrf(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(request
-                    -> request.requestMatchers("/auth/**").permitAll()
-                    .requestMatchers("/webhook").permitAll()
-                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                    .requestMatchers("/swagger-ui/**").permitAll()
-                    .requestMatchers("/v3/**").permitAll()
-                    .anyRequest().authenticated()
-            )
-            .addFilterBefore(userAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
+        .csrf(AbstractHttpConfigurer::disable)
+        .authorizeHttpRequests(request -> request.requestMatchers("/auth/**").permitAll()
+            .requestMatchers("/webhook").permitAll()
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+            .requestMatchers("/swagger-ui/**").permitAll()
+            .requestMatchers("/v3/**").permitAll()
+            .anyRequest().authenticated())
+        .addFilterBefore(userAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
     return http.build();
   }
 
   @Bean
   public UserDetailsService userDetailsService() throws EntityNotFoundException {
     return (String userEmail) -> {
-      User user = userRepo.findById(userEmail).orElseThrow(() -> new EntityNotFoundException("User not found"));
+      User user = userRepo.findUserWithVerifyTrue(userEmail)
+          .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-      List<GrantedAuthority> authorities = user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
+      List<GrantedAuthority> authorities = user.getRoles().stream()
+          .map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
 
       return org.springframework.security.core.userdetails.User.builder()
-              .username(user.getEmail())
-              .password(user.getPassword())
-              .authorities(authorities)
-              .build();
+          .username(user.getEmail())
+          .password(user.getPassword())
+          .authorities(authorities)
+          .build();
     };
   }
 
-  // Se declara PasswordEncoder para asi definir que tipo de encriptacion va a tener las passwords
+  // Se declara PasswordEncoder para asi definir que tipo de encriptacion va a
+  // tener las passwords
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
@@ -74,7 +76,8 @@ public class SecurityConfig {
   }
 
   @Bean
-  public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+      throws Exception {
     return authenticationConfiguration.getAuthenticationManager();
   }
 

@@ -7,6 +7,8 @@ import com.ancore.ancoregaming.checkout.model.Checkout;
 import com.ancore.ancoregaming.checkout.model.CheckoutItems;
 import com.ancore.ancoregaming.checkout.repositories.ICheckoutItemsRepository;
 import com.ancore.ancoregaming.checkout.repositories.ICheckoutRepository;
+import com.ancore.ancoregaming.email.dtos.PurchaseEmailDTO;
+import com.ancore.ancoregaming.email.services.EmailService;
 import com.ancore.ancoregaming.product.model.Product;
 import com.ancore.ancoregaming.user.model.User;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -43,10 +45,15 @@ public class CheckoutService {
   private StockReservationService stockReservationService;
   @Autowired
   private ICheckoutItemsRepository checkoutItemsRepository;
+  @Autowired
+  private EmailService emailService;
 
   @Transactional
   public Session createCheckoutSession(UserDetails userDetails) throws StripeException {
     Cart userCart = this.cartRepository.findByUserEmailAndUnpaidItems(userDetails.getUsername());
+    if (userCart == null) {
+      throw new EntityNotFoundException("User cart not found");
+    }
     Map<String, Object> params = new HashMap<>();
 
     List<Object> lineItems = new ArrayList<>();
@@ -75,11 +82,13 @@ public class CheckoutService {
         JsonNode metadataNode = sessionNode.get("metadata");
         if (metadataNode != null && metadataNode.has("cartId") && "paid".equals(paymentStatus)) {
           String cartId = metadataNode.get("cartId").asText();
-
+          String userEmail = sessionNode.get("customer_email").asText();
           Cart userCart = this.cartRepository.findCartByIdWithoutItemsUnpaid(UUID.fromString(cartId))
               .orElseThrow(() -> new EntityNotFoundException("User cart not found"));
-          List<CartItem> cartItems = userCart.getItems();
 
+          this.sendEmail(userEmail, userCart);
+
+          List<CartItem> cartItems = userCart.getItems();
           cartItems.forEach(item -> {
             Product product = item.getProduct();
             if (product == null) {
@@ -100,6 +109,7 @@ public class CheckoutService {
           userCart.setSubtotal(BigDecimal.ZERO);
           userCart.getUser().getStockReservation()
               .forEach((reservation) -> this.stockReservationService.confirmPayment(reservation.getId()));
+
         }
       }
     } catch (OptimisticLockException e) {
@@ -158,5 +168,19 @@ public class CheckoutService {
     BigDecimal totalAmount = multiplyAmount.divide(percentage);
 
     return convertToCents(totalAmount);
+  }
+
+  private void sendEmail(String userEmail, Cart cart) {
+    PurchaseEmailDTO purchaseEmailDTO = new PurchaseEmailDTO();
+    String productsMessage = cart.getItems().get(0).getProduct().getName();
+    String productCuantityString = cart.getItems().size() > 1
+        ? " and another " + (cart.getItems().size() - 1) + " products"
+        : "";
+    purchaseEmailDTO.setAddressee(userEmail);
+    purchaseEmailDTO.setItems(cart.getItems());
+    purchaseEmailDTO.setProductsCuantity("$" + (productsMessage + productCuantityString));
+    purchaseEmailDTO.setTotal(cart.getTotal());
+    purchaseEmailDTO.setUsername(cart.getUser().getUsername());
+    this.emailService.sendPurchaseMail(purchaseEmailDTO);
   }
 }
