@@ -1,5 +1,9 @@
 package com.ancore.ancoregaming.review.services;
 
+import com.ancore.ancoregaming.cart.model.Cart;
+import com.ancore.ancoregaming.cart.model.CartItem;
+import com.ancore.ancoregaming.cart.repositories.ICartItemRepository;
+import com.ancore.ancoregaming.cart.repositories.ICartRepository;
 import com.ancore.ancoregaming.product.model.Product;
 import com.ancore.ancoregaming.product.services.product.IProductService;
 import com.ancore.ancoregaming.review.dtos.ReactionType;
@@ -32,6 +36,10 @@ public class ReviewService implements IReviewService {
   private IUserService userService;
   @Autowired
   private IReviewReactionRepository reviewReactionRepository;
+  @Autowired
+  private ICartRepository cartRepository;
+  @Autowired
+  private ICartItemRepository cartItemRepository;
 
   @Override
   public List<Review> findAllReviews(boolean recommendad) {
@@ -68,11 +76,20 @@ public class ReviewService implements IReviewService {
   public Review createReview(String productId, ReviewDTO reviewDTO, UserDetails userDetails) {
     User user = this.userService.findUser(userDetails.getUsername());
     Product product = this.productService.findProduct(productId);
+    Optional<Cart> userCart = this.cartRepository.findByUserEmailWithPaidItems(user.getEmail());
+    if (userCart.isEmpty()) {
+      throw new EntityNotFoundException("User paid cart not found");
+    }
+    Optional<CartItem> paidCartItem = this.cartItemRepository
+        .findPaidCartItemByCartIdAndProductId(userCart.get().getId(), product.getId());
+    if (paidCartItem.isEmpty()) {
+      throw new EntityNotFoundException("Paid item not found");
+    }
     Review review = new Review.Builder()
         .setTitle(reviewDTO.getTitle())
         .setComment(reviewDTO.getComment())
         .setRating(reviewDTO.isRecommended())
-        .setProduct(product)
+        .setProduct(paidCartItem.get().getProduct())
         .setUser(user)
         .build();
     this.reviewRepository.save(review);

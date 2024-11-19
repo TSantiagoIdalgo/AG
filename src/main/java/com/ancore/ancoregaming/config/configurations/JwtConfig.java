@@ -27,19 +27,21 @@ public class JwtConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
-            .csrf(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(req
-                    -> req.requestMatchers("/auth/**").permitAll()
-                    .requestMatchers("/api/checkout/webhook").permitAll()
-                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                    .requestMatchers("/swagger-ui/**").permitAll()
-                    .requestMatchers("/v3/**").permitAll()
-                    .anyRequest().authenticated()
-            )
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authenticationProvider(authenticationProvider)
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-            .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthenticateConfig));
+        .csrf(AbstractHttpConfigurer::disable)
+        .authorizeHttpRequests(req -> req.requestMatchers("/auth/**").permitAll()
+            .requestMatchers("/api/checkout/webhook").permitAll()
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+            .requestMatchers("/swagger-ui/**").permitAll()
+            .requestMatchers("/v3/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/user/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/product/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/whitelist/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/review/**").permitAll()
+            .anyRequest().authenticated())
+        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authenticationProvider(authenticationProvider)
+        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+        .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthenticateConfig));
 
     return http.build();
   }

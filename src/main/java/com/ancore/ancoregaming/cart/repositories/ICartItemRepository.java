@@ -12,6 +12,11 @@ public interface ICartItemRepository extends JpaRepository<CartItem, UUID> {
   public CartItem findByCartId(UUID cartId);
 
   @Query("SELECT ci FROM CartItem ci JOIN ci.cart c JOIN ci.product p WHERE c.id = :cartId AND p.id = :productId AND ci.itemIsPaid = false")
-  Optional<CartItem> findUnpaidCartItemByCartIdAndProductId(@Param("cartId") UUID cartId, @Param("productId") UUID productId);
+  Optional<CartItem> findUnpaidCartItemByCartIdAndProductId(@Param("cartId") UUID cartId,
+      @Param("productId") UUID productId);
+
+  @Query("SELECT ci FROM CartItem ci JOIN ci.cart c JOIN ci.product p WHERE c.id = :cartId AND p.id = :productId AND ci.itemIsPaid = true")
+  Optional<CartItem> findPaidCartItemByCartIdAndProductId(@Param("cartId") UUID cartId,
+      @Param("productId") UUID productId);
 
 }
