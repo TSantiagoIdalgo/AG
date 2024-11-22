@@ -4,7 +4,6 @@ uploads/
 bin/
 out/
 build/
-application.properties
 
 # Dependencias de Maven o Gradle
 .mvn/
@@ -35,7 +34,6 @@ Thumbs.db
 
 # Archivos de configuración de sistema o entorno
 *.env
-*.properties
 
 # Archivos de caché
 *.cache
