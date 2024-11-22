@@ -6,9 +6,7 @@ out/
 build/
 
 # Dependencias de Maven o Gradle
-.mvn/
 .gradle/
-mvnw*
 gradlew*
 !gradle/wrapper/gradle-wrapper.jar
 # Archivos de logs
