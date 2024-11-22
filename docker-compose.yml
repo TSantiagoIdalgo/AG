@@ -1,0 +1,31 @@
+services:
+  ancore-gaming-api:
+    image: ancore-gaming-api
+    container_name: ancore-gaming-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - ancore-networks
+    depends_on:
+      - ancore_database
+  ancore_database: 
+    image: postgres
+    container_name: ancore_postgres
+    environment: 
+      POSTGRES_PASSWORD: 277353
+      POSTGRES_USER: postgres
+      POSTGRES_DB: ancore_gaming
+    ports:
+      - "5431:5432"
+    networks:
+      - ancore-networks
+    
+    volumes:
+      - postgres-volumes:/var/lib/postgres
+networks:
+  ancore-networks:
+volumes:
+  postgres-volumes:
