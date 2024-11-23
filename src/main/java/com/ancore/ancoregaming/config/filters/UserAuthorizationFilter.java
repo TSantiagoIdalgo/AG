@@ -1,20 +1,21 @@
 package com.ancore.ancoregaming.config.filters;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
+
+import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.UriTemplate;
-import org.springframework.lang.NonNull;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
@@ -34,8 +35,7 @@ public class UserAuthorizationFilter extends OncePerRequestFilter {
     if (authentication != null && authentication.isAuthenticated() && requestPath.contains("user")) {
       Object principal = authentication.getPrincipal();
 
-      if (principal instanceof UserDetails) {
-        UserDetails userDetails = (UserDetails) principal;
+      if (principal instanceof UserDetails userDetails) {
         String username = userDetails.getUsername();
         boolean isAdmin = userDetails
             .getAuthorities()

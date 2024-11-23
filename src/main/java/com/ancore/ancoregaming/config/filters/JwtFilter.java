@@ -1,17 +1,8 @@
 package com.ancore.ancoregaming.config.filters;
 
-import com.ancore.ancoregaming.auth.services.JwtService;
-import com.ancore.ancoregaming.user.model.User;
-import com.ancore.ancoregaming.user.repositories.IUserRepository;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
 
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,6 +12,17 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import com.ancore.ancoregaming.auth.services.JwtService;
+import com.ancore.ancoregaming.user.model.User;
+import com.ancore.ancoregaming.user.repositories.IUserRepository;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 // Filtro para authenticar al usuario con un json web token
 @Component
@@ -45,11 +47,11 @@ public class JwtFilter extends OncePerRequestFilter {
         .flatMap(Arrays::stream)
         .filter(cookie -> "access_token".equals(cookie.getName()))
         .findFirst();
+
     if (cookieJwt.isEmpty()) {
       chain.doFilter(request, response);
       return;
     }
-
     final String jwtToken = cookieJwt.get().getValue();
     String username = jwtService.extractUsername(jwtToken);
 

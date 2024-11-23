@@ -1,15 +1,5 @@
 package com.ancore.ancoregaming.auth.controller;
 
-import com.ancore.ancoregaming.auth.services.AuthService;
-import com.ancore.ancoregaming.auth.dtos.JwtResponse;
-import com.ancore.ancoregaming.auth.dtos.LoginDTO;
-import com.ancore.ancoregaming.common.ApiEntityResponse;
-import com.ancore.ancoregaming.common.ApiResponse;
-import com.ancore.ancoregaming.user.dtos.CreateUserDTO;
-import com.ancore.ancoregaming.user.model.User;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +7,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.ancore.ancoregaming.auth.dtos.JwtResponse;
+import com.ancore.ancoregaming.auth.dtos.LoginDTO;
+import com.ancore.ancoregaming.auth.services.AuthService;
+import com.ancore.ancoregaming.common.ApiEntityResponse;
+import com.ancore.ancoregaming.common.ApiResponse;
+import com.ancore.ancoregaming.user.dtos.CreateUserDTO;
+import com.ancore.ancoregaming.user.model.User;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/auth")
