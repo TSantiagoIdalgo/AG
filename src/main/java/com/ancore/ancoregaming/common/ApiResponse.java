@@ -1,25 +1,15 @@
 package com.ancore.ancoregaming.common;
 
-import org.springframework.http.HttpStatus;
-
 public class ApiResponse<T> {
-
-  private HttpStatus responseMsg;
   private T data;
   private ExceptionResponse error;
 
-  public ApiResponse(HttpStatus responseMsg, T data, ExceptionResponse error) {
-    this.responseMsg = responseMsg;
+  public ApiResponse() {
+  }
+
+  public ApiResponse(T data, ExceptionResponse error) {
     this.data = data;
     this.error = error;
-  }
-
-  public HttpStatus getResponseMsg() {
-    return responseMsg;
-  }
-
-  public void setResponseMsg(HttpStatus responseMsg) {
-    this.responseMsg = responseMsg;
   }
 
   public T getData() {

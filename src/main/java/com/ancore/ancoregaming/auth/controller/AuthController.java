@@ -30,8 +30,8 @@ public class AuthController {
   @PostMapping("/register")
   public ApiEntityResponse<User> register(@Valid @RequestBody CreateUserDTO user) {
     User userResponse = authService.createUser(user);
-    ApiResponse<User> response = new ApiResponse<>(HttpStatus.CREATED, userResponse, null);
-    return ApiEntityResponse.of(HttpStatus.OK, response);
+    ApiResponse<User> response = new ApiResponse<>(userResponse, null);
+    return ApiEntityResponse.of(HttpStatus.CREATED, response);
   }
 
   @PostMapping("/login")
@@ -43,7 +43,7 @@ public class AuthController {
     res.addCookie(jwtCookie);
     res.addCookie(refreshJwtCookie);
 
-    ApiResponse<?> response = new ApiResponse<>(HttpStatus.OK, null, null);
+    ApiResponse<?> response = new ApiResponse<>();
     return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 
@@ -61,7 +61,7 @@ public class AuthController {
     }
     SecurityContextHolder.clearContext();
 
-    ApiResponse<?> response = new ApiResponse<>(HttpStatus.OK, null, null);
+    ApiResponse<?> response = new ApiResponse<>();
     return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 

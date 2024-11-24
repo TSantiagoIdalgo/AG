@@ -1,16 +1,5 @@
 package com.ancore.ancoregaming.checkout.controllers;
 
-import com.ancore.ancoregaming.checkout.dtos.CheckoutSessionDTO;
-import com.ancore.ancoregaming.checkout.services.CheckoutService;
-import com.ancore.ancoregaming.common.ApiEntityResponse;
-import com.ancore.ancoregaming.common.ApiResponse;
-import com.ancore.ancoregaming.common.ExceptionResponse;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.stripe.exception.SignatureVerificationException;
-import com.stripe.exception.StripeException;
-import com.stripe.model.Event;
-import com.stripe.model.checkout.Session;
-import com.stripe.net.Webhook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -22,6 +11,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.ancore.ancoregaming.checkout.dtos.CheckoutSessionDTO;
+import com.ancore.ancoregaming.checkout.services.CheckoutService;
+import com.ancore.ancoregaming.common.ApiEntityResponse;
+import com.ancore.ancoregaming.common.ApiResponse;
+import com.ancore.ancoregaming.common.ExceptionResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.stripe.exception.SignatureVerificationException;
+import com.stripe.exception.StripeException;
+import com.stripe.model.Event;
+import com.stripe.model.checkout.Session;
+import com.stripe.net.Webhook;
 
 @RestController
 @RequestMapping("/api/checkout")
@@ -36,9 +37,8 @@ public class CheckoutController {
   public ApiEntityResponse<CheckoutSessionDTO> createCheckoutSession(@AuthenticationPrincipal UserDetails user)
       throws StripeException {
     Session session = this.checkoutService.createCheckoutSession(user);
-    ApiResponse<CheckoutSessionDTO> response = new ApiResponse<>(HttpStatus.OK,
-        new CheckoutSessionDTO(session.getUrl()), null);
-    return ApiEntityResponse.of(HttpStatus.OK, response);
+    ApiResponse<CheckoutSessionDTO> response = new ApiResponse<>(new CheckoutSessionDTO(session.getUrl()), null);
+    return ApiEntityResponse.of(HttpStatus.CREATED, response);
   }
 
   @PostMapping("/webhook")
@@ -49,8 +49,8 @@ public class CheckoutController {
       event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
     } catch (SignatureVerificationException e) {
       ExceptionResponse error = new ExceptionResponse(400, "Error verifying webhook", e.getMessage());
-      ApiResponse<ExceptionResponse> response = new ApiResponse<>(HttpStatus.BAD_REQUEST, null, error);
-      return ApiEntityResponse.of(HttpStatus.OK, response);
+      ApiResponse<ExceptionResponse> response = new ApiResponse<>(null, error);
+      return ApiEntityResponse.of(HttpStatus.BAD_REQUEST, response);
     }
 
     try {
@@ -62,16 +62,16 @@ public class CheckoutController {
       }
     } catch (JsonProcessingException e) {
       ExceptionResponse error = new ExceptionResponse(400, "Error verifying webhook", e.getMessage());
-      ApiResponse<ExceptionResponse> response = new ApiResponse<>(HttpStatus.BAD_REQUEST, null, error);
+      ApiResponse<ExceptionResponse> response = new ApiResponse<>(null, error);
       return ApiEntityResponse.of(HttpStatus.BAD_REQUEST, response);
     }
 
-    return ApiEntityResponse.of(HttpStatus.OK, new ApiResponse<>(HttpStatus.OK, null, null));
+    return ApiEntityResponse.of(HttpStatus.OK, new ApiResponse<>(null, null));
   }
 
   private ResponseEntity<ApiResponse<?>> createErrorResponse(String message, HttpStatus status) {
     ExceptionResponse error = new ExceptionResponse(status.value(), message, null);
-    ApiResponse<ExceptionResponse> response = new ApiResponse<>(status, null, error);
+    ApiResponse<ExceptionResponse> response = new ApiResponse<>(null, error);
     return ResponseEntity.status(status).body(response);
   }
 }

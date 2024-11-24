@@ -1,12 +1,7 @@
 package com.ancore.ancoregaming.user.controllers;
 
-import com.ancore.ancoregaming.common.ApiEntityResponse;
-import com.ancore.ancoregaming.common.ApiResponse;
-import com.ancore.ancoregaming.user.dtos.UpdateUserDTO;
-import com.ancore.ancoregaming.user.dtos.UserDTO;
-import com.ancore.ancoregaming.user.model.User;
-import com.ancore.ancoregaming.user.services.user.IUserService;
 import java.util.List;
+
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +15,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.ancore.ancoregaming.common.ApiEntityResponse;
+import com.ancore.ancoregaming.common.ApiResponse;
+import com.ancore.ancoregaming.user.dtos.UpdateUserDTO;
+import com.ancore.ancoregaming.user.dtos.UserDTO;
+import com.ancore.ancoregaming.user.model.User;
+import com.ancore.ancoregaming.user.services.user.IUserService;
 
 @RestController
 @RequestMapping("/user")
@@ -37,7 +39,7 @@ public class UserController {
         users,
         new TypeToken<List<UserDTO>>() {
         }.getType());
-    ApiResponse<List<UserDTO>> response = new ApiResponse<>(HttpStatus.OK, usersDTO, null);
+    ApiResponse<List<UserDTO>> response = new ApiResponse<>(usersDTO, null);
     return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 
@@ -45,7 +47,7 @@ public class UserController {
   public ApiEntityResponse<UserDTO> findUser(@PathVariable String userId) {
     User userFound = this.userService.findUser(userId);
     UserDTO userDTO = modelMapper.map(userFound, UserDTO.class);
-    ApiResponse<UserDTO> response = new ApiResponse<>(HttpStatus.OK, userDTO, null);
+    ApiResponse<UserDTO> response = new ApiResponse<>(userDTO, null);
     return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 
@@ -53,7 +55,7 @@ public class UserController {
   public ApiEntityResponse<UserDTO> deleteUser(@PathVariable String userId) {
     User userDeleted = this.userService.destroyUser(userId);
     UserDTO userDTO = modelMapper.map(userDeleted, UserDTO.class);
-    ApiResponse<UserDTO> response = new ApiResponse<>(HttpStatus.OK, userDTO, null);
+    ApiResponse<UserDTO> response = new ApiResponse<>(userDTO, null);
 
     return ApiEntityResponse.of(HttpStatus.OK, response);
   }
@@ -63,7 +65,7 @@ public class UserController {
       @RequestBody UpdateUserDTO updateUser) {
     User userUpdated = this.userService.updateUser(userId, updateUser);
     UserDTO userDTO = modelMapper.map(userUpdated, UserDTO.class);
-    ApiResponse<UserDTO> response = new ApiResponse<>(HttpStatus.OK, userDTO, null);
+    ApiResponse<UserDTO> response = new ApiResponse<>(userDTO, null);
 
     return ApiEntityResponse.of(HttpStatus.OK, response);
   }
@@ -72,7 +74,7 @@ public class UserController {
   public ApiEntityResponse<UserDTO> verifyUser(@RequestParam String token) {
     User user = this.userService.verifyUser(token);
     UserDTO userDTO = modelMapper.map(user, UserDTO.class);
-    ApiResponse<UserDTO> response = new ApiResponse<>(HttpStatus.OK, userDTO, null);
+    ApiResponse<UserDTO> response = new ApiResponse<>(userDTO, null);
 
     return ApiEntityResponse.of(HttpStatus.OK, response);
   }

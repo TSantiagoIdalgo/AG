@@ -1,19 +1,12 @@
 package com.ancore.ancoregaming.review.controllers;
 
-import com.ancore.ancoregaming.common.ApiEntityResponse;
-import com.ancore.ancoregaming.common.ApiResponse;
-import com.ancore.ancoregaming.review.dtos.ReactionRequestDTO;
-import com.ancore.ancoregaming.review.dtos.ReviewDTO;
-import com.ancore.ancoregaming.review.dtos.ReviewRecommendationDTO;
-import com.ancore.ancoregaming.review.dtos.UpdateReviewDTO;
-import com.ancore.ancoregaming.review.model.Review;
-import com.ancore.ancoregaming.review.services.IReviewService;
-import jakarta.validation.Valid;
 import java.util.List;
+
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,6 +19,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ancore.ancoregaming.common.ApiEntityResponse;
+import com.ancore.ancoregaming.common.ApiResponse;
+import com.ancore.ancoregaming.review.dtos.ReactionRequestDTO;
+import com.ancore.ancoregaming.review.dtos.ReviewDTO;
+import com.ancore.ancoregaming.review.dtos.ReviewRecommendationDTO;
+import com.ancore.ancoregaming.review.dtos.UpdateReviewDTO;
+import com.ancore.ancoregaming.review.model.Review;
+import com.ancore.ancoregaming.review.services.IReviewService;
+
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/review")
 public class ReviewController {
@@ -34,6 +38,7 @@ public class ReviewController {
   private IReviewService reviewService;
   private final ModelMapper modelMapper = new ModelMapper();
 
+  @Secured("ROLE_ADMIN")
   @GetMapping("/")
   public ApiEntityResponse<List<ReviewDTO>> getAllReviews(@RequestParam boolean recommended) {
     List<Review> reviews = this.reviewService.findAllReviews(recommended);
@@ -41,7 +46,7 @@ public class ReviewController {
         reviews,
         new TypeToken<List<ReviewDTO>>() {
         }.getType());
-    ApiResponse<List<ReviewDTO>> response = new ApiResponse<>(HttpStatus.OK, reviewsDTO, null);
+    ApiResponse<List<ReviewDTO>> response = new ApiResponse<>(reviewsDTO, null);
     return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 
@@ -52,7 +57,7 @@ public class ReviewController {
         reviews,
         new TypeToken<List<ReviewDTO>>() {
         }.getType());
-    ApiResponse<List<ReviewDTO>> response = new ApiResponse<>(HttpStatus.OK, reviewsDTO, null);
+    ApiResponse<List<ReviewDTO>> response = new ApiResponse<>(reviewsDTO, null);
     return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 
@@ -60,7 +65,7 @@ public class ReviewController {
   public ApiEntityResponse<ReviewDTO> getReview(@PathVariable String reviewId) {
     Review review = this.reviewService.findReview(reviewId);
     ReviewDTO reviewDTO = modelMapper.map(review, ReviewDTO.class);
-    ApiResponse<ReviewDTO> response = new ApiResponse<>(HttpStatus.OK, reviewDTO, null);
+    ApiResponse<ReviewDTO> response = new ApiResponse<>(reviewDTO, null);
     return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 
@@ -68,7 +73,7 @@ public class ReviewController {
   public ApiEntityResponse<ReviewRecommendationDTO> getReviewRecommendation(@PathVariable String productId) {
     double percentage = this.reviewService.getRecommendationPercentage(productId);
     ReviewRecommendationDTO reviewRecommendationDTO = new ReviewRecommendationDTO(productId, (percentage * 100));
-    ApiResponse<ReviewRecommendationDTO> response = new ApiResponse<>(HttpStatus.OK, reviewRecommendationDTO, null);
+    ApiResponse<ReviewRecommendationDTO> response = new ApiResponse<>(reviewRecommendationDTO, null);
 
     return ApiEntityResponse.of(HttpStatus.OK, response);
   }
@@ -78,8 +83,8 @@ public class ReviewController {
       @Valid @RequestBody ReviewDTO reviewDTO, @AuthenticationPrincipal UserDetails user) {
     Review newReview = this.reviewService.createReview(productId, reviewDTO, user);
     ReviewDTO newReviewDTO = modelMapper.map(newReview, ReviewDTO.class);
-    ApiResponse<ReviewDTO> response = new ApiResponse<>(HttpStatus.OK, newReviewDTO, null);
-    return ApiEntityResponse.of(HttpStatus.OK, response);
+    ApiResponse<ReviewDTO> response = new ApiResponse<>(newReviewDTO, null);
+    return ApiEntityResponse.of(HttpStatus.CREATED, response);
   }
 
   @PatchMapping("/{reviewId}")
@@ -87,7 +92,7 @@ public class ReviewController {
       @RequestBody UpdateReviewDTO updateReviewDTO) {
     Review review = this.reviewService.updateReview(reviewId, updateReviewDTO);
     ReviewDTO reviewDTO = modelMapper.map(review, ReviewDTO.class);
-    ApiResponse<ReviewDTO> response = new ApiResponse<>(HttpStatus.OK, reviewDTO, null);
+    ApiResponse<ReviewDTO> response = new ApiResponse<>(reviewDTO, null);
     return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 
@@ -95,7 +100,7 @@ public class ReviewController {
   public ApiEntityResponse<ReviewDTO> deleteReview(@PathVariable String reviewId) {
     Review review = this.reviewService.deleteReview(reviewId);
     ReviewDTO reviewDTO = modelMapper.map(review, ReviewDTO.class);
-    ApiResponse<ReviewDTO> response = new ApiResponse<>(HttpStatus.OK, reviewDTO, null);
+    ApiResponse<ReviewDTO> response = new ApiResponse<>(reviewDTO, null);
     return ApiEntityResponse.of(HttpStatus.OK, response);
 
   }
@@ -106,7 +111,7 @@ public class ReviewController {
     Review review = this.reviewService.addReaction(user.getUsername(), reviewReactionDTO.getReviewId(),
         reviewReactionDTO.getReactionType());
     ReviewDTO reviewDTO = modelMapper.map(review, ReviewDTO.class);
-    ApiResponse<ReviewDTO> response = new ApiResponse<>(HttpStatus.OK, reviewDTO, null);
-    return ApiEntityResponse.of(HttpStatus.OK, response);
+    ApiResponse<ReviewDTO> response = new ApiResponse<>(reviewDTO, null);
+    return ApiEntityResponse.of(HttpStatus.CREATED, response);
   }
 }

@@ -1,16 +1,7 @@
 package com.ancore.ancoregaming.product.controllers;
 
-import com.ancore.ancoregaming.common.ApiEntityResponse;
-import com.ancore.ancoregaming.common.ApiResponse;
-import com.ancore.ancoregaming.product.dtos.CreateProductDTO;
-import com.ancore.ancoregaming.product.dtos.FilesDTO;
-import com.ancore.ancoregaming.product.dtos.ProductDTO;
-import com.ancore.ancoregaming.product.dtos.ProductFilterDTO;
-import com.ancore.ancoregaming.product.dtos.UpdateProductDTO;
-import com.ancore.ancoregaming.product.model.Product;
-import com.ancore.ancoregaming.product.services.product.IProductService;
-import jakarta.validation.Valid;
 import java.util.List;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,6 +18,18 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ancore.ancoregaming.common.ApiEntityResponse;
+import com.ancore.ancoregaming.common.ApiResponse;
+import com.ancore.ancoregaming.product.dtos.CreateProductDTO;
+import com.ancore.ancoregaming.product.dtos.FilesDTO;
+import com.ancore.ancoregaming.product.dtos.ProductDTO;
+import com.ancore.ancoregaming.product.dtos.ProductFilterDTO;
+import com.ancore.ancoregaming.product.dtos.UpdateProductDTO;
+import com.ancore.ancoregaming.product.model.Product;
+import com.ancore.ancoregaming.product.services.product.IProductService;
+
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/product")
 public class ProductController {
@@ -40,7 +43,7 @@ public class ProductController {
     Page<Product> products = this.productService.findAll(filterDTO);
     Page<ProductDTO> productsDTO = products.map((product) -> modelMapper.map(product, ProductDTO.class));
 
-    ApiResponse<Page<ProductDTO>> response = new ApiResponse<>(HttpStatus.OK, productsDTO, null);
+    ApiResponse<Page<ProductDTO>> response = new ApiResponse<>(productsDTO, null);
     return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 
@@ -50,15 +53,15 @@ public class ProductController {
       @Valid @ModelAttribute FilesDTO filesDTO) {
     Product newProduct = this.productService.createProduct(product, filesDTO);
     ProductDTO productDTO = modelMapper.map(newProduct, ProductDTO.class);
-    ApiResponse<ProductDTO> response = new ApiResponse<>(HttpStatus.OK, productDTO, null);
-    return ApiEntityResponse.of(HttpStatus.OK, response);
+    ApiResponse<ProductDTO> response = new ApiResponse<>(productDTO, null);
+    return ApiEntityResponse.of(HttpStatus.CREATED, response);
   }
 
   @GetMapping("/{productId}")
   public ApiEntityResponse<ProductDTO> findProduct(@PathVariable String productId) {
     Product product = this.productService.findProduct(productId);
     ProductDTO productDTO = modelMapper.map(product, ProductDTO.class);
-    ApiResponse<ProductDTO> response = new ApiResponse<>(HttpStatus.OK, productDTO, null);
+    ApiResponse<ProductDTO> response = new ApiResponse<>(productDTO, null);
     return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 
@@ -66,7 +69,7 @@ public class ProductController {
   @DeleteMapping("/{productId}")
   public ApiEntityResponse<?> deleteProduct(@PathVariable String productId) {
     this.productService.destroyProduct(productId);
-    ApiResponse<?> response = new ApiResponse<>(HttpStatus.OK, null, null);
+    ApiResponse<?> response = new ApiResponse<>(null, null);
     return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 
@@ -82,7 +85,7 @@ public class ProductController {
     FilesDTO filesDTO = new FilesDTO(mainImage, trailer, backgroundImage, images);
     Product product = this.productService.updateProductFields(productId, updateProductDTO, filesDTO);
     ProductDTO productDTO = modelMapper.map(product, ProductDTO.class);
-    ApiResponse<ProductDTO> response = new ApiResponse<>(HttpStatus.OK, productDTO, null);
+    ApiResponse<ProductDTO> response = new ApiResponse<>(productDTO, null);
     return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 }
