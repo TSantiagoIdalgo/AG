@@ -1,5 +1,21 @@
 package com.ancore.ancoregaming.product.services.product;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.ancore.ancoregaming.product.dtos.CreateProductDTO;
 import com.ancore.ancoregaming.product.dtos.FilesDTO;
 import com.ancore.ancoregaming.product.dtos.ProductFilterDTO;
@@ -12,21 +28,8 @@ import com.ancore.ancoregaming.product.services.genre.GenreService;
 import com.ancore.ancoregaming.product.services.platform.PlatformService;
 import com.ancore.ancoregaming.product.services.requirements.RequirementsService;
 import com.ancore.ancoregaming.product.services.upload.UploadService;
+
 import jakarta.persistence.EntityNotFoundException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class ProductService implements IProductService {
@@ -66,6 +69,7 @@ public class ProductService implements IProductService {
   public Page<Product> findAll(ProductFilterDTO filterDTO) {
     Specification<Product> spec = ProductSpecificationService
         .orderByCheckoutCount(filterDTO.isOrderByCheckoutCount())
+        .and(ProductSpecificationService.orderByWishListCount(filterDTO.isOrderbyWishList()))
         .and(ProductSpecificationService.orderByRecommendationCount(filterDTO.isOrderByRecommendation()))
         .and(ProductSpecificationService.hasDeveloper(filterDTO.getDeveloper()))
         .and(ProductSpecificationService.hasPriceRange(filterDTO.getMinPrice(), filterDTO.getMaxPrice()))

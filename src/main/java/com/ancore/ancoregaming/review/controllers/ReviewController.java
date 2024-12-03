@@ -6,7 +6,6 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -38,7 +37,6 @@ public class ReviewController {
   private IReviewService reviewService;
   private final ModelMapper modelMapper = new ModelMapper();
 
-  @Secured("ROLE_ADMIN")
   @GetMapping("/")
   public ApiEntityResponse<List<ReviewDTO>> getAllReviews() {
     List<Review> reviews = this.reviewService.findAllReviews();

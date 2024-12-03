@@ -1,7 +1,13 @@
 package com.ancore.ancoregaming.product.model;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.UUID;
+
 import com.ancore.ancoregaming.checkout.model.StockReservation;
 import com.ancore.ancoregaming.review.model.Review;
+import com.ancore.ancoregaming.whitelist.model.WhitelistItem;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -16,9 +22,6 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Version;
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -86,6 +89,9 @@ public class Product {
 
   @OneToMany(mappedBy = "product")
   private List<Review> reviews;
+
+  @OneToMany(mappedBy = "product")
+  private List<WhitelistItem> whitelistItems;
 
   @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
   private List<StockReservation> stockReservation;

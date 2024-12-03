@@ -1,9 +1,9 @@
 package com.ancore.ancoregaming.product.dtos;
 
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
 
 @Getter
 @Setter
@@ -21,6 +21,7 @@ public class ProductFilterDTO {
     private List<String> tags;
     private List<String> platform;
     private String name;
+    private boolean orderbyWishList;
     private boolean orderByRecommendation;
     private boolean orderByCheckoutCount;
 }

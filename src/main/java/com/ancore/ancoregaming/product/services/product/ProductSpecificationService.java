@@ -1,12 +1,16 @@
 package com.ancore.ancoregaming.product.services.product;
 
 import java.util.List;
+
 import org.springframework.data.jpa.domain.Specification;
+
 import com.ancore.ancoregaming.checkout.model.CheckoutItems;
 import com.ancore.ancoregaming.product.model.Genre;
 import com.ancore.ancoregaming.product.model.Platform;
 import com.ancore.ancoregaming.product.model.Product;
 import com.ancore.ancoregaming.review.model.Review;
+import com.ancore.ancoregaming.whitelist.model.WhitelistItem;
+
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
@@ -72,6 +76,20 @@ public class ProductSpecificationService {
 
                 query.orderBy(criteriaBuilder.desc(checkoutCount));
             }
+            return criteriaBuilder.conjunction();
+        };
+    }
+
+    public static Specification<Product> orderByWishListCount(boolean orderByWishList) {
+        return (root, query, criteriaBuilder) -> {
+            if (orderByWishList && query != null) {
+                Subquery<Long> subquery = query.subquery(Long.class);
+                Root<WhitelistItem> whitelistRoot = subquery.from(WhitelistItem.class);
+                subquery.select(criteriaBuilder.count(whitelistRoot))
+                        .where(criteriaBuilder.equal(whitelistRoot.get("product"), root));
+                query.orderBy(criteriaBuilder.desc(subquery));
+            }
+
             return criteriaBuilder.conjunction();
         };
     }
