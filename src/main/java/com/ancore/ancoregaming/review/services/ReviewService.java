@@ -1,5 +1,15 @@
 package com.ancore.ancoregaming.review.services;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
+
 import com.ancore.ancoregaming.cart.model.Cart;
 import com.ancore.ancoregaming.cart.model.CartItem;
 import com.ancore.ancoregaming.cart.repositories.ICartItemRepository;
@@ -15,15 +25,8 @@ import com.ancore.ancoregaming.review.repositories.IReviewReactionRepository;
 import com.ancore.ancoregaming.review.repositories.IReviewRepository;
 import com.ancore.ancoregaming.user.model.User;
 import com.ancore.ancoregaming.user.services.user.IUserService;
+
 import jakarta.persistence.EntityNotFoundException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
 
 @Service
 public class ReviewService implements IReviewService {
@@ -42,8 +45,8 @@ public class ReviewService implements IReviewService {
   private ICartItemRepository cartItemRepository;
 
   @Override
-  public List<Review> findAllReviews(boolean recommendad) {
-    List<Review> reviews = this.reviewRepository.findReviewsOrderedByLikes(recommendad);
+  public List<Review> findAllReviews() {
+    List<Review> reviews = this.reviewRepository.findAll();
 
     if (reviews.isEmpty()) {
       throw new EntityNotFoundException("Reviews are empty");
@@ -63,8 +66,8 @@ public class ReviewService implements IReviewService {
   }
 
   @Override
-  public List<Review> findProductReviews(String productId) {
-    List<Review> reviews = this.reviewRepository.findByProductId(UUID.fromString(productId));
+  public List<Review> findProductReviews(String productId, boolean recommended) {
+    List<Review> reviews = this.reviewRepository.findReviewsOrderedByLikes(recommended, UUID.fromString(productId));
     if (reviews.isEmpty()) {
       throw new EntityNotFoundException("The product has no reviews");
     }
@@ -154,6 +157,11 @@ public class ReviewService implements IReviewService {
         | InvocationTargetException e) {
       throw new RuntimeException("Error asignando el campo " + fieldName + "  " + e.getMessage());
     }
+  }
+
+  @Override
+  public long getReviewsCount() {
+    return this.reviewRepository.count();
   }
 
 }

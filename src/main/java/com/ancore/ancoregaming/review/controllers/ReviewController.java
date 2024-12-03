@@ -40,8 +40,8 @@ public class ReviewController {
 
   @Secured("ROLE_ADMIN")
   @GetMapping("/")
-  public ApiEntityResponse<List<ReviewDTO>> getAllReviews(@RequestParam boolean recommended) {
-    List<Review> reviews = this.reviewService.findAllReviews(recommended);
+  public ApiEntityResponse<List<ReviewDTO>> getAllReviews() {
+    List<Review> reviews = this.reviewService.findAllReviews();
     List<ReviewDTO> reviewsDTO = modelMapper.map(
         reviews,
         new TypeToken<List<ReviewDTO>>() {
@@ -51,8 +51,9 @@ public class ReviewController {
   }
 
   @GetMapping("/product/{productId}")
-  public ApiEntityResponse<List<ReviewDTO>> getAllProductReviews(@PathVariable String productId) {
-    List<Review> reviews = this.reviewService.findProductReviews(productId);
+  public ApiEntityResponse<List<ReviewDTO>> getAllProductReviews(@PathVariable String productId,
+      @RequestParam boolean recommended) {
+    List<Review> reviews = this.reviewService.findProductReviews(productId, recommended);
     List<ReviewDTO> reviewsDTO = modelMapper.map(
         reviews,
         new TypeToken<List<ReviewDTO>>() {
@@ -113,5 +114,16 @@ public class ReviewController {
     ReviewDTO reviewDTO = modelMapper.map(review, ReviewDTO.class);
     ApiResponse<ReviewDTO> response = new ApiResponse<>(reviewDTO, null);
     return ApiEntityResponse.of(HttpStatus.CREATED, response);
+  }
+
+  @GetMapping("/count")
+  public ApiEntityResponse<ReviewCount> getReviewsCount() {
+    long count = this.reviewService.getReviewsCount();
+    ReviewCount reviewCount = new ReviewCount(count);
+    ApiResponse<ReviewCount> response = new ApiResponse<>(reviewCount, null);
+    return ApiEntityResponse.of(HttpStatus.OK, response);
+  }
+
+  public record ReviewCount(long count) {
   }
 }

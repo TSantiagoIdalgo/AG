@@ -1,12 +1,14 @@
 package com.ancore.ancoregaming.review.repositories;
 
-import com.ancore.ancoregaming.review.model.Review;
 import java.util.List;
 import java.util.UUID;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import com.ancore.ancoregaming.review.model.Review;
 
 @Repository
 public interface IReviewRepository extends JpaRepository<Review, UUID> {
@@ -20,10 +22,12 @@ public interface IReviewRepository extends JpaRepository<Review, UUID> {
 
         @Query("SELECT r FROM Review r " +
                         "LEFT JOIN r.reactions rr " +
-                        "WHERE r.recommended = :recommended " +
+                        "WHERE r.recommended = :recommended AND r.product.id = :productId " +
                         "GROUP BY r.id " +
                         "ORDER BY SUM(CASE WHEN rr.reactionType = 'LIKE' THEN 1 ELSE 0 END) DESC, " +
                         "         SUM(CASE WHEN rr.reactionType = 'DISLIKE' THEN 1 ELSE 0 END) ASC")
         List<Review> findReviewsOrderedByLikes(
-                        @Param("recommended") final boolean recommended);
+                        @Param("recommended") final boolean recommended,
+                        @Param("productId") UUID productId);
+
 }
