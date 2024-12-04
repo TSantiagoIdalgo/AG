@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Repository;
 import com.ancore.ancoregaming.review.model.Review;
 
 @Repository
-public interface IReviewRepository extends JpaRepository<Review, UUID> {
+public interface IReviewRepository extends JpaRepository<Review, UUID>, JpaSpecificationExecutor<Review> {
 
         List<Review> findByProductId(UUID productId);
 
@@ -29,5 +30,7 @@ public interface IReviewRepository extends JpaRepository<Review, UUID> {
         List<Review> findReviewsOrderedByLikes(
                         @Param("recommended") final boolean recommended,
                         @Param("productId") UUID productId);
+
+        Review findByProductIdAndUserEmail(UUID productId, String userEmail);
 
 }

@@ -1,8 +1,12 @@
 package com.ancore.ancoregaming.review.dtos;
 
-import com.ancore.ancoregaming.user.dtos.UserDTO;
-import jakarta.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.List;
+
+import com.ancore.ancoregaming.product.dtos.ProductDTO;
+import com.ancore.ancoregaming.user.dtos.UserDTO;
+
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,6 +23,8 @@ public class ReviewDTO {
   private boolean recommended;
   private UserDTO user;
   private List<ReviewReactionDTO> reactions;
+  private Date createdAt;
+  private ProductDTO product;
 
   public ReviewDTO() {
   }

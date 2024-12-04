@@ -7,6 +7,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +22,7 @@ import com.ancore.ancoregaming.product.model.Product;
 import com.ancore.ancoregaming.product.services.product.IProductService;
 import com.ancore.ancoregaming.review.dtos.ReactionType;
 import com.ancore.ancoregaming.review.dtos.ReviewDTO;
+import com.ancore.ancoregaming.review.dtos.ReviewFilter;
 import com.ancore.ancoregaming.review.dtos.UpdateReviewDTO;
 import com.ancore.ancoregaming.review.model.Review;
 import com.ancore.ancoregaming.review.model.ReviewReaction;
@@ -26,6 +31,7 @@ import com.ancore.ancoregaming.review.repositories.IReviewRepository;
 import com.ancore.ancoregaming.user.model.User;
 import com.ancore.ancoregaming.user.services.user.IUserService;
 
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
@@ -45,14 +51,13 @@ public class ReviewService implements IReviewService {
   private ICartItemRepository cartItemRepository;
 
   @Override
-  public List<Review> findAllReviews() {
-    List<Review> reviews = this.reviewRepository.findAll();
+  public Page<Review> findAllReviews(ReviewFilter filter) {
+    Specification<Review> spec = ReviewSpecification.orderByCreatedAt(filter.isOrderByCreatedAt());
 
-    if (reviews.isEmpty()) {
-      throw new EntityNotFoundException("Reviews are empty");
-    }
+    Pageable pageable = PageRequest.of(filter.getPageNumber(), filter.getPageSize());
+    Page<Review> pagedResult = reviewRepository.findAll(spec, pageable);
 
-    return reviews;
+    return pagedResult;
   }
 
   @Override
@@ -79,11 +84,17 @@ public class ReviewService implements IReviewService {
   public Review createReview(String productId, ReviewDTO reviewDTO, UserDetails userDetails) {
     User user = this.userService.findUser(userDetails.getUsername());
     Product product = this.productService.findProduct(productId);
+
+    Review reviewFound = this.reviewRepository.findByProductIdAndUserEmail(product.getId(), user.getEmail());
+    if (reviewFound != null) {
+      throw new EntityExistsException("There is already a review from this user for this product");
+    }
+
     Optional<Cart> userCart = this.cartRepository.findByUserEmailWithPaidItems(user.getEmail());
     if (userCart.isEmpty()) {
       throw new EntityNotFoundException("User paid cart not found");
     }
-    Optional<CartItem> paidCartItem = this.cartItemRepository
+    List<CartItem> paidCartItem = this.cartItemRepository
         .findPaidCartItemByCartIdAndProductId(userCart.get().getId(), product.getId());
     if (paidCartItem.isEmpty()) {
       throw new EntityNotFoundException("Paid item not found");
@@ -92,7 +103,7 @@ public class ReviewService implements IReviewService {
         .setTitle(reviewDTO.getTitle())
         .setComment(reviewDTO.getComment())
         .setRating(reviewDTO.isRecommended())
-        .setProduct(paidCartItem.get().getProduct())
+        .setProduct(paidCartItem.get(0).getProduct())
         .setUser(user)
         .build();
     this.reviewRepository.save(review);

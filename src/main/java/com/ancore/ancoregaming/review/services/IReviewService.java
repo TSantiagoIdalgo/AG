@@ -2,16 +2,18 @@ package com.ancore.ancoregaming.review.services;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.ancore.ancoregaming.review.dtos.ReactionType;
 import com.ancore.ancoregaming.review.dtos.ReviewDTO;
+import com.ancore.ancoregaming.review.dtos.ReviewFilter;
 import com.ancore.ancoregaming.review.dtos.UpdateReviewDTO;
 import com.ancore.ancoregaming.review.model.Review;
 
 public interface IReviewService {
 
-  public List<Review> findAllReviews();
+  public Page<Review> findAllReviews(ReviewFilter filter);
 
   public Review findReview(String reviewId);
 

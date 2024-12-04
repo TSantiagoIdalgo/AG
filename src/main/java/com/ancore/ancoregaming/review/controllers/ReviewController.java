@@ -5,11 +5,13 @@ import java.util.List;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +24,7 @@ import com.ancore.ancoregaming.common.ApiEntityResponse;
 import com.ancore.ancoregaming.common.ApiResponse;
 import com.ancore.ancoregaming.review.dtos.ReactionRequestDTO;
 import com.ancore.ancoregaming.review.dtos.ReviewDTO;
+import com.ancore.ancoregaming.review.dtos.ReviewFilter;
 import com.ancore.ancoregaming.review.dtos.ReviewRecommendationDTO;
 import com.ancore.ancoregaming.review.dtos.UpdateReviewDTO;
 import com.ancore.ancoregaming.review.model.Review;
@@ -38,13 +41,11 @@ public class ReviewController {
   private final ModelMapper modelMapper = new ModelMapper();
 
   @GetMapping("/")
-  public ApiEntityResponse<List<ReviewDTO>> getAllReviews() {
-    List<Review> reviews = this.reviewService.findAllReviews();
-    List<ReviewDTO> reviewsDTO = modelMapper.map(
-        reviews,
-        new TypeToken<List<ReviewDTO>>() {
-        }.getType());
-    ApiResponse<List<ReviewDTO>> response = new ApiResponse<>(reviewsDTO, null);
+  public ApiEntityResponse<Page<ReviewDTO>> getAllReviews(@ModelAttribute ReviewFilter filterDTO) {
+    Page<Review> reviews = this.reviewService.findAllReviews(filterDTO);
+    Page<ReviewDTO> reviewsDTO = reviews.map((review) -> modelMapper.map(review, ReviewDTO.class));
+
+    ApiResponse<Page<ReviewDTO>> response = new ApiResponse<>(reviewsDTO, null);
     return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 
