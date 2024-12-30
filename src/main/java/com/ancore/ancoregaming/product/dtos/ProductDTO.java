@@ -3,6 +3,7 @@ package com.ancore.ancoregaming.product.dtos;
 import com.ancore.ancoregaming.product.model.Genre;
 import com.ancore.ancoregaming.product.model.Platform;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import lombok.Getter;
@@ -27,6 +28,9 @@ public class ProductDTO {
   private String backgroundImage;
   private String trailer;
   private String mainImage;
+  private LocalDate release_date;
+  private String distributor;
+  private String pegi;
 
   @Override
   public String toString() {

@@ -1,6 +1,7 @@
 package com.ancore.ancoregaming.product.model;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -86,6 +87,13 @@ public class Product {
 
   @Column
   private BigDecimal discount;
+  
+  @Column
+  private LocalDate release_date;
+  @Column
+  private String distributor;
+  @Column
+  private String pegi;
 
   @OneToMany(mappedBy = "product")
   private List<Review> reviews;
@@ -120,6 +128,9 @@ public class Product {
     this.images = builder.images;
     this.discount = builder.discount;
     this.reviews = builder.reviews;
+    this.release_date = builder.release_date;
+    this.distributor = builder.distributor;
+    this.pegi = builder.pegi;
   }
 
   public static class Builder {
@@ -141,12 +152,30 @@ public class Product {
     private List<String> images;
     private BigDecimal discount;
     private List<Review> reviews;
+    private LocalDate release_date;
+    private String distributor;
+    private String pegi;
 
     public Builder setName(String name) {
       this.name = name;
       return this;
     }
-
+    
+    public Builder setRelease_date(LocalDate release_date) {
+      this.release_date = release_date;
+      return this;
+    }
+    
+    public Builder setDistributor(String distributor) {
+      this.distributor = distributor;
+      return this;
+    }
+    
+    public Builder setPegi(String pegi) {
+      this.pegi = pegi;
+      return this;
+    }
+    
     public Builder setDescription(String description) {
       this.description = description;
       return this;

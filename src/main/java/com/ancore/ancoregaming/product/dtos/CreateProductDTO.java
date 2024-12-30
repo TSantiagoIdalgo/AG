@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 public class CreateProductDTO {
@@ -49,6 +50,13 @@ public class CreateProductDTO {
 
   @Positive(message = "The discount must be positive")
   public BigDecimal discount;
+  
+  @NotNull
+  public LocalDate release_date;
+  @NotNull
+  public String distributor;
+  @NotNull
+  public String pegi;
 
   @Override
   public String toString() {

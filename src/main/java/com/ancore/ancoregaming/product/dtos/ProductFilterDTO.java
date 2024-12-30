@@ -1,5 +1,6 @@
 package com.ancore.ancoregaming.product.dtos;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import lombok.Getter;
@@ -20,8 +21,36 @@ public class ProductFilterDTO {
     private List<String> genres;
     private List<String> tags;
     private List<String> platform;
+    private List<String> system;
     private String name;
+    private LocalDate release_date;
+    private String distributor;
+    private String pegi;
     private boolean orderByWishList;
     private boolean orderByRecommendation;
     private boolean orderByCheckoutCount;
+    
+    @Override
+    public String toString() {
+        return "ProductFilterDTO{" +
+            "pageSize=" + pageSize +
+            ", pageNumber=" + pageNumber +
+            ", developer='" + developer + '\'' +
+            ", franchise='" + franchise + '\'' +
+            ", minPrice=" + minPrice +
+            ", maxPrice=" + maxPrice +
+            ", minDiscount=" + minDiscount +
+            ", maxDiscount=" + maxDiscount +
+            ", genres=" + genres +
+            ", tags=" + tags +
+            ", platform=" + platform +
+            ", name='" + name + '\'' +
+            ", release_date=" + release_date +
+            ", distributor='" + distributor + '\'' +
+            ", pegi='" + pegi + '\'' +
+            ", orderByWishList=" + orderByWishList +
+            ", orderByRecommendation=" + orderByRecommendation +
+            ", orderByCheckoutCount=" + orderByCheckoutCount +
+            '}';
+    }
 }

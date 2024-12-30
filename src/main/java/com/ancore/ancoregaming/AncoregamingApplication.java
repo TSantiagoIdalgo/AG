@@ -11,9 +11,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class AncoregamingApplication {
 
-  public static void main(String[] args) {
-    SpringApplication.run(AncoregamingApplication.class, args);
-  }
+  public static void main(String[] args) { SpringApplication.run(AncoregamingApplication.class, args); }
 
   @Bean
   public OpenAPI ancoreAPI() {

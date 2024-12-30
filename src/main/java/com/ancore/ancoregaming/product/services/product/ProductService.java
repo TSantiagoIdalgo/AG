@@ -64,6 +64,9 @@ public class ProductService implements IProductService {
         .setPrice(product.price)
         .setDisabled(product.disabled)
         .setDiscount(product.discount)
+        .setRelease_date(product.release_date)
+        .setDistributor(product.distributor)
+        .setPegi(product.pegi)
         .build();
     return this.uploadProductFiles(newProduct, filesDTO, Optional.empty());
   }
@@ -75,12 +78,14 @@ public class ProductService implements IProductService {
         .and(ProductSpecificationService.orderByWishListCount(filterDTO.isOrderByWishList()))
         .and(ProductSpecificationService.orderByRecommendationCount(filterDTO.isOrderByRecommendation()))
         .and(ProductSpecificationService.hasDeveloper(filterDTO.getDeveloper()))
+        .and(ProductSpecificationService.hasDistributor(filterDTO.getDistributor()))
         .and(ProductSpecificationService.hasPriceRange(filterDTO.getMinPrice(), filterDTO.getMaxPrice()))
         .and(ProductSpecificationService.hasDiscountRange(filterDTO.getMinDiscount(), filterDTO.getMaxDiscount()))
         .and(ProductSpecificationService.hasFranchise(filterDTO.getFranchise()))
         .and(ProductSpecificationService.hasGenres(filterDTO.getGenres()))
         .and(ProductSpecificationService.hasName(filterDTO.getName()))
         .and(ProductSpecificationService.hasPlatform(filterDTO.getPlatform()))
+        .and(ProductSpecificationService.hasSystem(filterDTO.getSystem()))
         .and(ProductSpecificationService.hasTags(filterDTO.getTags()));
 
     Pageable pageable = PageRequest.of(filterDTO.getPageNumber(), filterDTO.getPageSize());

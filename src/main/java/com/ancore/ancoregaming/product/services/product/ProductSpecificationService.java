@@ -42,6 +42,14 @@ public class ProductSpecificationService {
                         builder.lower(root.get("developer")),
                         "%" + developer.toLowerCase() + "%");
     }
+    
+    public static Specification<Product> hasDistributor(String distributor) {
+        return (root, query, builder) -> distributor == null ? builder.conjunction()
+            : builder.like(
+                builder.lower(root.get("distributor")),
+            "%" + distributor.toLowerCase() + "%"
+        );
+    }
 
     public static Specification<Product> hasPriceRange(Double minPrice, Double maxPrice) {
         return (root, query, builder) -> {
@@ -154,6 +162,22 @@ public class ProductSpecificationService {
                             criteriaBuilder.lower(platformJoin.get("name")),
                             genre.toLowerCase()))
                     .toList();
+            return criteriaBuilder.or(predicates.toArray(new Predicate[0]));
+        };
+    }
+    
+    public static Specification<Product> hasSystem(List<String> systemNames) {
+        return (root, query, criteriaBuilder) -> {
+            if (systemNames == null || systemNames.isEmpty()) {
+                return criteriaBuilder.conjunction();
+            }
+            
+            Join<Product, Platform> platformJoin = root.join("platforms");
+            List<Predicate> predicates = systemNames.stream()
+                .map(genre -> criteriaBuilder.equal(
+                    criteriaBuilder.lower(platformJoin.get("platform")),
+                    genre.toLowerCase()))
+                .toList();
             return criteriaBuilder.or(predicates.toArray(new Predicate[0]));
         };
     }
