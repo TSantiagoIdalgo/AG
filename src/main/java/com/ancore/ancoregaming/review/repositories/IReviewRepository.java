@@ -15,7 +15,10 @@ import com.ancore.ancoregaming.review.model.Review;
 public interface IReviewRepository extends JpaRepository<Review, UUID>, JpaSpecificationExecutor<Review> {
 
         List<Review> findByProductId(UUID productId);
-
+        
+        @Query("SELECT COUNT(r) FROM Review r WHERE r.product.id = :productId")
+        Long countReviewsByProductId(@Param("productId") UUID productId);
+        
         @Query("SELECT (COUNT(r) * 1.0) / (SELECT COUNT(r2) FROM Review r2 WHERE r2.product.id = :productId) "
                         + "FROM Review r "
                         + "WHERE r.product.id = :productId AND r.recommended = true")

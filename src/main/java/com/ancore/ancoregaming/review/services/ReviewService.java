@@ -55,9 +55,8 @@ public class ReviewService implements IReviewService {
     Specification<Review> spec = ReviewSpecification.orderByCreatedAt(filter.isOrderByCreatedAt());
 
     Pageable pageable = PageRequest.of(filter.getPageNumber(), filter.getPageSize());
-    Page<Review> pagedResult = reviewRepository.findAll(spec, pageable);
-
-    return pagedResult;
+    
+    return reviewRepository.findAll(spec, pageable);
   }
 
   @Override
@@ -117,7 +116,7 @@ public class ReviewService implements IReviewService {
       if (method.getName().startsWith("get") && method.getReturnType().equals(Optional.class)) {
         try {
           Optional<?> value = (Optional<?>) method.invoke(updateReviewDTO);
-          if (value != null) {
+          if (value.isPresent()) {
             value.ifPresent(val -> setReviewField(review, method.getName().substring(3), val));
           }
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
@@ -154,6 +153,8 @@ public class ReviewService implements IReviewService {
 
   @Override
   public Double getRecommendationPercentage(String productId) {
+    Long reviewsCount = this.reviewRepository.countReviewsByProductId(UUID.fromString(productId));
+    if (reviewsCount == 0) throw  new EntityNotFoundException("There are no reviews for this product");
     return this.reviewRepository.findRecommendationPercentageByProductId(UUID.fromString(productId));
   }
 
