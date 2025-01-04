@@ -20,6 +20,7 @@ public class ProductDTO {
   public String developer;
   public List<Genre> genres;
   public List<String> tags;
+  public List<RequirementsDTO> requirements;
   public boolean disabled;
   public int stock;
   public BigDecimal price;

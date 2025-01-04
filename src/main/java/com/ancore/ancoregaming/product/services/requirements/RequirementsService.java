@@ -33,7 +33,7 @@ public class RequirementsService implements IRequirementsService {
     Requirements newRequirement = new Requirements.Builder()
             .setType(requirement.getType())
             .setStorage(requirement.getStorage())
-            .setOS(requirement.getOS())
+            .setOS(requirement.getOs())
             .setMemory(requirement.getMemory())
             .setGraphics(requirement.getGraphics())
             .setDirectx_v(requirement.getDirectx_v())

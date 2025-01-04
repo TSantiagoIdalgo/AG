@@ -23,13 +23,13 @@ public class Requirements {
   @GeneratedValue(strategy = GenerationType.SEQUENCE)
   private Long id;
   @Column
-  private String OS;
+  private String os;
   @Column
   private double memory;
   @Column
   private String graphics;
   @Column
-  private double Directx_v;
+  private double directx_v;
   @Column
   private double storage;
   @Column
@@ -42,10 +42,10 @@ public class Requirements {
   }
 
   private Requirements(Builder builder) {
-    this.OS = builder.OS;
+    this.os = builder.os;
     this.memory = builder.memory;
     this.graphics = builder.graphics;
-    this.Directx_v = builder.Directx_v;
+    this.directx_v = builder.directx_v;
     this.storage = builder.storage;
     this.type = builder.type;
     this.processor = builder.processor;
@@ -53,16 +53,16 @@ public class Requirements {
 
   public static class Builder {
 
-    private String OS;
+    private String os;
     private double memory;
     private String graphics;
-    private double Directx_v;
+    private double directx_v;
     private double storage;
     private RequirementType type;
     private String processor;
 
     public Builder setOS(String OS) {
-      this.OS = OS;
+      this.os = OS;
       return this;
     }
 
@@ -82,7 +82,7 @@ public class Requirements {
     }
 
     public Builder setDirectx_v(double Directx_v) {
-      this.Directx_v = Directx_v;
+      this.directx_v = Directx_v;
       return this;
     }
 
@@ -103,7 +103,7 @@ public class Requirements {
 
   @Override
   public String toString() {
-    return "Requirements{" + "id=" + id + ", OS=" + OS + ", memory=" + memory + ", graphics=" + graphics + ", Directx_v=" + Directx_v + ", storage=" + storage + ", type=" + type + '}';
+    return "Requirements{" + "id=" + id + ", OS=" + os + ", memory=" + memory + ", graphics=" + graphics + ", Directx_v=" + directx_v + ", storage=" + storage + ", type=" + type + '}';
   }
 
 }
