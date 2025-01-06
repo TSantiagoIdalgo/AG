@@ -144,8 +144,7 @@ public class CheckoutService {
             "currency", "usd",
             "product_data", Map.of(
                 "name", product.getName(),
-                "images", Collections.singletonList(product.getMainImage()),
-                "description", product.getDescription()),
+                "images", Collections.singletonList(product.getMainImage())),
             "unit_amount", this.getFinalPrice(product.getPrice(), product.getDiscount())),
         "quantity", quantity);
 

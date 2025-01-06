@@ -24,7 +24,7 @@ public class ReviewDTO {
   private UserDTO user;
   private List<ReviewReactionDTO> reactions;
   private Date createdAt;
-  private ProductDTO product;
+  private ReviewProductDTO product;
 
   public ReviewDTO() {
   }
