@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.ancore.ancoregaming.review.dtos.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,10 +21,6 @@ import com.ancore.ancoregaming.cart.repositories.ICartItemRepository;
 import com.ancore.ancoregaming.cart.repositories.ICartRepository;
 import com.ancore.ancoregaming.product.model.Product;
 import com.ancore.ancoregaming.product.services.product.IProductService;
-import com.ancore.ancoregaming.review.dtos.ReactionType;
-import com.ancore.ancoregaming.review.dtos.ReviewDTO;
-import com.ancore.ancoregaming.review.dtos.ReviewFilter;
-import com.ancore.ancoregaming.review.dtos.UpdateReviewDTO;
 import com.ancore.ancoregaming.review.model.Review;
 import com.ancore.ancoregaming.review.model.ReviewReaction;
 import com.ancore.ancoregaming.review.repositories.IReviewReactionRepository;
@@ -152,10 +149,12 @@ public class ReviewService implements IReviewService {
   }
 
   @Override
-  public Double getRecommendationPercentage(String productId) {
+  public ReviewRecommendationDTO getRecommendationPercentage(String productId) {
     Long reviewsCount = this.reviewRepository.countReviewsByProductId(UUID.fromString(productId));
     if (reviewsCount == 0) throw  new EntityNotFoundException("There are no reviews for this product");
-    return this.reviewRepository.findRecommendationPercentageByProductId(UUID.fromString(productId));
+    Double average = this.reviewRepository.findRecommendationPercentageByProductId(UUID.fromString(productId));
+    
+    return new ReviewRecommendationDTO(productId, (average * 100), reviewsCount);
   }
 
   private void setReviewField(Review review, String fieldName, Object value) {

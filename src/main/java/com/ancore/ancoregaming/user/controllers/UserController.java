@@ -2,11 +2,14 @@ package com.ancore.ancoregaming.user.controllers;
 
 import java.util.List;
 
+import org.apache.coyote.BadRequestException;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import com.ancore.ancoregaming.common.ApiEntityResponse;
@@ -36,9 +39,12 @@ public class UserController {
     return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 
-  @GetMapping("/{userId}")
-  public ApiEntityResponse<UserDTO> findUser(@PathVariable String userId) {
-    User userFound = this.userService.findUser(userId);
+  @GetMapping("/find/{userId}")
+  public ApiEntityResponse<UserDTO> findUser(@PathVariable String userId, @AuthenticationPrincipal UserDetails user) throws BadRequestException {
+    User userFound;
+    if (user.getUsername() != null) userFound = this.userService.findUser(user.getUsername());
+    else if (userId != null) userFound = this.userService.findUser(userId);
+    else throw new BadRequestException("UserId is required");
     UserDTO userDTO = modelMapper.map(userFound, UserDTO.class);
     ApiResponse<UserDTO> response = new ApiResponse<>(userDTO, null);
     return ApiEntityResponse.of(HttpStatus.OK, response);

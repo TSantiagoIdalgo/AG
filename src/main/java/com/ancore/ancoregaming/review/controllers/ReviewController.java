@@ -71,8 +71,7 @@ public class ReviewController {
 
   @GetMapping("/recommendation/{productId}")
   public ApiEntityResponse<ReviewRecommendationDTO> getReviewRecommendation(@PathVariable String productId) {
-    double percentage = this.reviewService.getRecommendationPercentage(productId);
-    ReviewRecommendationDTO reviewRecommendationDTO = new ReviewRecommendationDTO(productId, (percentage * 100));
+    ReviewRecommendationDTO reviewRecommendationDTO = this.reviewService.getRecommendationPercentage(productId);
     ApiResponse<ReviewRecommendationDTO> response = new ApiResponse<>(reviewRecommendationDTO, null);
 
     return ApiEntityResponse.of(HttpStatus.OK, response);

@@ -174,7 +174,7 @@ public class CheckoutService {
         : "";
     purchaseEmailDTO.setAddressee(userEmail);
     purchaseEmailDTO.setItems(cart.getItems());
-    purchaseEmailDTO.setProductsQuantity("$" + (productsMessage + productCuantityString));
+    purchaseEmailDTO.setProductsQuantity(productsMessage + productCuantityString);
     purchaseEmailDTO.setTotal(cart.getTotal());
     purchaseEmailDTO.setUsername(cart.getUser().getUsername());
     this.emailService.sendPurchaseMail(purchaseEmailDTO);
