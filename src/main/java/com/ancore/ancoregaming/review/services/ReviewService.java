@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import com.ancore.ancoregaming.review.dtos.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +76,30 @@ public class ReviewService implements IReviewService {
 
     return reviews;
   }
-
+  
+  @Override
+  public List<ReviewUserReaction> findProductReviewsWithUserReaction(String productId, boolean recommended, String userId) {
+    List<Object[]> reviews = this.reviewRepository.findReviewsOrderedByLikesWithUserReaction(recommended, UUID.fromString(productId), userId);
+    
+    return reviews.stream()
+        .map(res -> {
+          Review review = (Review) res[0];
+          ReactionType reaction = (ReactionType) res[1];
+          return ReviewUserReaction.builder()
+              .id(review.getId())
+              .reactions(review.getReactions())
+              .title(review.getTitle())
+              .createdAt(review.getCreatedAt())
+              .comment(review.getComment())
+              .reactionType(reaction)
+              .product(review.getProduct())
+              .user(review.getUser())
+              .recommended(review.isRecommended())
+              .build();
+        })
+        .toList();
+  }
+  
   @Override
   public Review createReview(String productId, ReviewDTO reviewDTO, UserDetails userDetails) {
     User user = this.userService.findUser(userDetails.getUsername());
@@ -129,14 +153,20 @@ public class ReviewService implements IReviewService {
     Optional<ReviewReaction> existingReaction = reviewReactionRepository.findByUserEmailAndReviewId(userId,
         UUID.fromString(reviewId));
     if (existingReaction.isPresent()) {
-      throw new IllegalStateException("User has already reacted to this review");
+      if (existingReaction.get().getReactionType().equals(reactionType)) {
+        this.reviewReactionRepository.delete(existingReaction.get());
+      } else {
+        existingReaction.get().setReactionType(reactionType);
+        this.reviewReactionRepository.save(existingReaction.get());
+      }
+      
+      return this.findReview(reviewId);
     }
 
     User user = this.userService.findUser(userId);
     Review review = this.findReview(reviewId);
-
     ReviewReaction reaction = new ReviewReaction(user, review, reactionType);
-
+    review.getReactions().add(reaction);
     this.reviewReactionRepository.save(reaction);
     return review;
   }

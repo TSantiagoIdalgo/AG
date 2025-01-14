@@ -25,7 +25,6 @@ import lombok.Setter;
 @Setter
 @Entity
 public class Review {
-
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
@@ -94,5 +93,16 @@ public class Review {
     public Review build() {
       return new Review(this);
     }
+  }
+  
+  @Override
+  public String toString() {
+    return "Review{" +
+        "createdAt=" + createdAt +
+        ", recommended=" + recommended +
+        ", comment='" + comment + '\'' +
+        ", title='" + title + '\'' +
+        ", id=" + id +
+        '}';
   }
 }

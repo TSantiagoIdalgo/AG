@@ -25,6 +25,7 @@ public class ReviewDTO {
   private List<ReviewReactionDTO> reactions;
   private Date createdAt;
   private ReviewProductDTO product;
+  private ReactionType reactionType;
 
   public ReviewDTO() {
   }
@@ -35,11 +36,19 @@ public class ReviewDTO {
     this.recommended = recommended;
     this.user = user;
   }
-
+  
   @Override
   public String toString() {
-    return "ReviewDTO{" + ", title=" + title + ", comment=" + comment + ", recommended=" + recommended + ", user="
-        + user + '}';
+    return "ReviewDTO{" +
+        "id='" + id + '\'' +
+        ", title='" + title + '\'' +
+        ", comment='" + comment + '\'' +
+        ", recommended=" + recommended +
+        ", user=" + user +
+        ", reactions=" + reactions +
+        ", createdAt=" + createdAt +
+        ", product=" + product +
+        ", reactionType=" + reactionType +
+        '}';
   }
-
 }

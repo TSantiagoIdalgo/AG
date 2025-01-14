@@ -2,6 +2,7 @@ package com.ancore.ancoregaming.review.controllers;
 
 import java.util.List;
 
+import com.ancore.ancoregaming.review.dtos.*;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ancore.ancoregaming.common.ApiEntityResponse;
 import com.ancore.ancoregaming.common.ApiResponse;
-import com.ancore.ancoregaming.review.dtos.ReactionRequestDTO;
-import com.ancore.ancoregaming.review.dtos.ReviewDTO;
-import com.ancore.ancoregaming.review.dtos.ReviewFilter;
-import com.ancore.ancoregaming.review.dtos.ReviewRecommendationDTO;
-import com.ancore.ancoregaming.review.dtos.UpdateReviewDTO;
 import com.ancore.ancoregaming.review.model.Review;
 import com.ancore.ancoregaming.review.services.IReviewService;
 
@@ -51,7 +47,18 @@ public class ReviewController {
 
   @GetMapping("/product/{productId}")
   public ApiEntityResponse<List<ReviewDTO>> getAllProductReviews(@PathVariable String productId,
-      @RequestParam boolean recommended) {
+      @RequestParam boolean recommended,
+      @AuthenticationPrincipal UserDetails user) {
+    if (user != null) {
+      List<ReviewUserReaction> reviews = this.reviewService.findProductReviewsWithUserReaction(productId, recommended, user.getUsername());
+
+      List<ReviewDTO> reviewsDTO = modelMapper.map(
+          reviews,
+          new TypeToken<List<ReviewDTO>>() {
+          }.getType());
+      ApiResponse<List<ReviewDTO>> response = new ApiResponse<>(reviewsDTO, null);
+      return ApiEntityResponse.of(HttpStatus.OK, response);
+    }
     List<Review> reviews = this.reviewService.findProductReviews(productId, recommended);
     List<ReviewDTO> reviewsDTO = modelMapper.map(
         reviews,

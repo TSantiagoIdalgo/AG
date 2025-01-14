@@ -42,7 +42,7 @@ public class UserController {
   @GetMapping("/find/{userId}")
   public ApiEntityResponse<UserDTO> findUser(@PathVariable String userId, @AuthenticationPrincipal UserDetails user) throws BadRequestException {
     User userFound;
-    if (user.getUsername() != null) userFound = this.userService.findUser(user.getUsername());
+    if (user != null) userFound = this.userService.findUser(user.getUsername());
     else if (userId != null) userFound = this.userService.findUser(userId);
     else throw new BadRequestException("UserId is required");
     UserDTO userDTO = modelMapper.map(userFound, UserDTO.class);
