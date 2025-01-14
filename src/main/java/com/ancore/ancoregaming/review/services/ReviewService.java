@@ -149,7 +149,7 @@ public class ReviewService implements IReviewService {
   }
 
   @Override
-  public Review addReaction(String userId, String reviewId, ReactionType reactionType) {
+  public ReviewReaction addReaction(String userId, String reviewId, ReactionType reactionType) {
     Optional<ReviewReaction> existingReaction = reviewReactionRepository.findByUserEmailAndReviewId(userId,
         UUID.fromString(reviewId));
     if (existingReaction.isPresent()) {
@@ -160,15 +160,13 @@ public class ReviewService implements IReviewService {
         this.reviewReactionRepository.save(existingReaction.get());
       }
       
-      return this.findReview(reviewId);
+      return existingReaction.get();
     }
 
     User user = this.userService.findUser(userId);
     Review review = this.findReview(reviewId);
     ReviewReaction reaction = new ReviewReaction(user, review, reactionType);
-    review.getReactions().add(reaction);
-    this.reviewReactionRepository.save(reaction);
-    return review;
+    return this.reviewReactionRepository.save(reaction);
   }
 
   @Override

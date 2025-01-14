@@ -3,6 +3,7 @@ package com.ancore.ancoregaming.review.controllers;
 import java.util.List;
 
 import com.ancore.ancoregaming.review.dtos.*;
+import com.ancore.ancoregaming.review.model.ReviewReaction;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,12 +113,12 @@ public class ReviewController {
   }
 
   @PostMapping("/reaction/")
-  public ApiEntityResponse<ReviewDTO> addReviewReaction(@RequestBody ReactionRequestDTO reviewReactionDTO,
+  public ApiEntityResponse<ReviewReactionDTO> addReviewReaction(@RequestBody ReactionRequestDTO reviewReactionDTO,
       @AuthenticationPrincipal UserDetails user) {
-    Review review = this.reviewService.addReaction(user.getUsername(), reviewReactionDTO.getReviewId(),
+    ReviewReaction reaction = this.reviewService.addReaction(user.getUsername(), reviewReactionDTO.getReviewId(),
         reviewReactionDTO.getReactionType());
-    ReviewDTO reviewDTO = modelMapper.map(review, ReviewDTO.class);
-    ApiResponse<ReviewDTO> response = new ApiResponse<>(reviewDTO, null);
+    ReviewReactionDTO reactionDTO = modelMapper.map(reaction, ReviewReactionDTO.class);
+    ApiResponse<ReviewReactionDTO> response = new ApiResponse<>(reactionDTO, null);
     return ApiEntityResponse.of(HttpStatus.CREATED, response);
   }
 

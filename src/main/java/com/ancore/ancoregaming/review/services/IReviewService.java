@@ -3,6 +3,7 @@ package com.ancore.ancoregaming.review.services;
 import java.util.List;
 
 import com.ancore.ancoregaming.review.dtos.*;
+import com.ancore.ancoregaming.review.model.ReviewReaction;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -24,7 +25,7 @@ public interface IReviewService {
 
   public Review deleteReview(String reviewId);
 
-  public Review addReaction(String userId, String reviewId, ReactionType reactionType);
+  public ReviewReaction addReaction(String userId, String reviewId, ReactionType reactionType);
 
   public ReviewRecommendationDTO getRecommendationPercentage(String productId);
 
