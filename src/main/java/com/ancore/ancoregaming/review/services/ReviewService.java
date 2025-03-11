@@ -80,7 +80,8 @@ public class ReviewService implements IReviewService {
   @Override
   public List<ReviewUserReaction> findProductReviewsWithUserReaction(String productId, boolean recommended, String userId) {
     List<Object[]> reviews = this.reviewRepository.findReviewsOrderedByLikesWithUserReaction(recommended, UUID.fromString(productId), userId);
-    
+    if (reviews.isEmpty()) throw new EntityNotFoundException("The product has no reviews");
+
     return reviews.stream()
         .map(res -> {
           Review review = (Review) res[0];

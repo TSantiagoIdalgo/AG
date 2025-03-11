@@ -29,6 +29,9 @@ public class ProductFilterDTO {
     private boolean orderByWishList;
     private boolean orderByRecommendation;
     private boolean orderByCheckoutCount;
+    private boolean orderByCreatedAt;
+    private boolean orderByPrice;
+    private boolean orderByDiscount;
     
     @Override
     public String toString() {

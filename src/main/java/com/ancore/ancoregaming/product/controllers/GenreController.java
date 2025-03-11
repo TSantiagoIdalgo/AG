@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,10 +21,13 @@ import com.ancore.ancoregaming.product.services.genre.IGenreService;
 @RequestMapping("/genre")
 public class GenreController {
 
-  @Autowired
-  private IGenreService genreService;
+  private final IGenreService genreService;
 
-  @Secured("ROLE_ADMIN")
+  @Autowired
+  public GenreController(IGenreService genreService) {
+    this.genreService = genreService;
+  }
+
   @GetMapping("/")
   public ApiEntityResponse<List<Genre>> getAllGenres() {
     List<Genre> genres = this.genreService.findAllGenres();

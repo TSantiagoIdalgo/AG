@@ -37,6 +37,8 @@ public class JwtConfig {
             .requestMatchers(HttpMethod.GET, "/product/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/whitelist/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/review/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/platform/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/genre/**").permitAll()
             .anyRequest().authenticated())
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authenticationProvider(authenticationProvider)

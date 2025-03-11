@@ -33,9 +33,13 @@ import jakarta.validation.Valid;
 @RequestMapping("/review")
 public class ReviewController {
 
-  @Autowired
-  private IReviewService reviewService;
+  private final IReviewService reviewService;
   private final ModelMapper modelMapper = new ModelMapper();
+
+  @Autowired
+  public ReviewController(IReviewService reviewService) {
+    this.reviewService = reviewService;
+  }
 
   @GetMapping("/")
   public ApiEntityResponse<Page<ReviewDTO>> getAllReviews(@ModelAttribute ReviewFilter filterDTO) {

@@ -21,7 +21,7 @@ public class GenreService implements IGenreService {
   
   @Override
   public Genre createGenre(String genreName) {
-    Optional<Genre> genreFound = this.genreRepository.findById(genreName);
+    Optional<Genre> genreFound = this.genreRepository.findGenreByName(genreName);
     if (genreFound.isPresent()) {
       return genreFound.get();
     }

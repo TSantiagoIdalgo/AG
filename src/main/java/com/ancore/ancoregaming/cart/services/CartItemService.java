@@ -4,10 +4,9 @@ import com.ancore.ancoregaming.cart.model.Cart;
 import com.ancore.ancoregaming.cart.model.CartItem;
 import com.ancore.ancoregaming.cart.repositories.ICartItemRepository;
 import com.ancore.ancoregaming.product.model.Product;
+import java.math.BigDecimal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
 
 @Service
 public class CartItemService implements ICartItemService {
@@ -22,7 +21,7 @@ public class CartItemService implements ICartItemService {
     public CartItem findOrCreateCartItem(Cart cart, Product product) {
         CartItem cartItem = cartItemRepository.findUnpaidCartItemByCartIdAndProductId(cart.getId(), product.getId())
                 .orElseGet(() -> createItem(cart, product));
-
+        
         return cartItem.isItemIsPaid() ? createItem(cart, product) : cartItem;
     }
 
