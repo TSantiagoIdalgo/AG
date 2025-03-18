@@ -16,17 +16,6 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class ProductSpecificationService {
 
-  public static Specification<Product> hasName(String name) {
-    return (root, query, builder) -> {
-      if (name == null) {
-        return builder.conjunction();
-      }
-      return builder.like(
-          builder.lower(root.get("name")),
-          "%" + name.toLowerCase() + "%");
-    };
-  }
-
   public static Specification<Product> hasFranchise(String franchise) {
     return (root, query, builder) -> franchise == null ? builder.conjunction()
         : builder.like(
@@ -172,19 +161,23 @@ public class ProductSpecificationService {
     };
   }
 
-  public static Specification<Product> hasTags(List<String> tags) {
+  public static Specification<Product> hasKeyword(String keyword) {
     return (root, query, criteriaBuilder) -> {
-      if (tags == null || tags.isEmpty()) {
+      if (keyword == null || keyword.isBlank()) {
         return criteriaBuilder.conjunction();
       }
+      Predicate namePredicate = criteriaBuilder.like(
+          criteriaBuilder.lower(root.get("name")),
+          "%" + keyword.toLowerCase() + "%"
+      );
 
       Join<Product, String> tagsJoin = root.join("tags");
-      List<Predicate> predicates = tags.stream()
-          .map(tag -> criteriaBuilder.like(
+      Predicate tagPredicate = criteriaBuilder.like(
           criteriaBuilder.lower(tagsJoin),
-          "%" + tag.toLowerCase() + "%"))
-          .toList();
-      return criteriaBuilder.or(predicates.toArray(new Predicate[0]));
+          "%" + keyword.toLowerCase() + "%"
+      );
+
+      return criteriaBuilder.or(namePredicate, tagPredicate);
     };
   }
 

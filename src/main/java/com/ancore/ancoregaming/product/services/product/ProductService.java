@@ -36,7 +36,7 @@ public class ProductService implements IProductService {
   private final IProductRepository productRepository;
   private final UploadService uploadService;
   private final RequirementsService requirementService;
-  
+
   @Autowired
   public ProductService(GenreService genreService, PlatformService platformService, IProductRepository productRepository, UploadService uploadService, RequirementsService requirementService) {
     this.genreService = genreService;
@@ -45,7 +45,7 @@ public class ProductService implements IProductService {
     this.uploadService = uploadService;
     this.requirementService = requirementService;
   }
-  
+
   @Override
   public Product createProduct(CreateProductDTO product, FilesDTO filesDTO) {
     Product newProduct = new Product.Builder()
@@ -71,22 +71,21 @@ public class ProductService implements IProductService {
   @Override
   public Page<Product> findAll(ProductFilterDTO filterDTO) {
     Specification<Product> spec = ProductSpecificationService
-            .orderByCheckoutCount(filterDTO.isOrderByCheckoutCount())
-            .and(ProductSpecificationService.orderByWishListCount(filterDTO.isOrderByWishList()))
-            .and(ProductSpecificationService.orderByRecommendationCount(filterDTO.isOrderByRecommendation()))
-            .and(ProductSpecificationService.orderByCreatedAt(filterDTO.isOrderByCreatedAt()))
-            .and(ProductSpecificationService.orderByPrice(filterDTO.isOrderByPrice()))
-            .and(ProductSpecificationService.orderByDiscount(filterDTO.isOrderByDiscount()))
-            .and(ProductSpecificationService.hasDeveloper(filterDTO.getDeveloper()))
-            .and(ProductSpecificationService.hasDistributor(filterDTO.getDistributor()))
-            .and(ProductSpecificationService.hasPriceRange(filterDTO.getMinPrice(), filterDTO.getMaxPrice()))
-            .and(ProductSpecificationService.hasDiscountRange(filterDTO.getMinDiscount(), filterDTO.getMaxDiscount()))
-            .and(ProductSpecificationService.hasFranchise(filterDTO.getFranchise()))
-            .and(ProductSpecificationService.hasGenres(filterDTO.getGenres()))
-            .and(ProductSpecificationService.hasName(filterDTO.getName()))
-            .and(ProductSpecificationService.hasPlatform(filterDTO.getPlatform()))
-            .and(ProductSpecificationService.hasSystem(filterDTO.getSystem()))
-            .and(ProductSpecificationService.hasTags(filterDTO.getTags()));
+        .orderByCheckoutCount(filterDTO.isOrderByCheckoutCount())
+        .and(ProductSpecificationService.orderByWishListCount(filterDTO.isOrderByWishList()))
+        .and(ProductSpecificationService.orderByRecommendationCount(filterDTO.isOrderByRecommendation()))
+        .and(ProductSpecificationService.orderByCreatedAt(filterDTO.isOrderByCreatedAt()))
+        .and(ProductSpecificationService.orderByPrice(filterDTO.isOrderByPrice()))
+        .and(ProductSpecificationService.orderByDiscount(filterDTO.isOrderByDiscount()))
+        .and(ProductSpecificationService.hasDeveloper(filterDTO.getDeveloper()))
+        .and(ProductSpecificationService.hasDistributor(filterDTO.getDistributor()))
+        .and(ProductSpecificationService.hasPriceRange(filterDTO.getMinPrice(), filterDTO.getMaxPrice()))
+        .and(ProductSpecificationService.hasDiscountRange(filterDTO.getMinDiscount(), filterDTO.getMaxDiscount()))
+        .and(ProductSpecificationService.hasFranchise(filterDTO.getFranchise()))
+        .and(ProductSpecificationService.hasGenres(filterDTO.getGenres()))
+        .and(ProductSpecificationService.hasKeyword(filterDTO.getName()))
+        .and(ProductSpecificationService.hasPlatform(filterDTO.getPlatform()))
+        .and(ProductSpecificationService.hasSystem(filterDTO.getSystem()));
 
     Pageable pageable = PageRequest.of(filterDTO.getPageNumber(), filterDTO.getPageSize());
     return productRepository.findAll(spec, pageable);
