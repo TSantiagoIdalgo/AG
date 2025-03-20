@@ -1,5 +1,8 @@
 package com.ancore.ancoregaming.auth.controller;
 
+import com.ancore.ancoregaming.user.dtos.UserDTO;
+import com.ancore.ancoregaming.user.services.user.UserService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,9 +27,16 @@ import jakarta.validation.Valid;
 @RequestMapping("/auth")
 public class AuthController {
 
+  private final AuthService authService;
+  private final UserService userService;
+  private final ModelMapper modelMapper = new ModelMapper();
+  
   @Autowired
-  private AuthService authService;
-
+  public AuthController(AuthService authService, UserService userService) {
+    this.authService = authService;
+    this.userService = userService;
+  }
+  
   @PostMapping("/register")
   public ApiEntityResponse<User> register(@Valid @RequestBody CreateUserDTO user) {
     User userResponse = authService.createUser(user);
@@ -35,15 +45,18 @@ public class AuthController {
   }
 
   @PostMapping("/login")
-  public ApiEntityResponse<?> login(HttpServletResponse res, @Valid @RequestBody final LoginDTO login) {
+  public ApiEntityResponse<UserDTO> login(HttpServletResponse res, @Valid @RequestBody final LoginDTO login) {
     JwtResponse loginResponse = authService.login(login);
     Cookie jwtCookie = getCookie("access_token", loginResponse.access_token());
     Cookie refreshJwtCookie = getCookie("refresh_token", loginResponse.refresh_token());
 
     res.addCookie(jwtCookie);
     res.addCookie(refreshJwtCookie);
+    
+    User user = userService.findUser(login.email());
+    UserDTO userDTO = modelMapper.map(user, UserDTO.class);
 
-    ApiResponse<?> response = new ApiResponse<>();
+    ApiResponse<UserDTO> response = new ApiResponse<UserDTO>(userDTO, null);
     return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 

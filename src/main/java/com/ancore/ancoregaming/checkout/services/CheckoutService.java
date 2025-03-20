@@ -62,8 +62,8 @@ public class CheckoutService {
     params.put("metadata", Map.of("cartId", userCart.getId()));
     params.put("customer_email", userDetails.getUsername());
     params.put("payment_method_types", List.of("card"));
-    params.put("success_url", "https://www.google.com");
-    params.put("cancel_url", "https://www.google.com");
+    params.put("success_url", "http://localhost:5173/ancore/congratulations");
+    params.put("cancel_url", "http://localhost:5173/ancore/payment_failed");
 
     return Session.create(params);
   }
