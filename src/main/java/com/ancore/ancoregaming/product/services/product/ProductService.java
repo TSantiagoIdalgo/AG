@@ -83,6 +83,7 @@ public class ProductService implements IProductService {
         .and(ProductSpecificationService.hasDiscountRange(filterDTO.getMinDiscount(), filterDTO.getMaxDiscount()))
         .and(ProductSpecificationService.hasFranchise(filterDTO.getFranchise()))
         .and(ProductSpecificationService.hasGenres(filterDTO.getGenres()))
+        .and(ProductSpecificationService.hasTags(filterDTO.getTags()))
         .and(ProductSpecificationService.hasKeyword(filterDTO.getName()))
         .and(ProductSpecificationService.hasPlatform(filterDTO.getPlatform()))
         .and(ProductSpecificationService.hasSystem(filterDTO.getSystem()));

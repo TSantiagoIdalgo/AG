@@ -35,9 +35,13 @@ import jakarta.validation.Valid;
 public class ProductController {
 
   private final ModelMapper modelMapper = new ModelMapper();
+  private final IProductService productService;
+  
   @Autowired
-  private IProductService productService;
-
+  public ProductController(IProductService productService) {
+    this.productService = productService;
+  }
+  
   @GetMapping("/")
   public ApiEntityResponse<Page<ProductDTO>> findProducts(@ModelAttribute ProductFilterDTO filterDTO) {
     Page<Product> products = this.productService.findAll(filterDTO);

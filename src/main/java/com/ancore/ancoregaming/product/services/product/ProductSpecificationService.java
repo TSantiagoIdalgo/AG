@@ -160,6 +160,22 @@ public class ProductSpecificationService {
       return criteriaBuilder.conjunction();
     };
   }
+  
+  public static Specification<Product> hasTags(List<String> tags) {
+    return (root, query, criteriaBuilder) -> {
+      if (tags == null || tags.isEmpty()) {
+        return criteriaBuilder.conjunction();
+      }
+      
+      Join<Product, String> tagsJoin = root.join("tags");
+      List<Predicate> predicates = tags.stream()
+          .map(tag -> criteriaBuilder.like(
+              criteriaBuilder.lower(tagsJoin),
+              "%" + tag.toLowerCase() + "%"))
+          .toList();
+      return criteriaBuilder.or(predicates.toArray(new Predicate[0]));
+    };
+  }
 
   public static Specification<Product> hasKeyword(String keyword) {
     return (root, query, criteriaBuilder) -> {

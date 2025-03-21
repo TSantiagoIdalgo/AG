@@ -17,6 +17,7 @@ public class ProductFilterDTO {
   private Double maxPrice;
   private Double minDiscount;
   private Double maxDiscount;
+  private List<String> tags;
   private List<String> genres;
   private List<String> platform;
   private List<String> system;
