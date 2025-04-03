@@ -4,6 +4,7 @@ import com.ancore.ancoregaming.user.model.Role;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -14,4 +15,5 @@ public class UserDTO {
   private String email;
   private boolean verify;
   private List<Role> roles;
+  private Date createdAt;
 }

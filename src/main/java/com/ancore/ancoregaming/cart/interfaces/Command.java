@@ -1,9 +1,11 @@
 package com.ancore.ancoregaming.cart.interfaces;
 
-public interface Command<T> {
-    T execute();
+import org.apache.coyote.BadRequestException;
 
-    T undo();
+public interface Command<T> {
+    T execute() throws BadRequestException;
+
+    T undo() throws BadRequestException;
 
     T getResult();
 }

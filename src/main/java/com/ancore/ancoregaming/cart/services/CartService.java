@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -39,11 +40,12 @@ public class CartService implements ICartService {
 
   @Override
   @Transactional
-  public Cart increaseProducts(User user, Product product) {
+  public Cart increaseProducts(User user, Product product) throws BadRequestException {
     Cart userCart = this.findOrCreateUserCart(user.getEmail(), user);
     CartItem cartItem = this.cartItemService.findOrCreateCartItem(userCart, product);
     this.cartItemService.incrementCartItem(userCart, cartItem, product);
-
+    
+    
     return userCart;
   }
 

@@ -7,6 +7,7 @@ import com.ancore.ancoregaming.product.model.Product;
 import com.ancore.ancoregaming.product.services.product.IProductService;
 import com.ancore.ancoregaming.user.model.User;
 import com.ancore.ancoregaming.user.services.user.IUserService;
+import org.apache.coyote.BadRequestException;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public class DecreaseProductCommand implements Command<Cart> {
@@ -30,7 +31,7 @@ public class DecreaseProductCommand implements Command<Cart> {
     }
 
     @Override
-    public Cart undo() {
+    public Cart undo() throws BadRequestException {
         this.result = this.cartService.increaseProducts(user, product);
         return result;
     }

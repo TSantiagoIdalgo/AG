@@ -4,6 +4,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.util.Date;
+
 public class CreateUserDTO {
 
   @NotNull(message = "Username cannot be null")
@@ -12,7 +14,7 @@ public class CreateUserDTO {
   @NotNull(message = "Email cannot be null")
   @Email(message = "Email should be valid")
   private String email;
-  @NotNull(message = "Passwor cannot be null")
+  @NotNull(message = "Password cannot be null")
   private String password;
 
   public CreateUserDTO(String username, String email, String password) {
@@ -44,7 +46,7 @@ public class CreateUserDTO {
   public void setPassword(String password) {
     this.password = password;
   }
-
+  
   @Override
   public String toString() {
     return "UserDTO{" + "username=" + username + ", email=" + email + ", password=" + password + '}';

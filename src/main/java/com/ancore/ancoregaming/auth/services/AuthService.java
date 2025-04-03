@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -34,7 +35,7 @@ public class AuthService {
   private final AuthenticationManager authManager;
   private final EmailService emailService;
 
-  public User createUser(CreateUserDTO user) {
+  public User createUser(@NotNull CreateUserDTO user) {
     Optional<User> userOptional = this.userRepository.findById(user.getEmail());
     User userWithUsername = this.userRepository.findByUsername(user.getUsername());
     if (userWithUsername != null) {
@@ -64,7 +65,7 @@ public class AuthService {
     return newUser;
   }
 
-  public JwtResponse login(LoginDTO login) throws EntityNotFoundException {
+  public JwtResponse login(@NotNull LoginDTO login) throws EntityNotFoundException {
     authManager.authenticate(new UsernamePasswordAuthenticationToken(login.email(), login.password()));
     User user = userRepository.findById(login.email()).orElseThrow(() -> new EntityNotFoundException("User not found"));
 

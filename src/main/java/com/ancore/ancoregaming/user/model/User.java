@@ -1,5 +1,6 @@
 package com.ancore.ancoregaming.user.model;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -9,17 +10,7 @@ import com.ancore.ancoregaming.checkout.model.StockReservation;
 import com.ancore.ancoregaming.review.model.Review;
 import com.ancore.ancoregaming.whitelist.model.Whitelist;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -41,6 +32,9 @@ public class User {
 
   @Column
   private boolean verify;
+  
+  @Temporal(value = TemporalType.TIMESTAMP)
+  private Date createdAt;
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
   private List<Role> roles;
@@ -69,6 +63,7 @@ public class User {
     this.password = password;
     this.verify = verify;
     this.roles = roles;
+    this.createdAt = new Date();
   }
 
   @Override

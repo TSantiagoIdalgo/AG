@@ -5,7 +5,11 @@ import com.ancore.ancoregaming.cart.model.CartItem;
 import com.ancore.ancoregaming.cart.repositories.ICartItemRepository;
 import com.ancore.ancoregaming.product.model.Product;
 import java.math.BigDecimal;
+
+import jakarta.persistence.EntityNotFoundException;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.ParameterOutOfBoundsException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -26,7 +30,10 @@ public class CartItemService implements ICartItemService {
     }
 
     @Override
-    public void incrementCartItem(Cart cart, CartItem item, Product product) {
+    public void incrementCartItem(Cart cart, CartItem item, Product product) throws BadRequestException {
+        if (item.getQuantity() >= product.getStock()) {
+            throw new BadRequestException("Stock exceed");
+        }
         item.setQuantity(item.getQuantity() + 1);
 
         item.setSubtotal(item.getSubtotal().add(product.getPrice()));

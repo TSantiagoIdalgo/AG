@@ -1,5 +1,6 @@
 package com.ancore.ancoregaming.cart.controllers;
 
+import org.apache.coyote.BadRequestException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -54,7 +55,7 @@ public class CartController {
 
   @PostMapping("/increase/{productId}")
   public ApiEntityResponse<UserCartDTO> increaseProductCart(@PathVariable String productId,
-      @AuthenticationPrincipal UserDetails user) {
+      @AuthenticationPrincipal UserDetails user) throws BadRequestException {
     AddProductCommand command = commandFactory.createAddProductCommand(productId, user);
     Cart cart = command.execute();
     UserCartDTO userCartDTO = modelMapper.map(cart, UserCartDTO.class);
