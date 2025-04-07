@@ -1,5 +1,6 @@
 package com.ancore.ancoregaming.checkout.services;
 
+import com.ancore.ancoregaming.cart.dtos.UserCartDTO;
 import com.ancore.ancoregaming.cart.model.Cart;
 import com.ancore.ancoregaming.cart.model.CartItem;
 import com.ancore.ancoregaming.cart.repositories.ICartRepository;
@@ -24,6 +25,7 @@ import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -37,14 +39,17 @@ public class CheckoutService {
   private final StockReservationService stockReservationService;
   private final ICheckoutItemsRepository checkoutItemsRepository;
   private final EmailService emailService;
+  private final SseService sseService;
+  private final ModelMapper modelMapper = new ModelMapper();
   
   @Autowired
-  public CheckoutService(ICartRepository cartRepository, ICheckoutRepository paymentRepository, StockReservationService stockReservationService, ICheckoutItemsRepository checkoutItemsRepository, EmailService emailService) {
+  public CheckoutService(ICartRepository cartRepository, ICheckoutRepository paymentRepository, StockReservationService stockReservationService, ICheckoutItemsRepository checkoutItemsRepository, EmailService emailService, SseService sseService) {
     this.cartRepository = cartRepository;
     this.paymentRepository = paymentRepository;
     this.stockReservationService = stockReservationService;
     this.checkoutItemsRepository = checkoutItemsRepository;
     this.emailService = emailService;
+    this.sseService = sseService;
   }
   
   @Transactional
@@ -62,9 +67,9 @@ public class CheckoutService {
     params.put("metadata", Map.of("cartId", userCart.getId()));
     params.put("customer_email", userDetails.getUsername());
     params.put("payment_method_types", List.of("card"));
-    params.put("success_url", "http://localhost:5173/ancore/user/activation?cart_id=" + userCart.getId());
+    params.put("success_url", "http://localhost:5173/ancore/user/activation");
     params.put("cancel_url", "http://localhost:5173/ancore/user/activation_failed");
-
+    
     return Session.create(params);
   }
 
@@ -102,11 +107,12 @@ public class CheckoutService {
           });
 
           this.generatePaymentReceipt(sessionNode, userCart);
+          UserCartDTO cart = modelMapper.map(userCart, UserCartDTO.class);
+          sseService.sendToClient(userEmail, cart);
           userCart.setTotal(BigDecimal.ZERO);
           userCart.setSubtotal(BigDecimal.ZERO);
           userCart.getUser().getStockReservation()
               .forEach((reservation) -> this.stockReservationService.confirmPayment(reservation.getId()));
-
         }
       }
     } catch (OptimisticLockException e) {

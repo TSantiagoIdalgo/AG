@@ -155,6 +155,12 @@
             <version>RELEASE</version>
             <scope>compile</scope>
         </dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework/spring-webflux -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webflux</artifactId>
+			<version>6.2.5</version>
+		</dependency>
 
     </dependencies>
 

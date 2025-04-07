@@ -30,6 +30,7 @@ public class JwtConfig {
         .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(req -> req.requestMatchers("/auth/**").permitAll()
             .requestMatchers("/api/checkout/webhook").permitAll()
+            .requestMatchers("/api/checkout/sse").permitAll()
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
             .requestMatchers("/swagger-ui/**").permitAll()
             .requestMatchers("/v3/**").permitAll()
