@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -70,13 +71,9 @@ public class CheckoutController {
   }
   
   @GetMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-  public Flux<Object> stream (@AuthenticationPrincipal UserDetails userDetails) throws BadRequestException {
+  public Flux<ServerSentEvent<Object>> stream (@AuthenticationPrincipal UserDetails userDetails) throws BadRequestException {
     if (userDetails != null && userDetails.getUsername() != null) {
-      Sinks.Many<Object> sink = sseService.addClient(userDetails.getUsername());
-      return sink.asFlux()
-          .doFinally(signal -> {
-            sseService.removeClient(userDetails.getUsername());
-          });
+      return this.sseService.addClient(userDetails.getUsername());
     };
    return Flux.empty();
   }

@@ -1,6 +1,9 @@
 package com.ancore.ancoregaming.checkout.services;
 
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Sinks;
 
 import java.util.Map;
@@ -8,12 +11,16 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class SseService {
-  public final Map<String, Sinks.Many<Object>> clients = new ConcurrentHashMap<>();
+  private final Map<String, FluxSink<Object>> clients = new ConcurrentHashMap<>();
   
-  public Sinks.Many<Object> addClient(String userId) {
-    Sinks.Many<Object> sink = Sinks.many().multicast().onBackpressureBuffer();
-    clients.put(userId, sink);
-    return sink;
+  public Flux<ServerSentEvent<Object>>addClient(String userId) {
+    return Flux.create(emitter -> {
+      clients.put(userId, emitter);
+      emitter.onDispose(() -> clients.remove(userId));
+    }).map(data -> ServerSentEvent.builder()
+        .event("payment")
+        .data(data)
+        .build());
   }
   
   public void removeClient(String userId) {
@@ -22,7 +29,7 @@ public class SseService {
   
   public void sendToClient(String userId, Object data) {
     if (clients.containsKey(userId)) {
-      clients.get(userId).tryEmitNext(data);
+      clients.get(userId).next(data);
     }
   }
 }
