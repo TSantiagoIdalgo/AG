@@ -1,13 +1,18 @@
 package com.ancore.ancoregaming.checkout.controllers;
 
+import com.ancore.ancoregaming.checkout.dtos.CheckoutDTO;
+import com.ancore.ancoregaming.checkout.model.Checkout;
 import com.ancore.ancoregaming.checkout.services.SseService;
 import org.apache.coyote.BadRequestException;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +30,8 @@ import com.stripe.net.Webhook;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/checkout")
 public class CheckoutController {
@@ -35,6 +42,19 @@ public class CheckoutController {
   private String endpointSecret;
   @Autowired
   private SseService sseService;
+  private final ModelMapper modelMapper = new ModelMapper();
+  
+  @GetMapping("/user")
+  public ApiEntityResponse<List<CheckoutDTO>> getUserCheckouts(@AuthenticationPrincipal UserDetails userDetails) throws BadRequestException {
+    if (userDetails == null || userDetails.getUsername() == null) {
+      throw new BadRequestException("UNAUTHENTICATED");
+    }
+    List<Checkout> checkouts = this.checkoutService.getUserCheckouts(userDetails);
+    var checkoutType = new TypeToken<List<CheckoutDTO>>() {};
+    List<CheckoutDTO> checkoutDTO = modelMapper.map(checkouts, checkoutType.getType());
+    ApiResponse<List<CheckoutDTO>> response = new ApiResponse<>(checkoutDTO, null);
+    return ApiEntityResponse.of(HttpStatus.OK, response);
+  }
   
   @PostMapping("/create-checkout-session")
   public ApiEntityResponse<CheckoutSessionDTO> createCheckoutSession(@AuthenticationPrincipal UserDetails user)

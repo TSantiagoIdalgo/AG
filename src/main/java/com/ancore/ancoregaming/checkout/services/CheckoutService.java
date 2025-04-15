@@ -119,6 +119,17 @@ public class CheckoutService {
       throw new ConcurrencyFailureException("A concurrency conflict occurred. Try again.");
     }
   }
+  
+  public List<Checkout> getUserCheckouts (UserDetails userDetails) {
+    final String userEmail = userDetails.getUsername();
+    List<Checkout> checkout = this.paymentRepository.findByUserEmail(userEmail);
+    System.out.println(checkout);
+    if (checkout == null || checkout.isEmpty()) {
+      throw new EntityNotFoundException("The user has no payments");
+    }
+    
+    return checkout;
+  }
 
   private void generatePaymentReceipt(JsonNode sessionNode, Cart userCart) {
     String stripePaymentId = sessionNode.get("id").asText();

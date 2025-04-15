@@ -16,6 +16,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +40,7 @@ public class CartService implements ICartService {
   }
   
   @Override
-  public Long getQuantityProductsCart(UserDetails userDetails) {
+  public Long getQuantityProductsCart(@NotNull UserDetails userDetails) {
     return this.cartRepository.countUserCartProducts(userDetails.getUsername());
   }
   
@@ -56,7 +57,7 @@ public class CartService implements ICartService {
 
   @Override
   @Transactional
-  public Cart decreaseProduct(User user, Product product) {
+  public Cart decreaseProduct(@NotNull User user, Product product) {
     Optional<Cart> userCart = this.findUserCart(user.getEmail());
     if (userCart.isEmpty()) {
       throw new EntityNotFoundException("User cart not found");
@@ -73,7 +74,7 @@ public class CartService implements ICartService {
 
   @Override
   @Transactional
-  public Cart removeProduct(User user, Product product) {
+  public Cart removeProduct(@NotNull User user, Product product) {
     Optional<Cart> userCartFound = this.findUserCart(user.getEmail());
     if (userCartFound.isEmpty()) {
       throw new EntityNotFoundException("User cart not found");

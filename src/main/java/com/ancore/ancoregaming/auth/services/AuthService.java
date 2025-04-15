@@ -46,9 +46,9 @@ public class AuthService {
 
     String passwordHash = passwordEncoder.encode(user.getPassword());
     List<Role> roles = new ArrayList<>();
-    Role role = roleService.findRoleByName("ROLE_ADMIN");
+    Role role = roleService.findRoleByName("ROLE_USER");
     if (role == null) {
-      Role newRole = roleService.createRole("ROLE_ADMIN");
+      Role newRole = roleService.createRole("ROLE_USER");
       roles.add(newRole);
     } else {
       roles.add(role);

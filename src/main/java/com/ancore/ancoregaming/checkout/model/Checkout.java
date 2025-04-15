@@ -16,11 +16,13 @@ import java.util.UUID;
 import com.ancore.ancoregaming.user.model.User;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Getter
 @Setter
+@RequiredArgsConstructor
 public class Checkout {
 
   @Id
@@ -43,7 +45,9 @@ public class Checkout {
   private List<CheckoutItems> checkoutItems;
   @Temporal(TemporalType.TIMESTAMP)
   private Date createdAt;
-
+  
+ 
+  
   private Checkout(Builder builder) {
     this.stripePaymentId = builder.stripePaymentId;
     this.total = builder.total;
@@ -103,5 +107,19 @@ public class Checkout {
       return new Checkout(this);
     }
   }
-
+  
+  
+  @Override
+  public String toString() {
+    return "Checkout{" +
+        "id=" + id +
+        ", stripePaymentId='" + stripePaymentId + '\'' +
+        ", subTotal=" + subTotal +
+        ", total=" + total +
+        ", currency='" + currency + '\'' +
+        ", paymentStatus='" + paymentStatus + '\'' +
+        ", checkoutItems=" + checkoutItems +
+        ", createdAt=" + createdAt +
+        '}';
+  }
 }
