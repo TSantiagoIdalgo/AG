@@ -10,7 +10,10 @@ import org.springframework.data.repository.query.Param;
 public interface ICartRepository extends JpaRepository<Cart, UUID> {
 
   public Optional<Cart> findByUserEmail(@Param("userEmail") String userEmail);
-
+  
+  @Query("SELECT COUNT(i) FROM Cart c JOIN c.items i WHERE c.user.email = :userEmail AND i.itemIsPaid = false")
+  public Long countUserCartProducts(@Param("userEmail") String userEmail);
+  
   @Query("SELECT c FROM Cart c LEFT JOIN FETCH c.items i WHERE c.user.email = :userEmail AND i.itemIsPaid = false")
   public Cart findByUserEmailAndUnpaidItems(@Param("userEmail") String userEmail);
 

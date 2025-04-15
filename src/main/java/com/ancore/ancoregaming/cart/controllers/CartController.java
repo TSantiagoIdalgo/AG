@@ -5,6 +5,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,6 +43,14 @@ public class CartController {
     Cart cart = this.cartService.getUserCart(user);
     UserCartDTO userCart = modelMapper.map(cart, UserCartDTO.class);
     ApiResponse<UserCartDTO> response = new ApiResponse<>(userCart, null);
+    return ApiEntityResponse.of(HttpStatus.OK, response);
+  }
+  
+  @GetMapping("/count/unpaid")
+  public ApiEntityResponse<Long> getCountOfUserCartProducts(@AuthenticationPrincipal UserDetails userDetails) throws BadRequestException {
+    if(userDetails == null) throw new BadRequestException("UNAUTHENTICATED");
+    Long countProducts = this.cartService.getQuantityProductsCart(userDetails);
+    ApiResponse<Long> response = new ApiResponse<>(countProducts, null);
     return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 

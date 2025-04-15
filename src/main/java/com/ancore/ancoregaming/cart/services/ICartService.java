@@ -9,6 +9,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 public interface ICartService {
 
   public Cart increaseProducts(User user, Product product) throws BadRequestException;
+  
+  public Long getQuantityProductsCart (UserDetails userDetails);
 
   public Cart decreaseProduct(User user, Product product);
 

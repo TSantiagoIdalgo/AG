@@ -37,7 +37,12 @@ public class CartService implements ICartService {
 
     return userCart.get();
   }
-
+  
+  @Override
+  public Long getQuantityProductsCart(UserDetails userDetails) {
+    return this.cartRepository.countUserCartProducts(userDetails.getUsername());
+  }
+  
   @Override
   @Transactional
   public Cart increaseProducts(User user, Product product) throws BadRequestException {
