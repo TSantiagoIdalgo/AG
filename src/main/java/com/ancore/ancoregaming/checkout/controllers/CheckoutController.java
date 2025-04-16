@@ -75,7 +75,7 @@ public class CheckoutController {
       ApiResponse<ExceptionResponse> response = new ApiResponse<>(null, error);
       return ApiEntityResponse.of(HttpStatus.BAD_REQUEST, response);
     }
-    
+
     try {
       if (!event.getType().equals("checkout.session.completed")) {
         throw new BadRequestException("Invalid webhook event");

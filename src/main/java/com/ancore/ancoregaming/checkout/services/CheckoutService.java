@@ -69,7 +69,8 @@ public class CheckoutService {
     params.put("payment_method_types", List.of("card"));
     params.put("success_url", "http://localhost:5173/ancore/user/activation");
     params.put("cancel_url", "http://localhost:5173/ancore/user/activation_failed");
-    
+    long expiresAt = (System.currentTimeMillis() / 1000L) + (30 * 60);
+    params.put("expires_at", expiresAt);
     return Session.create(params);
   }
 
@@ -123,7 +124,6 @@ public class CheckoutService {
   public List<Checkout> getUserCheckouts (UserDetails userDetails) {
     final String userEmail = userDetails.getUsername();
     List<Checkout> checkout = this.paymentRepository.findByUserEmail(userEmail);
-    System.out.println(checkout);
     if (checkout == null || checkout.isEmpty()) {
       throw new EntityNotFoundException("The user has no payments");
     }
