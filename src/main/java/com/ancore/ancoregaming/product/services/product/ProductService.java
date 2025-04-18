@@ -7,6 +7,7 @@ import com.ancore.ancoregaming.product.dtos.UpdateProductDTO;
 import com.ancore.ancoregaming.product.model.Genre;
 import com.ancore.ancoregaming.product.model.Platform;
 import com.ancore.ancoregaming.product.model.Product;
+import com.ancore.ancoregaming.product.model.ProductWithUserWishlist;
 import com.ancore.ancoregaming.product.repositories.IProductRepository;
 import com.ancore.ancoregaming.product.services.genre.GenreService;
 import com.ancore.ancoregaming.product.services.platform.PlatformService;
@@ -25,6 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -97,7 +99,13 @@ public class ProductService implements IProductService {
     return this.productRepository.findById(UUID.fromString(productId))
         .orElseThrow(() -> new EntityNotFoundException("Product not found"));
   }
-
+  
+  @Override
+  public ProductWithUserWishlist findProductWithWishlist(UserDetails userDetails, UUID productId) {
+    if (userDetails != null) return this.productRepository.findProductWithUserWishlist(userDetails.getUsername(), productId);
+    return this.productRepository.findProductWithUserWishlist(null, productId);
+  }
+  
   @Override
   public void destroyProduct(String productId) {
     Product product = this.findProduct(productId);

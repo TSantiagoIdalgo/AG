@@ -1,12 +1,17 @@
 package com.ancore.ancoregaming.product.controllers;
 
 import java.util.List;
+import java.util.UUID;
 
+import com.ancore.ancoregaming.product.dtos.*;
+import com.ancore.ancoregaming.product.model.ProductWithUserWishlist;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -20,11 +25,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.ancore.ancoregaming.common.ApiEntityResponse;
 import com.ancore.ancoregaming.common.ApiResponse;
-import com.ancore.ancoregaming.product.dtos.CreateProductDTO;
-import com.ancore.ancoregaming.product.dtos.FilesDTO;
-import com.ancore.ancoregaming.product.dtos.ProductDTO;
-import com.ancore.ancoregaming.product.dtos.ProductFilterDTO;
-import com.ancore.ancoregaming.product.dtos.UpdateProductDTO;
 import com.ancore.ancoregaming.product.model.Product;
 import com.ancore.ancoregaming.product.services.product.IProductService;
 
@@ -66,6 +66,16 @@ public class ProductController {
     Product product = this.productService.findProduct(productId);
     ProductDTO productDTO = modelMapper.map(product, ProductDTO.class);
     ApiResponse<ProductDTO> response = new ApiResponse<>(productDTO, null);
+    return ApiEntityResponse.of(HttpStatus.OK, response);
+  }
+  
+  @GetMapping("/wishlist/{productId}")
+  public ApiEntityResponse<ProductWithUserWishlistDTO> findProductIsInWishlist (@AuthenticationPrincipal UserDetails userDetails, @PathVariable UUID productId) {
+    ProductWithUserWishlist productWithWishlist = this.productService.findProductWithWishlist(userDetails, productId);
+    
+    ProductWithUserWishlistDTO productWithWishlistDTO = modelMapper.map(productWithWishlist, ProductWithUserWishlistDTO.class);
+    
+    ApiResponse<ProductWithUserWishlistDTO> response = new ApiResponse<>(productWithWishlistDTO, null);
     return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 
