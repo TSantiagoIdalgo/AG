@@ -14,6 +14,8 @@ public interface IReviewService {
   public Page<Review> findAllReviews(ReviewFilter filter);
 
   public Review findReview(String reviewId);
+  
+  public List<Review> findUserReview(UserDetails userDetails);
 
   public List<Review> findProductReviews(String productId, boolean recommended);
   

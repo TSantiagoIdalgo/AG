@@ -9,6 +9,7 @@ import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -49,6 +50,16 @@ public class ReviewController {
     ApiResponse<Page<ReviewDTO>> response = new ApiResponse<>(reviewsDTO, null);
     return ApiEntityResponse.of(HttpStatus.OK, response);
   }
+  
+  @GetMapping("/user")
+  @Secured({"ROLE_USER", "ROLE_ADMIN"})
+  public ApiEntityResponse<List<ReviewDTO>> getUserReviews(@AuthenticationPrincipal UserDetails userDetails) {
+    List<Review> reviews = this.reviewService.findUserReview(userDetails);
+    var reviewType = new TypeToken<List<ReviewDTO>>() {};
+    List<ReviewDTO> reviewsDTO = modelMapper.map(reviews, reviewType.getType());
+    ApiResponse<List<ReviewDTO>> response = new ApiResponse<>(reviewsDTO, null);
+    return ApiEntityResponse.of(HttpStatus.OK, response);
+  }
 
   @GetMapping("/product/{productId}")
   public ApiEntityResponse<List<ReviewDTO>> getAllProductReviews(@PathVariable String productId,
@@ -82,6 +93,7 @@ public class ReviewController {
   }
 
   @GetMapping("/recommendation/{productId}")
+  @Secured({"ROLE_USER", "ROLE_ADMIN"})
   public ApiEntityResponse<ReviewRecommendationDTO> getReviewRecommendation(@PathVariable String productId) {
     ReviewRecommendationDTO reviewRecommendationDTO = this.reviewService.getRecommendationPercentage(productId);
     ApiResponse<ReviewRecommendationDTO> response = new ApiResponse<>(reviewRecommendationDTO, null);
@@ -90,6 +102,7 @@ public class ReviewController {
   }
 
   @PostMapping("/{productId}")
+  @Secured({"ROLE_USER", "ROLE_ADMIN"})
   public ApiEntityResponse<ReviewDTO> createReview(@PathVariable String productId,
       @Valid @RequestBody ReviewDTO reviewDTO, @AuthenticationPrincipal UserDetails user) {
     Review newReview = this.reviewService.createReview(productId, reviewDTO, user);

@@ -7,7 +7,7 @@ import com.ancore.ancoregaming.product.dtos.UpdateProductDTO;
 import com.ancore.ancoregaming.product.model.Genre;
 import com.ancore.ancoregaming.product.model.Platform;
 import com.ancore.ancoregaming.product.model.Product;
-import com.ancore.ancoregaming.product.model.ProductWithUserWishlist;
+import com.ancore.ancoregaming.product.model.ProductWithUserWishlistAndPurchased;
 import com.ancore.ancoregaming.product.repositories.IProductRepository;
 import com.ancore.ancoregaming.product.services.genre.GenreService;
 import com.ancore.ancoregaming.product.services.platform.PlatformService;
@@ -101,9 +101,9 @@ public class ProductService implements IProductService {
   }
   
   @Override
-  public ProductWithUserWishlist findProductWithWishlist(UserDetails userDetails, UUID productId) {
-    if (userDetails != null) return this.productRepository.findProductWithUserWishlist(userDetails.getUsername(), productId);
-    return this.productRepository.findProductWithUserWishlist(null, productId);
+  public ProductWithUserWishlistAndPurchased findProductWithWishlistAndPurchase(UserDetails userDetails, UUID productId) {
+    if (userDetails != null) return this.productRepository.findProductWithUserWishlistAndPurchase(userDetails.getUsername(), productId);
+    return this.productRepository.findProductWithUserWishlistAndPurchase(null, productId);
   }
   
   @Override

@@ -66,7 +66,16 @@ public class ReviewService implements IReviewService {
 
     return review.get();
   }
-
+  
+  @Override
+  public List<Review> findUserReview(UserDetails userDetails) {
+    List<Review> userReviews = this.reviewRepository.findReviewByUserEmail(userDetails.getUsername());
+    if (userReviews.isEmpty()) {
+      throw new EntityNotFoundException("User has not reviews");
+    }
+    return userReviews;
+  }
+  
   @Override
   public List<Review> findProductReviews(String productId, boolean recommended) {
     List<Review> reviews = this.reviewRepository.findReviewsOrderedByLikes(recommended, UUID.fromString(productId));

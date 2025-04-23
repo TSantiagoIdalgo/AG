@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.ancore.ancoregaming.product.dtos.*;
-import com.ancore.ancoregaming.product.model.ProductWithUserWishlist;
+import com.ancore.ancoregaming.product.model.ProductWithUserWishlistAndPurchased;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -70,8 +70,8 @@ public class ProductController {
   }
   
   @GetMapping("/wishlist/{productId}")
-  public ApiEntityResponse<ProductWithUserWishlistDTO> findProductIsInWishlist (@AuthenticationPrincipal UserDetails userDetails, @PathVariable UUID productId) {
-    ProductWithUserWishlist productWithWishlist = this.productService.findProductWithWishlist(userDetails, productId);
+  public ApiEntityResponse<ProductWithUserWishlistDTO> findProductIsInWishlistAndPurchased (@AuthenticationPrincipal UserDetails userDetails, @PathVariable UUID productId) {
+    ProductWithUserWishlistAndPurchased productWithWishlist = this.productService.findProductWithWishlistAndPurchase(userDetails, productId);
     
     ProductWithUserWishlistDTO productWithWishlistDTO = modelMapper.map(productWithWishlist, ProductWithUserWishlistDTO.class);
     
