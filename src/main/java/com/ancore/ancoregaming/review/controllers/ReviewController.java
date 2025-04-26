@@ -63,10 +63,9 @@ public class ReviewController {
 
   @GetMapping("/product/{productId}")
   public ApiEntityResponse<List<ReviewDTO>> getAllProductReviews(@PathVariable String productId,
-      @RequestParam boolean recommended,
       @AuthenticationPrincipal UserDetails user) {
     if (user != null) {
-      List<ReviewUserReaction> reviews = this.reviewService.findProductReviewsWithUserReaction(productId, recommended, user.getUsername());
+      List<ReviewUserReaction> reviews = this.reviewService.findProductReviewsWithUserReaction(productId, user.getUsername());
 
       List<ReviewDTO> reviewsDTO = modelMapper.map(
           reviews,
@@ -75,7 +74,7 @@ public class ReviewController {
       ApiResponse<List<ReviewDTO>> response = new ApiResponse<>(reviewsDTO, null);
       return ApiEntityResponse.of(HttpStatus.OK, response);
     }
-    List<Review> reviews = this.reviewService.findProductReviews(productId, recommended);
+    List<Review> reviews = this.reviewService.findProductReviews(productId);
     List<ReviewDTO> reviewsDTO = modelMapper.map(
         reviews,
         new TypeToken<List<ReviewDTO>>() {

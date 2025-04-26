@@ -5,9 +5,9 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import com.ancore.ancoregaming.review.dtos.*;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -77,8 +77,8 @@ public class ReviewService implements IReviewService {
   }
   
   @Override
-  public List<Review> findProductReviews(String productId, boolean recommended) {
-    List<Review> reviews = this.reviewRepository.findReviewsOrderedByLikes(recommended, UUID.fromString(productId));
+  public List<Review> findProductReviews(String productId) {
+    List<Review> reviews = this.reviewRepository.findReviewsOrderedByLikes(UUID.fromString(productId));
     if (reviews.isEmpty()) {
       throw new EntityNotFoundException("The product has no reviews");
     }
@@ -87,8 +87,8 @@ public class ReviewService implements IReviewService {
   }
   
   @Override
-  public List<ReviewUserReaction> findProductReviewsWithUserReaction(String productId, boolean recommended, String userId) {
-    List<Object[]> reviews = this.reviewRepository.findReviewsOrderedByLikesWithUserReaction(recommended, UUID.fromString(productId), userId);
+  public List<ReviewUserReaction> findProductReviewsWithUserReaction(String productId, String userId) {
+    List<Object[]> reviews = this.reviewRepository.findReviewsOrderedByLikesWithUserReaction(UUID.fromString(productId), userId);
     if (reviews.isEmpty()) throw new EntityNotFoundException("The product has no reviews");
 
     return reviews.stream()
@@ -111,7 +111,7 @@ public class ReviewService implements IReviewService {
   }
   
   @Override
-  public Review createReview(String productId, ReviewDTO reviewDTO, UserDetails userDetails) {
+  public Review createReview(String productId, ReviewDTO reviewDTO, @NotNull UserDetails userDetails) {
     User user = this.userService.findUser(userDetails.getUsername());
     Product product = this.productService.findProduct(productId);
 

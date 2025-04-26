@@ -26,12 +26,11 @@ public interface IReviewRepository extends JpaRepository<Review, UUID>, JpaSpeci
 
         @Query("SELECT r FROM Review r " +
                         "LEFT JOIN r.reactions rr " +
-                        "WHERE r.recommended = :recommended AND r.product.id = :productId " +
+                        "WHERE r.product.id = :productId " +
                         "GROUP BY r.id " +
                         "ORDER BY SUM(CASE WHEN rr.reactionType = 'LIKE' THEN 1 ELSE 0 END) DESC, " +
                         "         SUM(CASE WHEN rr.reactionType = 'DISLIKE' THEN 1 ELSE 0 END) ASC")
         List<Review> findReviewsOrderedByLikes(
-                        @Param("recommended") final boolean recommended,
                         @Param("productId") UUID productId);
 
         Review findByProductIdAndUserEmail(UUID productId, String userEmail);
@@ -44,12 +43,11 @@ public interface IReviewRepository extends JpaRepository<Review, UUID>, JpaSpeci
             "        WHERE rr.review.id = r.id AND rr.user.email = :userId) AS userReaction " +
             "FROM Review r " +
             "LEFT JOIN r.reactions rr " +
-            "WHERE r.recommended = :recommended AND r.product.id = :productId " +
+            "WHERE r.product.id = :productId " +
             "GROUP BY r.id " +
             "ORDER BY SUM(CASE WHEN rr.reactionType = 'LIKE' THEN 1 ELSE 0 END) DESC, " +
             "         SUM(CASE WHEN rr.reactionType = 'DISLIKE' THEN 1 ELSE 0 END) ASC")
         List<Object[]> findReviewsOrderedByLikesWithUserReaction(
-            @Param("recommended") final boolean recommended,
             @Param("productId") UUID productId,
             @Param("userId") String userId);
         

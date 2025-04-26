@@ -17,9 +17,9 @@ public interface IReviewService {
   
   public List<Review> findUserReview(UserDetails userDetails);
 
-  public List<Review> findProductReviews(String productId, boolean recommended);
+  public List<Review> findProductReviews(String productId);
   
-  public List<ReviewUserReaction> findProductReviewsWithUserReaction(String productId, boolean recommended, String userId);
+  public List<ReviewUserReaction> findProductReviewsWithUserReaction(String productId, String userId);
 
   public Review createReview(String productId, ReviewDTO reviewDTO, UserDetails userDetails);
 

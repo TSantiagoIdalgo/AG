@@ -3,12 +3,11 @@ package com.ancore.ancoregaming.review.dtos;
 import java.util.Date;
 import java.util.List;
 
-import com.ancore.ancoregaming.product.dtos.ProductDTO;
 import com.ancore.ancoregaming.user.dtos.UserDTO;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 @Setter
@@ -17,9 +16,7 @@ public class ReviewDTO {
   private String id;
   @NotNull
   private String title;
-  @NotNull
   private String comment;
-  @NotNull
   private boolean recommended;
   private UserDTO user;
   private List<ReviewReactionDTO> reactions;
@@ -30,7 +27,7 @@ public class ReviewDTO {
   public ReviewDTO() {
   }
 
-  public ReviewDTO(String title, String comment, boolean recommended, UserDTO user) {
+  public ReviewDTO(@NotNull String title, String comment, boolean recommended, UserDTO user) {
     this.title = title;
     this.comment = comment;
     this.recommended = recommended;
