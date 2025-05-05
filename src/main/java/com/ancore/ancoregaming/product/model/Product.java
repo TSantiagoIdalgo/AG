@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+import com.ancore.ancoregaming.cart.model.CartItem;
 import com.ancore.ancoregaming.checkout.model.StockReservation;
 import com.ancore.ancoregaming.review.model.Review;
 import com.ancore.ancoregaming.whitelist.model.WhitelistItem;
@@ -103,7 +104,10 @@ public class Product {
 
   @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
   private List<StockReservation> stockReservation;
-
+  
+  @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+  private List<CartItem> cartItems;
+  
   @Version
   private Long version;
 
@@ -131,6 +135,7 @@ public class Product {
     this.release_date = builder.release_date;
     this.distributor = builder.distributor;
     this.pegi = builder.pegi;
+    this.cartItems = builder.cartItems;
   }
 
   public static class Builder {
@@ -152,12 +157,18 @@ public class Product {
     private List<String> images;
     private BigDecimal discount;
     private List<Review> reviews;
+    private List<CartItem> cartItems;
     private LocalDate release_date;
     private String distributor;
     private String pegi;
 
     public Builder setName(String name) {
       this.name = name;
+      return this;
+    }
+    
+    public Builder setCartItems(List<CartItem> cartItems) {
+      this.cartItems = cartItems;
       return this;
     }
     

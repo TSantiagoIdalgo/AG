@@ -68,6 +68,16 @@ public class ReviewService implements IReviewService {
   }
   
   @Override
+  public Review findUserReviewByProductId(UserDetails userDetails, UUID productId) {
+    Review userReview = this.reviewRepository.findUserReviewByProductId(userDetails.getUsername(), productId);
+    if (userReview == null) {
+      throw new EntityNotFoundException("The user did not review this product");
+    }
+    
+    return userReview;
+  }
+  
+  @Override
   public List<Review> findUserReview(UserDetails userDetails) {
     List<Review> userReviews = this.reviewRepository.findReviewByUserEmail(userDetails.getUsername());
     if (userReviews.isEmpty()) {
@@ -142,19 +152,11 @@ public class ReviewService implements IReviewService {
 
   @Override
   public Review updateReview(String reviewId, UpdateReviewDTO updateReviewDTO) {
+    System.out.println(updateReviewDTO);
     Review review = this.findReview(reviewId);
-    for (Method method : updateReviewDTO.getClass().getMethods()) {
-      if (method.getName().startsWith("get") && method.getReturnType().equals(Optional.class)) {
-        try {
-          Optional<?> value = (Optional<?>) method.invoke(updateReviewDTO);
-          if (value.isPresent()) {
-            value.ifPresent(val -> setReviewField(review, method.getName().substring(3), val));
-          }
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-          throw new RuntimeException("Error actualizando campos de la review: " + e.getMessage());
-        }
-      }
-    }
+    updateReviewDTO.getTitle().ifPresent(review::setTitle);
+    updateReviewDTO.getComment().ifPresent(review::setComment);
+    updateReviewDTO.getRecommended().ifPresent(review::setRecommended);
     return this.reviewRepository.save(review);
   }
 

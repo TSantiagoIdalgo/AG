@@ -88,6 +88,7 @@ public class CartService implements ICartService {
     }
 
     userCart.getItems().remove(cartItem.get()); // Elimina el CartItem del Cart
+    product.getCartItems().remove(cartItem.get());
     userCart.setSubtotal(userCart.getSubtotal().subtract(cartItem.get().getSubtotal()));
     userCart.setTotal(userCart.getTotal().subtract(cartItem.get().getTotal()));
     this.cartItemRepository.deleteById(cartItem.get().getId());

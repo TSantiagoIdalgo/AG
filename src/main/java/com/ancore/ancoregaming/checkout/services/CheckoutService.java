@@ -4,6 +4,8 @@ import com.ancore.ancoregaming.cart.dtos.UserCartDTO;
 import com.ancore.ancoregaming.cart.model.Cart;
 import com.ancore.ancoregaming.cart.model.CartItem;
 import com.ancore.ancoregaming.cart.repositories.ICartRepository;
+import com.ancore.ancoregaming.checkout.model.ProductWithCheckoutList;
+import com.ancore.ancoregaming.checkout.model.ProductWithCheckouts;
 import com.ancore.ancoregaming.checkout.model.Checkout;
 import com.ancore.ancoregaming.checkout.model.CheckoutItems;
 import com.ancore.ancoregaming.checkout.repositories.ICheckoutItemsRepository;
@@ -109,7 +111,7 @@ public class CheckoutService {
 
           this.generatePaymentReceipt(sessionNode, userCart);
           UserCartDTO cart = modelMapper.map(userCart, UserCartDTO.class);
-          sseService.sendToClient(userEmail, cart);
+          sseService.sendToClient(userEmail, SseService.EVENT_TYPES.PAYMENT, cart);
           userCart.setTotal(BigDecimal.ZERO);
           userCart.setSubtotal(BigDecimal.ZERO);
           userCart.getUser().getStockReservation()
@@ -153,6 +155,7 @@ public class CheckoutService {
     checkout.setCheckoutItems(checkoutItems);
 
     this.paymentRepository.save(checkout);
+    sseService.sendToClient(userCart.getUser().getEmail(), SseService.EVENT_TYPES.NEW_PAYMENT_RECEIVED, checkout);
   }
 
   private Map<String, Object> getProductData(User user, Product product, int quantity) {
@@ -196,4 +199,29 @@ public class CheckoutService {
     purchaseEmailDTO.setUsername(cart.getUser().getUsername());
     this.emailService.sendPurchaseMail(purchaseEmailDTO);
   }
+  
+  public List<Checkout> findAll(int pageSize, int pageNumber) {
+    return this.paymentRepository.findAllOrdered(pageSize, pageNumber);
+  }
+  
+  public List<ProductWithCheckouts> findProductsCheckout() {
+    return this.paymentRepository.findProductWithCartItemsAndCheckouts();
+  }
+  
+  public List<ProductWithCheckoutList> groupByProduct(List<ProductWithCheckouts> flatList) {
+    Map<Product, List<Checkout>> grouped = flatList.stream()
+        .collect(Collectors.groupingBy(
+            ProductWithCheckouts::getProduct,
+            Collectors.mapping(
+                ProductWithCheckouts::getCheckout,
+                Collectors.filtering(Objects::nonNull, Collectors.toList())
+            )
+        ));
+    
+    return grouped.entrySet().stream()
+        .map(entry -> new ProductWithCheckoutList(entry.getKey(), entry.getValue()))
+        .toList();
+  }
+  
+  
 }

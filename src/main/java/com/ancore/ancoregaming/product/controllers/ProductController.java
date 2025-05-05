@@ -69,7 +69,7 @@ public class ProductController {
     return ApiEntityResponse.of(HttpStatus.OK, response);
   }
   
-  @GetMapping("/wishlist/{productId}")
+  @GetMapping("/user/{productId}")
   public ApiEntityResponse<ProductWithUserWishlistDTO> findProductIsInWishlistAndPurchased (@AuthenticationPrincipal UserDetails userDetails, @PathVariable UUID productId) {
     ProductWithUserWishlistAndPurchased productWithWishlist = this.productService.findProductWithWishlistAndPurchase(userDetails, productId);
     

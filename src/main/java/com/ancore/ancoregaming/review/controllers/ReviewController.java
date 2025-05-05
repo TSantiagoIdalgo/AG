@@ -1,6 +1,7 @@
 package com.ancore.ancoregaming.review.controllers;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.ancore.ancoregaming.review.dtos.*;
 import com.ancore.ancoregaming.review.model.ReviewReaction;
@@ -58,6 +59,14 @@ public class ReviewController {
     var reviewType = new TypeToken<List<ReviewDTO>>() {};
     List<ReviewDTO> reviewsDTO = modelMapper.map(reviews, reviewType.getType());
     ApiResponse<List<ReviewDTO>> response = new ApiResponse<>(reviewsDTO, null);
+    return ApiEntityResponse.of(HttpStatus.OK, response);
+  }
+  
+  @GetMapping("/user/{productId}")
+  public ApiEntityResponse<ReviewDTO> getUserReviewsByProduct(@AuthenticationPrincipal UserDetails userDetails, @PathVariable UUID productId) {
+    Review userReview = this.reviewService.findUserReviewByProductId(userDetails, productId);
+    ReviewDTO reviewsDTO = modelMapper.map(userReview, ReviewDTO.class);
+    ApiResponse<ReviewDTO> response = new ApiResponse<>(reviewsDTO, null);
     return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 

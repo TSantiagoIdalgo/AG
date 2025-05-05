@@ -49,6 +49,7 @@ public class CartItemService implements ICartItemService {
 
         if (newQuantity <= 0) {
             cart.getItems().remove(item); // Elimina el CartItem del Cart
+            product.getCartItems().remove(item);
             cart.setSubtotal(cart.getSubtotal().subtract(product.getPrice()));
             cart.setTotal(cart.getTotal().subtract(getFinalPrice(product.getPrice(), product.getDiscount())));
             this.cartItemRepository.deleteById(item.getId());
@@ -78,7 +79,8 @@ public class CartItemService implements ICartItemService {
                 .setItemIsPaid(false)
                 .build();
         userCart.getItems().add(newCartItem);
-
+        product.getCartItems().add(newCartItem);
+        
         return newCartItem;
     }
 }

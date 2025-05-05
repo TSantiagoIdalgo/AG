@@ -9,13 +9,15 @@ public class ProductWithUserWishlistDTO {
   private ProductDTO product;
   private boolean isInWishlist;
   private boolean purchasedByUser;
+  private boolean userReviewed;
   
   public ProductWithUserWishlistDTO() {
   }
   
-  public ProductWithUserWishlistDTO(ProductDTO product, boolean isInWishlist, boolean purchasedByUser) {
+  public ProductWithUserWishlistDTO(ProductDTO product, boolean isInWishlist, boolean purchasedByUser, boolean userReviewed) {
     this.product = product;
     this.isInWishlist = isInWishlist;
     this.purchasedByUser = purchasedByUser;
+    this.userReviewed = userReviewed;
   }
 }

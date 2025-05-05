@@ -8,17 +8,25 @@ import lombok.Setter;
 @Setter
 public class UpdateReviewDTO {
 
-  private Optional<String> title;
-  private Optional<String> comment;
-  private Optional<Double> rating;
+  private Optional<String> title = Optional.empty();
+  private Optional<String> comment = Optional.empty();;
+  private Optional<Boolean> recommended = Optional.empty();;
 
   public UpdateReviewDTO() {
   }
 
-  public UpdateReviewDTO(Optional<String> title, Optional<String> comment, Optional<Double> rating) {
+  public UpdateReviewDTO(Optional<String> title, Optional<String> comment, Optional<Boolean> recommended) {
     this.title = title;
     this.comment = comment;
-    this.rating = rating;
+    this.recommended = recommended;
   }
-
+  
+  @Override
+  public String toString() {
+    return "UpdateReviewDTO{" +
+        "title='" + title + '\'' +
+        ", comment='" + comment + '\'' +
+        ", recommended=" + recommended +
+        '}';
+  }
 }

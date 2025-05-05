@@ -30,6 +30,13 @@ public interface IProductRepository extends JpaRepository<Product, UUID>, JpaSpe
                 JOIN c.items ci
                 WHERE c.user.email = :userEmail AND ci.product = p AND ci.itemIsPaid = true
             ) THEN true ELSE false
+        END,
+        CASE
+            WHEN EXISTS (
+                SELECT 1
+                FROM Review r
+                WHERE r.user.email = :userEmail AND r.product = p
+            ) THEN true ELSE false
         END
     )
     FROM Product p

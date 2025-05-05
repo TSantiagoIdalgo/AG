@@ -1,19 +1,15 @@
-package com.ancore.ancoregaming.review.dtos;
+package com.ancore.ancoregaming.checkout.dtos;
 
-import com.ancore.ancoregaming.product.dtos.RequirementsDTO;
-import com.ancore.ancoregaming.product.model.Genre;
-import com.ancore.ancoregaming.product.model.Platform;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 @Getter
 @Setter
-public class ReviewProductDTO {
+public class CheckoutProductDTO {
   public UUID id;
   public String name;
   public BigDecimal price;
@@ -21,10 +17,10 @@ public class ReviewProductDTO {
   public String trailer;
   public String mainImage;
   
-  public ReviewProductDTO() {
+  public CheckoutProductDTO() {
   }
   
-  public ReviewProductDTO(UUID id, String name, BigDecimal price, BigDecimal discount, String trailer, String mainImage) {
+  public CheckoutProductDTO(UUID id, String name, BigDecimal price, BigDecimal discount, String trailer, String mainImage) {
     this.id = id;
     this.name = name;
     this.price = price;
@@ -35,7 +31,7 @@ public class ReviewProductDTO {
   
   @Override
   public String toString() {
-    return "ReviewProductDTO{" +
+    return "CheckoutProductDTO{" +
         "id=" + id +
         ", name='" + name + '\'' +
         ", price=" + price +
@@ -45,3 +41,4 @@ public class ReviewProductDTO {
         '}';
   }
 }
+

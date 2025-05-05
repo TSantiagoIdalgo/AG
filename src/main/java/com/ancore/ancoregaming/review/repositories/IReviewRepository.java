@@ -37,6 +37,9 @@ public interface IReviewRepository extends JpaRepository<Review, UUID>, JpaSpeci
         
         List<Review> findReviewByUserEmail(@Param("userEmail") String userEmail);
         
+        @Query("SELECT r FROM Review r WHERE r.user.email = :userEmail AND r.product.id = :productId")
+        Review findUserReviewByProductId(@Param("userEmail") String userEmail, @Param("productId") UUID productId);
+        
         @Query("SELECT r, " +
             "       (SELECT rr.reactionType " +
             "        FROM ReviewReaction rr " +

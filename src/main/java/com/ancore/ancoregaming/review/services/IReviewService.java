@@ -1,10 +1,14 @@
 package com.ancore.ancoregaming.review.services;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.ancore.ancoregaming.review.dtos.*;
 import com.ancore.ancoregaming.review.model.ReviewReaction;
 import org.springframework.data.domain.Page;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.ancore.ancoregaming.review.model.Review;
@@ -14,6 +18,8 @@ public interface IReviewService {
   public Page<Review> findAllReviews(ReviewFilter filter);
 
   public Review findReview(String reviewId);
+  
+  public Review findUserReviewByProductId(UserDetails userDetails, UUID productId);
   
   public List<Review> findUserReview(UserDetails userDetails);
 

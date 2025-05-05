@@ -1,7 +1,8 @@
 package com.ancore.ancoregaming.checkout.controllers;
 
-import com.ancore.ancoregaming.checkout.dtos.CheckoutDTO;
+import com.ancore.ancoregaming.checkout.dtos.*;
 import com.ancore.ancoregaming.checkout.model.Checkout;
+import com.ancore.ancoregaming.checkout.model.ProductWithCheckouts;
 import com.ancore.ancoregaming.checkout.services.SseService;
 import org.apache.coyote.BadRequestException;
 import org.modelmapper.ModelMapper;
@@ -11,12 +12,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import com.ancore.ancoregaming.checkout.dtos.CheckoutSessionDTO;
 import com.ancore.ancoregaming.checkout.services.CheckoutService;
 import com.ancore.ancoregaming.common.ApiEntityResponse;
 import com.ancore.ancoregaming.common.ApiResponse;
@@ -28,7 +28,6 @@ import com.stripe.model.Event;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Sinks;
 
 import java.util.List;
 
@@ -43,6 +42,28 @@ public class CheckoutController {
   @Autowired
   private SseService sseService;
   private final ModelMapper modelMapper = new ModelMapper();
+  
+  
+  @Secured("ROLE_ADMIN")
+  @GetMapping("/")
+  public ApiEntityResponse<List<CheckoutDTO>> findAllCheckouts(@RequestParam int pageSize, @RequestParam int pageNumber) {
+    var checkouts = this.checkoutService.findAll(pageSize, pageNumber);
+    var checkoutType = new TypeToken<List<CheckoutDTO>>() {};
+    List<CheckoutDTO> checkoutDTO = modelMapper.map(checkouts, checkoutType.getType());
+    ApiResponse<List<CheckoutDTO>> response = new ApiResponse<>(checkoutDTO, null);
+    return ApiEntityResponse.of(HttpStatus.OK, response);
+  }
+  
+  @GetMapping("/product")
+  public ApiEntityResponse<List<ProductWithCheckoutsDTO>> findAllProductCheckouts() {
+    List<ProductWithCheckouts> productsCheckout = this.checkoutService.findProductsCheckout();
+    
+    var grouped = this.checkoutService.groupByProduct(productsCheckout);
+    var checkoutType = new TypeToken<List<ProductWithCheckoutsDTO>>() {};
+    List<ProductWithCheckoutsDTO> checkoutDTO = modelMapper.map(grouped, checkoutType.getType());
+    ApiResponse<List<ProductWithCheckoutsDTO>> response = new ApiResponse<>(checkoutDTO, null);
+    return ApiEntityResponse.of(HttpStatus.OK, response);
+  }
   
   @GetMapping("/user")
   public ApiEntityResponse<List<CheckoutDTO>> getUserCheckouts(@AuthenticationPrincipal UserDetails userDetails) throws BadRequestException {
@@ -91,7 +112,7 @@ public class CheckoutController {
   }
   
   @GetMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-  public Flux<ServerSentEvent<Object>> stream (@AuthenticationPrincipal UserDetails userDetails) throws BadRequestException {
+  public Flux<ServerSentEvent<?>> stream (@AuthenticationPrincipal UserDetails userDetails) throws BadRequestException {
     if (userDetails != null && userDetails.getUsername() != null) {
       return this.sseService.addClient(userDetails.getUsername());
     };
