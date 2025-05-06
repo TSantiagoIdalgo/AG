@@ -1,6 +1,8 @@
 package com.ancore.ancoregaming.checkout.dtos;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
@@ -8,6 +10,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@RequiredArgsConstructor
 public class ProductCheckoutDTO {
   public UUID id;
   public String name;
@@ -15,16 +18,7 @@ public class ProductCheckoutDTO {
   public BigDecimal discount;
   public String trailer;
   public String mainImage;
+  private int stock;
+  private boolean disabled;
   
-  public ProductCheckoutDTO() {
-  }
-  
-  public ProductCheckoutDTO(UUID id, String name, BigDecimal price, BigDecimal discount, String trailer, String mainImage) {
-    this.id = id;
-    this.name = name;
-    this.price = price;
-    this.discount = discount;
-    this.trailer = trailer;
-    this.mainImage = mainImage;
-  }
 }

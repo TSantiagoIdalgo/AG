@@ -55,8 +55,8 @@ public class CheckoutController {
   }
   
   @GetMapping("/product")
-  public ApiEntityResponse<List<ProductWithCheckoutsDTO>> findAllProductCheckouts() {
-    List<ProductWithCheckouts> productsCheckout = this.checkoutService.findProductsCheckout();
+  public ApiEntityResponse<List<ProductWithCheckoutsDTO>> findAllProductCheckouts(@RequestParam int pageSize, @RequestParam int pageNumber) {
+    List<ProductWithCheckouts> productsCheckout = this.checkoutService.findProductsCheckout(pageSize, pageNumber);
     
     var grouped = this.checkoutService.groupByProduct(productsCheckout);
     var checkoutType = new TypeToken<List<ProductWithCheckoutsDTO>>() {};

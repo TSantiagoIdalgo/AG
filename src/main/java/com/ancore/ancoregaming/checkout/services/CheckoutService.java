@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.ConcurrencyFailureException;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -201,11 +202,13 @@ public class CheckoutService {
   }
   
   public List<Checkout> findAll(int pageSize, int pageNumber) {
-    return this.paymentRepository.findAllOrdered(pageSize, pageNumber);
+    PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
+    return this.paymentRepository.findAllOrdered(pageRequest);
   }
   
-  public List<ProductWithCheckouts> findProductsCheckout() {
-    return this.paymentRepository.findProductWithCartItemsAndCheckouts();
+  public List<ProductWithCheckouts> findProductsCheckout(int pageSize, int pageNumber) {
+    PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
+    return this.paymentRepository.findProductWithCartItemsAndCheckouts(pageRequest);
   }
   
   public List<ProductWithCheckoutList> groupByProduct(List<ProductWithCheckouts> flatList) {
