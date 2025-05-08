@@ -9,5 +9,5 @@ import lombok.Setter;
 @RequiredArgsConstructor
 public class CheckoutItemsDTO {
   public Long id;
-  public CheckoutItemDTO cartItem;
+  public CheckoutCartItemDTO cartItem;
 }

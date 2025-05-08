@@ -4,8 +4,9 @@ import com.ancore.ancoregaming.cart.dtos.UserCartDTO;
 import com.ancore.ancoregaming.cart.model.Cart;
 import com.ancore.ancoregaming.cart.model.CartItem;
 import com.ancore.ancoregaming.cart.repositories.ICartRepository;
-import com.ancore.ancoregaming.checkout.model.ProductWithCheckoutList;
-import com.ancore.ancoregaming.checkout.model.ProductWithCheckouts;
+import com.ancore.ancoregaming.checkout.dtos.CheckoutDTO;
+import com.ancore.ancoregaming.checkout.dtos.CheckoutItemDTO;
+import com.ancore.ancoregaming.checkout.dtos.CheckoutProductDTO;
 import com.ancore.ancoregaming.checkout.model.Checkout;
 import com.ancore.ancoregaming.checkout.model.CheckoutItems;
 import com.ancore.ancoregaming.checkout.repositories.ICheckoutItemsRepository;
@@ -24,8 +25,11 @@ import jakarta.persistence.OptimisticLockException;
 import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,31 +96,41 @@ public class CheckoutService {
           Cart userCart = this.cartRepository.findCartByIdWithoutItemsUnpaid(UUID.fromString(cartId))
               .orElseThrow(() -> new EntityNotFoundException("User cart not found"));
 
-          this.sendEmail(userEmail, userCart);
 
           List<CartItem> cartItems = userCart.getItems();
           cartItems.forEach(item -> {
-            Product product = item.getProduct();
-            if (product == null) {
-              throw new EntityNotFoundException("Product not found");
-            }
-            int newStock = product.getStock() - item.getQuantity();
-            if (newStock < 0) {
-              throw new IllegalStateException("Not enough stock for product: " + product.getId());
-            }
-            product.setStock(newStock);
-
             item.setItemIsPaid(true);
-
+            item.setPaidAt(new Date());
+            item.setPaymentStatus("paid");
           });
-
           this.generatePaymentReceipt(sessionNode, userCart);
-          UserCartDTO cart = modelMapper.map(userCart, UserCartDTO.class);
-          sseService.sendToClient(userEmail, SseService.EVENT_TYPES.PAYMENT, cart);
           userCart.setTotal(BigDecimal.ZERO);
           userCart.setSubtotal(BigDecimal.ZERO);
           userCart.getUser().getStockReservation()
               .forEach((reservation) -> this.stockReservationService.confirmPayment(reservation.getId()));
+          
+          UserCartDTO cart = modelMapper.map(userCart, UserCartDTO.class);
+          List<CheckoutProductDTO> checkoutProductDTOs = cartItems.stream()
+              .map(item -> {
+                System.out.println(item.getId());
+                CheckoutProductDTO productDTO = modelMapper.map(item.getProduct(), CheckoutProductDTO.class);
+                System.out.println(productDTO);
+                List<CheckoutItemDTO> itemDTO = List.of(modelMapper.map(item, CheckoutItemDTO.class));
+                productDTO.setCartItems(itemDTO);
+                return productDTO;
+              })
+              .toList();
+
+          TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+              sendEmail(userEmail, userCart);
+              sseService.sendToClient(userCart.getUser(), SseService.EVENT_TYPES.PAYMENT, cart);
+              checkoutProductDTOs.forEach(dto -> {
+                sseService.broadcast(SseService.EVENT_TYPES.NEW_PAYMENT_RECEIVED, dto);
+              });
+            }
+          });
         }
       }
     } catch (OptimisticLockException e) {
@@ -154,9 +168,7 @@ public class CheckoutService {
         .map((item) -> this.checkoutItemsRepository.save(new CheckoutItems(item, checkout)))
         .collect(Collectors.toList());
     checkout.setCheckoutItems(checkoutItems);
-
     this.paymentRepository.save(checkout);
-    sseService.sendToClient(userCart.getUser().getEmail(), SseService.EVENT_TYPES.NEW_PAYMENT_RECEIVED, checkout);
   }
 
   private Map<String, Object> getProductData(User user, Product product, int quantity) {
@@ -206,25 +218,11 @@ public class CheckoutService {
     return this.paymentRepository.findAllOrdered(pageRequest);
   }
   
-  public List<ProductWithCheckouts> findProductsCheckout(int pageSize, int pageNumber) {
+  public List<Product> findProductsCheckout(int pageSize, int pageNumber) {
     PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
-    return this.paymentRepository.findProductWithCartItemsAndCheckouts(pageRequest);
+    LocalDateTime now = LocalDateTime.now();
+    LocalDateTime sixMonthsAgo = now.minusMonths(6);
+    return this.paymentRepository.findProductWithCartItemsPaid(sixMonthsAgo, now, pageRequest);
   }
-  
-  public List<ProductWithCheckoutList> groupByProduct(List<ProductWithCheckouts> flatList) {
-    Map<Product, List<Checkout>> grouped = flatList.stream()
-        .collect(Collectors.groupingBy(
-            ProductWithCheckouts::getProduct,
-            Collectors.mapping(
-                ProductWithCheckouts::getCheckout,
-                Collectors.filtering(Objects::nonNull, Collectors.toList())
-            )
-        ));
-    
-    return grouped.entrySet().stream()
-        .map(entry -> new ProductWithCheckoutList(entry.getKey(), entry.getValue()))
-        .toList();
-  }
-  
   
 }

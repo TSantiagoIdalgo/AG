@@ -2,16 +2,10 @@ package com.ancore.ancoregaming.cart.model;
 
 import com.ancore.ancoregaming.checkout.model.CheckoutItems;
 import com.ancore.ancoregaming.product.model.Product;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import lombok.Getter;
@@ -42,6 +36,10 @@ public class CartItem {
   private BigDecimal subtotal;
   @Column
   private boolean itemIsPaid;
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date paidAt;
+  @Column
+  private String paymentStatus;
 
   @OneToMany(mappedBy = "cartItem")
   private List<CheckoutItems> checkoutItems;

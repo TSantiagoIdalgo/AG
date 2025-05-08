@@ -2,8 +2,12 @@ package com.ancore.ancoregaming.checkout.controllers;
 
 import com.ancore.ancoregaming.checkout.dtos.*;
 import com.ancore.ancoregaming.checkout.model.Checkout;
-import com.ancore.ancoregaming.checkout.model.ProductWithCheckouts;
+import com.ancore.ancoregaming.checkout.model.CheckoutItems;
 import com.ancore.ancoregaming.checkout.services.SseService;
+import com.ancore.ancoregaming.product.dtos.ProductDTO;
+import com.ancore.ancoregaming.product.model.Product;
+import com.ancore.ancoregaming.user.model.User;
+import com.ancore.ancoregaming.user.repositories.IUserRepository;
 import org.apache.coyote.BadRequestException;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -41,6 +45,8 @@ public class CheckoutController {
   private String endpointSecret;
   @Autowired
   private SseService sseService;
+  @Autowired
+  private IUserRepository userRepository;
   private final ModelMapper modelMapper = new ModelMapper();
   
   
@@ -55,13 +61,12 @@ public class CheckoutController {
   }
   
   @GetMapping("/product")
-  public ApiEntityResponse<List<ProductWithCheckoutsDTO>> findAllProductCheckouts(@RequestParam int pageSize, @RequestParam int pageNumber) {
-    List<ProductWithCheckouts> productsCheckout = this.checkoutService.findProductsCheckout(pageSize, pageNumber);
-    
-    var grouped = this.checkoutService.groupByProduct(productsCheckout);
-    var checkoutType = new TypeToken<List<ProductWithCheckoutsDTO>>() {};
-    List<ProductWithCheckoutsDTO> checkoutDTO = modelMapper.map(grouped, checkoutType.getType());
-    ApiResponse<List<ProductWithCheckoutsDTO>> response = new ApiResponse<>(checkoutDTO, null);
+  public ApiEntityResponse<List<CheckoutProductDTO>> findAllProductCheckouts(@RequestParam int pageSize, @RequestParam int pageNumber) {
+    List<Product> productsCheckout = this.checkoutService.findProductsCheckout(pageSize, pageNumber);
+    var checkoutType = new TypeToken<List<CheckoutProductDTO>>() {};
+    List<CheckoutProductDTO> checkoutDTO = modelMapper.map(productsCheckout, checkoutType.getType());
+
+    ApiResponse<List<CheckoutProductDTO>> response = new ApiResponse<>(checkoutDTO, null);
     return ApiEntityResponse.of(HttpStatus.OK, response);
   }
   
@@ -96,7 +101,6 @@ public class CheckoutController {
       ApiResponse<ExceptionResponse> response = new ApiResponse<>(null, error);
       return ApiEntityResponse.of(HttpStatus.BAD_REQUEST, response);
     }
-
     try {
       if (!event.getType().equals("checkout.session.completed")) {
         throw new BadRequestException("Invalid webhook event");
@@ -112,10 +116,9 @@ public class CheckoutController {
   }
   
   @GetMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-  public Flux<ServerSentEvent<?>> stream (@AuthenticationPrincipal UserDetails userDetails) throws BadRequestException {
-    if (userDetails != null && userDetails.getUsername() != null) {
-      return this.sseService.addClient(userDetails.getUsername());
-    };
-   return Flux.empty();
+  public Flux<ServerSentEvent<Object>> stream (@AuthenticationPrincipal UserDetails userDetails) throws BadRequestException {
+    User user = userRepository.findById(userDetails.getUsername())
+        .orElseThrow(() -> new RuntimeException("User not found"));
+    return sseService.addClient(user);
   }
 }

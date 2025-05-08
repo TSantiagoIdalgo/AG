@@ -1,6 +1,5 @@
 package com.ancore.ancoregaming.checkout.dtos;
 
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -12,12 +11,13 @@ import java.util.UUID;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class CheckoutItemDTO {
+public class CheckoutCartItemDTO {
   public UUID id;
   public int quantity;
   public BigDecimal total;
   public BigDecimal subtotal;
   public boolean itemIsPaid;
-  public Date paidAt;
   public String paymentStatus;
+  public Date paidAt;
+  public ProductCheckoutDTO product;
 }

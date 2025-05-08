@@ -1,15 +1,16 @@
 package com.ancore.ancoregaming.checkout.dtos;
 
+import com.ancore.ancoregaming.product.model.Platform;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
-@Getter
 @Setter
+@Getter
 @RequiredArgsConstructor
 public class ProductCheckoutDTO {
   public UUID id;
@@ -18,7 +19,7 @@ public class ProductCheckoutDTO {
   public BigDecimal discount;
   public String trailer;
   public String mainImage;
+  public List<Platform> platforms;
   private int stock;
   private boolean disabled;
-  
 }

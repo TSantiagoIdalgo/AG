@@ -26,7 +26,7 @@ public class StockReservationService {
     this.productRepository = productRepository;
   }
   
-  @Scheduled(cron = "0 */1 * * * *")
+  @Scheduled(cron = "0 */30 * * * *")
   @Transactional
   public void releaseExpiredReservations() {
     Instant now = Instant.now();
@@ -39,7 +39,7 @@ public class StockReservationService {
   }
 
   public void createReservation(int quantity, User user, Product product) {
-    StockReservation stockReservation = new StockReservation(quantity, user, product, Instant.now().plus(5, ChronoUnit.MINUTES));
+    StockReservation stockReservation = new StockReservation(quantity, user, product, Instant.now().plus(30, ChronoUnit.MINUTES));
     product.setStock(product.getStock() - quantity);
     productRepository.save(product);
 
@@ -48,7 +48,7 @@ public class StockReservationService {
 
   public void confirmPayment(UUID reservationId) {
     StockReservation reservation = stockReservationRepository.findById(reservationId)
-            .orElseThrow(() -> new EntityNotFoundException("Reserva no encontrada"));
+            .orElseThrow(() -> new EntityNotFoundException("NOT_FOUND"));
 
     stockReservationRepository.delete(reservation);
   }

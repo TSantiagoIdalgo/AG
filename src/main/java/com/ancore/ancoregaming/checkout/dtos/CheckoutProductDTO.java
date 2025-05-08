@@ -19,11 +19,14 @@ public class CheckoutProductDTO {
   public String trailer;
   public String mainImage;
   public List<Platform> platforms;
+  private int stock;
+  private boolean disabled;
+  private List<CheckoutItemDTO> cartItems;
   
   public CheckoutProductDTO() {
   }
   
-  public CheckoutProductDTO(UUID id, String name, BigDecimal price, BigDecimal discount, String trailer, String mainImage, List<Platform> platforms) {
+  public CheckoutProductDTO(UUID id, String name, BigDecimal price, BigDecimal discount, String trailer, String mainImage, List<Platform> platforms, int stock, boolean disabled, List<CheckoutItemDTO> cartItems) {
     this.id = id;
     this.name = name;
     this.price = price;
@@ -31,6 +34,9 @@ public class CheckoutProductDTO {
     this.trailer = trailer;
     this.mainImage = mainImage;
     this.platforms = platforms;
+    this.stock = stock;
+    this.disabled = disabled;
+    this.cartItems = cartItems;
   }
   
   @Override

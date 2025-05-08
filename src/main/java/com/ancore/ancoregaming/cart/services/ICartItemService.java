@@ -6,7 +6,7 @@ import com.ancore.ancoregaming.product.model.Product;
 import org.apache.coyote.BadRequestException;
 
 public interface ICartItemService {
-    public CartItem findOrCreateCartItem(Cart cart, Product product);
+    public CartItem findOrCreateCartItem(Cart cart, Product product) throws BadRequestException;
 
     public void incrementCartItem(Cart cart, CartItem item, Product product) throws BadRequestException;
 

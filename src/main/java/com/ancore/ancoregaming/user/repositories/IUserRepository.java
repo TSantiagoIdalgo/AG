@@ -11,6 +11,8 @@ import java.util.Optional;
 @Repository
 public interface IUserRepository extends JpaRepository<User, String> {
 
+  User findByEmail(String userEmail);
+  
   User findByUsername(String username);
 
   @Query("SELECT u FROM User u WHERE u.email = :email AND u.verify = true")

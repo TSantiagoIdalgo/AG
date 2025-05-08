@@ -22,7 +22,10 @@ public class CartItemService implements ICartItemService {
     }
 
     @Override
-    public CartItem findOrCreateCartItem(Cart cart, Product product) {
+    public CartItem findOrCreateCartItem(Cart cart, Product product) throws BadRequestException {
+        if (product.getStock() == 0) {
+            throw new BadRequestException("OUT_OF_STOCK");
+        }
         CartItem cartItem = cartItemRepository.findUnpaidCartItemByCartIdAndProductId(cart.getId(), product.getId())
                 .orElseGet(() -> createItem(cart, product));
         
