@@ -37,7 +37,7 @@ public interface ICheckoutRepository extends JpaRepository<Checkout, UUID> {
     FROM Product p
     LEFT JOIN p.cartItems ci
     WHERE ci.paidAt BETWEEN :startDate AND :endDate
-    ORDER BY ci.paidAt ASC
+    ORDER BY ci.paidAt DESC
 """)
   List<Product> findProductWithCartItemsPaid(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, Pageable pageable);
   
