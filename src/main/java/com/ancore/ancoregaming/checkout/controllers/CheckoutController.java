@@ -2,11 +2,7 @@ package com.ancore.ancoregaming.checkout.controllers;
 
 import com.ancore.ancoregaming.checkout.dtos.*;
 import com.ancore.ancoregaming.checkout.model.Checkout;
-import com.ancore.ancoregaming.checkout.model.CheckoutItems;
-import com.ancore.ancoregaming.checkout.services.SseService;
-import com.ancore.ancoregaming.product.dtos.ProductDTO;
 import com.ancore.ancoregaming.product.model.Product;
-import com.ancore.ancoregaming.user.model.User;
 import com.ancore.ancoregaming.user.repositories.IUserRepository;
 import org.apache.coyote.BadRequestException;
 import org.modelmapper.ModelMapper;
@@ -14,8 +10,6 @@ import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,14 +18,12 @@ import org.springframework.web.bind.annotation.*;
 import com.ancore.ancoregaming.checkout.services.CheckoutService;
 import com.ancore.ancoregaming.common.ApiEntityResponse;
 import com.ancore.ancoregaming.common.ApiResponse;
-import com.ancore.ancoregaming.common.ExceptionResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Event;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
-import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -43,8 +35,6 @@ public class CheckoutController {
   private CheckoutService checkoutService;
   @Value("${stripe.webhook.secret}")
   private String endpointSecret;
-  @Autowired
-  private SseService sseService;
   @Autowired
   private IUserRepository userRepository;
   private final ModelMapper modelMapper = new ModelMapper();
@@ -85,40 +75,22 @@ public class CheckoutController {
   @PostMapping("/create-checkout-session")
   public ApiEntityResponse<CheckoutSessionDTO> createCheckoutSession(@AuthenticationPrincipal UserDetails user)
       throws StripeException {
-    Session session = this.checkoutService.createCheckoutSession(user);
+    Session session = this.checkoutService.createCheckoutSession(user.getUsername());
     ApiResponse<CheckoutSessionDTO> response = new ApiResponse<>(new CheckoutSessionDTO(session.getUrl()), null);
     return ApiEntityResponse.of(HttpStatus.CREATED, response);
   }
   
   @PostMapping("/webhook")
-  public ApiEntityResponse<?> handleStripeWebhook(@RequestBody String payload,
-                                                  @RequestHeader("Stripe-Signature") String sigHeader) {
+  public void handleStripeWebhook(@RequestBody String payload,
+                                                  @RequestHeader("Stripe-Signature") String sigHeader) throws JsonProcessingException {
     Event event;
     try {
       event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
     } catch (SignatureVerificationException e) {
-      ExceptionResponse error = new ExceptionResponse(400, "Error verifying webhook", e.getMessage());
-      ApiResponse<ExceptionResponse> response = new ApiResponse<>(null, error);
-      return ApiEntityResponse.of(HttpStatus.BAD_REQUEST, response);
+      return;
     }
-    try {
-      if (!event.getType().equals("checkout.session.completed")) {
-        throw new BadRequestException("Invalid webhook event");
+      if (event.getType().equals("checkout.session.completed")) {
+        this.checkoutService.checkoutSessionComplete(payload);
       }
-      this.checkoutService.checkoutSessionComplete(payload);
-    } catch (JsonProcessingException | BadRequestException e) {
-      ExceptionResponse error = new ExceptionResponse(400, "Error verifying webhook", e.getMessage());
-      ApiResponse<ExceptionResponse> response = new ApiResponse<>(null, error);
-      return ApiEntityResponse.of(HttpStatus.BAD_REQUEST, response);
-    }
-    
-    return ApiEntityResponse.of(HttpStatus.OK, new ApiResponse<>(null, null));
-  }
-  
-  @GetMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-  public Flux<ServerSentEvent<Object>> stream (@AuthenticationPrincipal UserDetails userDetails) throws BadRequestException {
-    User user = userRepository.findById(userDetails.getUsername())
-        .orElseThrow(() -> new RuntimeException("User not found"));
-    return sseService.addClient(user);
   }
 }

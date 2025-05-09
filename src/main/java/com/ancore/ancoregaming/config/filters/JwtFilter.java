@@ -1,9 +1,12 @@
 package com.ancore.ancoregaming.config.filters;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,6 +27,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
+import javax.sql.DataSource;
+
 // Filtro para authenticar al usuario con un json web token
 @Component
 @RequiredArgsConstructor
@@ -32,12 +37,23 @@ public class JwtFilter extends OncePerRequestFilter {
   private final JwtService jwtService;
   private final IUserRepository userRepo;
   private final UserDetailsService userDetailsService;
-
+  
+  @Autowired
+  private DataSource dataSource;
+  
+  public boolean isConnectionValid() {
+    try (Connection conn = dataSource.getConnection()) {
+      return conn.isValid(2);
+    } catch (SQLException e) {
+      return false;
+    }
+  }
+  
   @Override
   protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
       @NonNull FilterChain chain)
       throws ServletException, IOException {
-    if (request.getServletPath().contains("/auth")) {
+    if (request.getServletPath().contains("/auth") || !isConnectionValid()) {
       chain.doFilter(request, response);
       return;
     }

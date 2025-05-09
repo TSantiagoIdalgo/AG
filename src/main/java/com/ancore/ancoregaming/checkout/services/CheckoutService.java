@@ -4,7 +4,6 @@ import com.ancore.ancoregaming.cart.dtos.UserCartDTO;
 import com.ancore.ancoregaming.cart.model.Cart;
 import com.ancore.ancoregaming.cart.model.CartItem;
 import com.ancore.ancoregaming.cart.repositories.ICartRepository;
-import com.ancore.ancoregaming.checkout.dtos.CheckoutDTO;
 import com.ancore.ancoregaming.checkout.dtos.CheckoutItemDTO;
 import com.ancore.ancoregaming.checkout.dtos.CheckoutProductDTO;
 import com.ancore.ancoregaming.checkout.model.Checkout;
@@ -15,6 +14,8 @@ import com.ancore.ancoregaming.email.dtos.PurchaseEmailDTO;
 import com.ancore.ancoregaming.email.services.EmailService;
 import com.ancore.ancoregaming.product.model.Product;
 import com.ancore.ancoregaming.user.model.User;
+import com.ancore.ancoregaming.websocket.controllers.PaymentWebSocketController;
+import com.ancore.ancoregaming.websocket.services.MessageService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,8 +29,6 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,22 +45,22 @@ public class CheckoutService {
   private final StockReservationService stockReservationService;
   private final ICheckoutItemsRepository checkoutItemsRepository;
   private final EmailService emailService;
-  private final SseService sseService;
   private final ModelMapper modelMapper = new ModelMapper();
+  private final MessageService messageService;
   
   @Autowired
-  public CheckoutService(ICartRepository cartRepository, ICheckoutRepository paymentRepository, StockReservationService stockReservationService, ICheckoutItemsRepository checkoutItemsRepository, EmailService emailService, SseService sseService) {
+  public CheckoutService(ICartRepository cartRepository, ICheckoutRepository paymentRepository, StockReservationService stockReservationService, ICheckoutItemsRepository checkoutItemsRepository, EmailService emailService, MessageService messageService) {
     this.cartRepository = cartRepository;
     this.paymentRepository = paymentRepository;
     this.stockReservationService = stockReservationService;
     this.checkoutItemsRepository = checkoutItemsRepository;
     this.emailService = emailService;
-    this.sseService = sseService;
+    this.messageService = messageService;
   }
   
   @Transactional
-  public Session createCheckoutSession(UserDetails userDetails) throws StripeException {
-    Cart userCart = this.cartRepository.findByUserEmailAndUnpaidItems(userDetails.getUsername());
+  public Session createCheckoutSession(String userId) throws StripeException {
+    Cart userCart = this.cartRepository.findByUserEmailAndUnpaidItems(userId);
     if (userCart == null) {
       throw new EntityNotFoundException("User cart not found");
     }
@@ -72,7 +71,7 @@ public class CheckoutService {
     params.put("mode", "payment");
     params.put("line_items", lineItems);
     params.put("metadata", Map.of("cartId", userCart.getId()));
-    params.put("customer_email", userDetails.getUsername());
+    params.put("customer_email", userId);
     params.put("payment_method_types", List.of("card"));
     params.put("success_url", "http://localhost:5173/ancore/user/activation");
     params.put("cancel_url", "http://localhost:5173/ancore/user/activation_failed");
@@ -90,47 +89,24 @@ public class CheckoutService {
       if (sessionNode != null) {
         String paymentStatus = sessionNode.get("payment_status").asText();
         JsonNode metadataNode = sessionNode.get("metadata");
+        String userEmail = sessionNode.get("customer_email").asText();
         if (metadataNode != null && metadataNode.has("cartId") && "paid".equals(paymentStatus)) {
           String cartId = metadataNode.get("cartId").asText();
-          String userEmail = sessionNode.get("customer_email").asText();
           Cart userCart = this.cartRepository.findCartByIdWithoutItemsUnpaid(UUID.fromString(cartId))
               .orElseThrow(() -> new EntityNotFoundException("User cart not found"));
-
-
           List<CartItem> cartItems = userCart.getItems();
           cartItems.forEach(item -> {
             item.setItemIsPaid(true);
             item.setPaidAt(new Date());
             item.setPaymentStatus("paid");
           });
-          this.generatePaymentReceipt(sessionNode, userCart);
           userCart.setTotal(BigDecimal.ZERO);
           userCart.setSubtotal(BigDecimal.ZERO);
           userCart.getUser().getStockReservation()
               .forEach((reservation) -> this.stockReservationService.confirmPayment(reservation.getId()));
-          
-          UserCartDTO cart = modelMapper.map(userCart, UserCartDTO.class);
-          List<CheckoutProductDTO> checkoutProductDTOs = cartItems.stream()
-              .map(item -> {
-                System.out.println(item.getId());
-                CheckoutProductDTO productDTO = modelMapper.map(item.getProduct(), CheckoutProductDTO.class);
-                System.out.println(productDTO);
-                List<CheckoutItemDTO> itemDTO = List.of(modelMapper.map(item, CheckoutItemDTO.class));
-                productDTO.setCartItems(itemDTO);
-                return productDTO;
-              })
-              .toList();
-
-          TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-            @Override
-            public void afterCommit() {
-              sendEmail(userEmail, userCart);
-              sseService.sendToClient(userCart.getUser(), SseService.EVENT_TYPES.PAYMENT, cart);
-              checkoutProductDTOs.forEach(dto -> {
-                sseService.broadcast(SseService.EVENT_TYPES.NEW_PAYMENT_RECEIVED, dto);
-              });
-            }
-          });
+          this.sendEmail(userEmail, userCart);
+          this.generatePaymentReceipt(sessionNode, userCart);
+          this.sentDataToUsers(userCart, cartItems);
         }
       }
     } catch (OptimisticLockException e) {
@@ -225,4 +201,19 @@ public class CheckoutService {
     return this.paymentRepository.findProductWithCartItemsPaid(sixMonthsAgo, now, pageRequest);
   }
   
+  public void sentDataToUsers(Cart userCart, List<CartItem> cartItems) {
+    UserCartDTO cart = modelMapper.map(userCart, UserCartDTO.class);
+    List<CheckoutProductDTO> checkoutProductDTOs = cartItems.stream()
+        .map(item -> {
+          CheckoutProductDTO productDTO = modelMapper.map(item.getProduct(), CheckoutProductDTO.class);
+          List<CheckoutItemDTO> itemDTO = List.of(modelMapper.map(item, CheckoutItemDTO.class));
+          productDTO.setCartItems(itemDTO);
+          return productDTO;
+        })
+        .toList();
+    messageService.sentToUser(userCart.getUser().getEmail(), MessageService.MessageTypes.PAYMENT, cart);
+    checkoutProductDTOs.forEach(item -> {
+      messageService.broadcast(MessageService.MessageTypes.NEW_PAYMENT_RECEIVED, item);
+    });
+  }
 }

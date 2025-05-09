@@ -18,28 +18,11 @@ import jakarta.persistence.EntityNotFoundException;
 @RestControllerAdvice
 public class ApiExceptions {
 
-  @ExceptionHandler(Exception.class)
-  public ApiEntityResponse<ExceptionResponse> handleGeneralException(Exception ex, WebRequest request) {
-    ExceptionResponse error = new ExceptionResponse(
-        HttpStatus.INTERNAL_SERVER_ERROR.value(),
-        ex.getMessage(),
-        "INPUT_ERROR");
-    ApiResponse<ExceptionResponse> response = new ApiResponse<>(null, error);
-    return ApiEntityResponse.of(HttpStatus.BAD_REQUEST, response);
-  }
-
   @ExceptionHandler(EntityNotFoundException.class)
   public ApiEntityResponse<ExceptionResponse> handleEntityNotFoundException(EntityNotFoundException ex) {
     ExceptionResponse error = new ExceptionResponse(404, ex.getMessage(), "NOT_FOUND");
     ApiResponse<ExceptionResponse> response = new ApiResponse<>(null, error);
     return ApiEntityResponse.of(HttpStatus.NOT_FOUND, response);
-  }
-
-  @ExceptionHandler(BadRequestException.class)
-  public ApiEntityResponse<String> handleBadRequestException(BadRequestException ex) {
-    ExceptionResponse error = new ExceptionResponse(400, ex.getMessage(), "BAD_REQUEST");
-    ApiResponse<String> response = new ApiResponse<>(null, error);
-    return ApiEntityResponse.of(HttpStatus.BAD_REQUEST, response);
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)

@@ -156,12 +156,12 @@
             <scope>compile</scope>
         </dependency>
 		<!-- https://mvnrepository.com/artifact/org.springframework/spring-webflux -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-websocket -->
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-webflux</artifactId>
-			<version>6.2.5</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-websocket</artifactId>
+			<version>3.4.5</version>
 		</dependency>
-
     </dependencies>
 
 	<build>
