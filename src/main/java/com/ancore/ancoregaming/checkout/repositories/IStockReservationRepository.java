@@ -13,4 +13,6 @@ public interface IStockReservationRepository extends JpaRepository<StockReservat
 
   @Query("SELECT r FROM StockReservation r WHERE r.expirationTime < :now")
   List<StockReservation> findExpiredReservations(Instant now);
+  
+  StockReservation findByUserEmailAndProductId(String userEmail, UUID productId);
 }

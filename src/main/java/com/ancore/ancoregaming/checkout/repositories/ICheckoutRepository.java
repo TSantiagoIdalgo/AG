@@ -1,5 +1,6 @@
 package com.ancore.ancoregaming.checkout.repositories;
 
+import com.ancore.ancoregaming.cart.model.Cart;
 import com.ancore.ancoregaming.checkout.model.Checkout;
 
 import java.time.LocalDateTime;
@@ -23,6 +24,14 @@ public interface ICheckoutRepository extends JpaRepository<Checkout, UUID> {
   List<Checkout> findAllOrdered(Pageable pageable);
   
   @Query("""
+      SELECT c FROM Checkout c
+      LEFT JOIN c.checkoutItems cki
+      LEFT JOIN cki.cartItem ci
+      WHERE ci.product = :product AND ci.cart = :cart AND ci.itemIsPaid = false
+      """)
+  Checkout findByCartAndProduct(Product product, Cart cart);
+  
+  @Query("""
       SELECT cki FROM CheckoutItems cki
       LEFT JOIN cki.cartItem ci
       LEFT JOIN ci.product p
@@ -33,12 +42,15 @@ public interface ICheckoutRepository extends JpaRepository<Checkout, UUID> {
   List<CheckoutItems> findCheckoutItems(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, Pageable pageable);
   
   @Query("""
-    SELECT p
-    FROM Product p
-    LEFT JOIN p.cartItems ci
-    WHERE ci.paidAt BETWEEN :startDate AND :endDate
-    ORDER BY ci.paidAt DESC
+  SELECT p
+  FROM Product p
+  JOIN FETCH p.cartItems ci
+  WHERE ci.paymentStatus IS NOT NULL AND ci.paidAt IS NOT NULL AND ci.paidAt BETWEEN :startDate AND :endDate
+  ORDER BY ci.paidAt ASC
 """)
-  List<Product> findProductWithCartItemsPaid(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, Pageable pageable);
+  List<Product> findProductWithCartItemsPaid(@Param("startDate") LocalDateTime startDate,
+                                             @Param("endDate") LocalDateTime endDate);
+  
+  
   
 }

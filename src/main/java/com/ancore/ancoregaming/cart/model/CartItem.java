@@ -38,9 +38,15 @@ public class CartItem {
   private boolean itemIsPaid;
   @Temporal(TemporalType.TIMESTAMP)
   private Date paidAt;
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date createdAt;
   @Column
   private String paymentStatus;
-
+  @Column(name = "payment_attempt", nullable = false)
+  private boolean paymentAttempt = false;
+  @Column(name = "active_session_id")
+  private UUID activeSessionId;
+  
   @OneToMany(mappedBy = "cartItem")
   private List<CheckoutItems> checkoutItems;
 

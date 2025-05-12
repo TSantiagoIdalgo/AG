@@ -21,4 +21,6 @@ public interface ICartService {
   public Cart getCartById(String cartId);
 
   public Cart getUserCart(UserDetails userDetails);
+  
+  Cart getUserCartWithoutPaymentStatus(UserDetails userDetails);
 }

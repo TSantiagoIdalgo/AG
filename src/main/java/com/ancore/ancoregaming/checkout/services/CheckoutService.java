@@ -67,16 +67,20 @@ public class CheckoutService {
     Map<String, Object> params = new HashMap<>();
 
     List<Object> lineItems = new ArrayList<>();
+    UUID activeSessionId = UUID.randomUUID();
     userCart.getItems().forEach((item) -> lineItems.add(this.getProductData(userCart.getUser(), item.getProduct(), item.getQuantity())));
     params.put("mode", "payment");
     params.put("line_items", lineItems);
-    params.put("metadata", Map.of("cartId", userCart.getId()));
+    params.put("metadata", Map.of("cartId", userCart.getId(), "activeSessionId", activeSessionId));
     params.put("customer_email", userId);
     params.put("payment_method_types", List.of("card"));
     params.put("success_url", "http://localhost:5173/ancore/user/activation");
     params.put("cancel_url", "http://localhost:5173/ancore/user/activation_failed");
     long expiresAt = (System.currentTimeMillis() / 1000L) + (30 * 60);
     params.put("expires_at", expiresAt);
+    
+    userCart.getItems().forEach(item -> item.setActiveSessionId(activeSessionId));
+    
     return Session.create(params);
   }
 
@@ -90,27 +94,62 @@ public class CheckoutService {
         String paymentStatus = sessionNode.get("payment_status").asText();
         JsonNode metadataNode = sessionNode.get("metadata");
         String userEmail = sessionNode.get("customer_email").asText();
+        String stripePaymentId = sessionNode.get("id").asText();
+        String status = sessionNode.get("payment_status").asText();
+        String currency = sessionNode.get("currency").asText();
         if (metadataNode != null && metadataNode.has("cartId") && "paid".equals(paymentStatus)) {
           String cartId = metadataNode.get("cartId").asText();
-          Cart userCart = this.cartRepository.findCartByIdWithoutItemsUnpaid(UUID.fromString(cartId))
-              .orElseThrow(() -> new EntityNotFoundException("User cart not found"));
+          String activeSessionId = metadataNode.get("activeSessionId").asText();
+          Cart userCart = this.cartRepository.findCartByIdWithoutItemsUnpaidWithSessionId(UUID.fromString(cartId), UUID.fromString(activeSessionId))
+              .orElseGet(() -> this.cartRepository.findCartByIdWithoutItemsUnpaid(UUID.fromString(cartId)));
           List<CartItem> cartItems = userCart.getItems();
           cartItems.forEach(item -> {
             item.setItemIsPaid(true);
             item.setPaidAt(new Date());
             item.setPaymentStatus("paid");
+            item.setPaymentAttempt(false);
           });
+          this.sendEmail(userEmail, userCart);
+          this.generatePaymentReceipt(userCart, stripePaymentId, currency, status);
+          this.sentDataToUsers(userCart, cartItems);
           userCart.setTotal(BigDecimal.ZERO);
           userCart.setSubtotal(BigDecimal.ZERO);
           userCart.getUser().getStockReservation()
               .forEach((reservation) -> this.stockReservationService.confirmPayment(reservation.getId()));
-          this.sendEmail(userEmail, userCart);
-          this.generatePaymentReceipt(sessionNode, userCart);
-          this.sentDataToUsers(userCart, cartItems);
         }
       }
     } catch (OptimisticLockException e) {
       throw new ConcurrencyFailureException("A concurrency conflict occurred. Try again.");
+    }
+  }
+  
+  @Transactional
+  public void checkoutSessionFailed(String payload) throws JsonProcessingException {
+    try {
+      ObjectMapper objectMapper = new ObjectMapper();
+      JsonNode jsonNode = objectMapper.readTree(payload);
+      JsonNode sessionNode = jsonNode.get("data").get("object");
+      
+      if (sessionNode != null) {
+        String userEmail = sessionNode.get("last_payment_error").get("payment_method").get("billing_details").get("email").asText();
+        String stripePaymentId = sessionNode.get("id").asText();
+        String currency = sessionNode.get("currency").asText();
+        String status = "unpaid";
+        Cart userCart = this.cartRepository.findByUserEmailAndUnpaidItems(userEmail);
+        if (userCart != null) {
+          List<CartItem> cartItems = userCart.getItems();
+          cartItems.forEach(item -> {
+            item.setPaidAt(new Date());
+            item.setPaymentStatus("unpaid");
+            item.setPaymentAttempt(true);
+          });
+          
+          this.sentDataToUsers(userCart, cartItems);
+          this.generatePaymentReceipt(userCart, stripePaymentId, currency, status);
+        }
+      }
+    } catch (JsonProcessingException e) {
+      System.out.println(e.getMessage());
     }
   }
   
@@ -124,11 +163,7 @@ public class CheckoutService {
     return checkout;
   }
 
-  private void generatePaymentReceipt(JsonNode sessionNode, Cart userCart) {
-    String stripePaymentId = sessionNode.get("id").asText();
-    String status = sessionNode.get("payment_status").asText();
-    String currency = sessionNode.get("currency").asText();
-
+  private void generatePaymentReceipt(Cart userCart, String stripePaymentId, String currency, String status) {
     Checkout checkout = new Checkout.Builder(stripePaymentId)
         .setTotal(userCart.getTotal())
         .setSubtotal(userCart.getSubtotal())
@@ -194,11 +229,10 @@ public class CheckoutService {
     return this.paymentRepository.findAllOrdered(pageRequest);
   }
   
-  public List<Product> findProductsCheckout(int pageSize, int pageNumber) {
-    PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
+  public List<Product> findProductsCheckout() {
     LocalDateTime now = LocalDateTime.now();
     LocalDateTime sixMonthsAgo = now.minusMonths(6);
-    return this.paymentRepository.findProductWithCartItemsPaid(sixMonthsAgo, now, pageRequest);
+    return this.paymentRepository.findProductWithCartItemsPaid(sixMonthsAgo, now);
   }
   
   public void sentDataToUsers(Cart userCart, List<CartItem> cartItems) {

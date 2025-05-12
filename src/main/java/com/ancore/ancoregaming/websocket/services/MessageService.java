@@ -12,6 +12,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -61,6 +62,7 @@ public class MessageService extends TextWebSocketHandler {
     try {
       WebSocketMessage message = new WebSocketMessage(type, payload);
       String json = objectMapper.writeValueAsString(message);
+      sessions.forEach((userId, session) -> System.out.println("USUARIO: " + userId));
       sessions.values().forEach(session -> {
         if (session.isOpen()) {
           try {

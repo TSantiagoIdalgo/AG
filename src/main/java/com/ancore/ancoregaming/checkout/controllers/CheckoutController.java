@@ -50,9 +50,10 @@ public class CheckoutController {
     return ApiEntityResponse.of(HttpStatus.OK, response);
   }
   
+  @Secured("ROLE_ADMIN")
   @GetMapping("/product")
-  public ApiEntityResponse<List<CheckoutProductDTO>> findAllProductCheckouts(@RequestParam int pageSize, @RequestParam int pageNumber) {
-    List<Product> productsCheckout = this.checkoutService.findProductsCheckout(pageSize, pageNumber);
+  public ApiEntityResponse<List<CheckoutProductDTO>> findAllProductCheckouts() {
+    List<Product> productsCheckout = this.checkoutService.findProductsCheckout();
     var checkoutType = new TypeToken<List<CheckoutProductDTO>>() {};
     List<CheckoutProductDTO> checkoutDTO = modelMapper.map(productsCheckout, checkoutType.getType());
 
@@ -89,8 +90,11 @@ public class CheckoutController {
     } catch (SignatureVerificationException e) {
       return;
     }
-      if (event.getType().equals("checkout.session.completed")) {
-        this.checkoutService.checkoutSessionComplete(payload);
-      }
+    
+    if (event.getType().equals("checkout.session.completed")) {
+      this.checkoutService.checkoutSessionComplete(payload);
+    } else if(event.getType().equals("payment_intent.payment_failed")) {
+      this.checkoutService.checkoutSessionFailed(payload);
+    }
   }
 }

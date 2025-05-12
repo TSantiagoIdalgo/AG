@@ -40,7 +40,7 @@ public class CartController {
 
   @GetMapping("/")
   public ApiEntityResponse<UserCartDTO> getUserCart(@AuthenticationPrincipal UserDetails user) {
-    Cart cart = this.cartService.getUserCart(user);
+    Cart cart = this.cartService.getUserCartWithoutPaymentStatus(user);
     UserCartDTO userCart = modelMapper.map(cart, UserCartDTO.class);
     ApiResponse<UserCartDTO> response = new ApiResponse<>(userCart, null);
     return ApiEntityResponse.of(HttpStatus.OK, response);

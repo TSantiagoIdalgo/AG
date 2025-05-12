@@ -1,14 +1,7 @@
 package com.ancore.ancoregaming.checkout.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
+import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -41,7 +34,7 @@ public class Checkout {
   @ManyToOne
   private User user;
 
-  @OneToMany(mappedBy = "checkout")
+  @OneToMany(mappedBy = "checkout", cascade = CascadeType.ALL)
   private List<CheckoutItems> checkoutItems;
   @Temporal(TemporalType.TIMESTAMP)
   private Date createdAt;

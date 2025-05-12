@@ -1,12 +1,7 @@
 package com.ancore.ancoregaming.checkout.model;
 
 import com.ancore.ancoregaming.cart.model.CartItem;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,7 +17,7 @@ public class CheckoutItems {
     @JoinColumn(name = "cart_item_id", nullable = false)
     private CartItem cartItem;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "checkout_id", nullable = false)
     private Checkout checkout;
 

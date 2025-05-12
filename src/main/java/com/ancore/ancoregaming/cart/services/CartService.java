@@ -27,7 +27,17 @@ public class CartService implements ICartService {
   private final ICartRepository cartRepository;
   private final ICartItemRepository cartItemRepository;
   private final ICartItemService cartItemService;
-
+  
+  @Override
+  public Cart getUserCartWithoutPaymentStatus(UserDetails userDetails) {
+    String userEmail = userDetails.getUsername();
+    Optional<Cart> userCart = this.cartRepository.findByUserEmailAndNoPaymentStatus(userEmail);
+    if (userCart.isEmpty()) {
+      throw new EntityNotFoundException("User cart not found");
+    }
+    return userCart.get();
+  }
+  
   @Override
   public Cart getUserCart(UserDetails userDetails) {
     String userEmail = userDetails.getUsername();
@@ -114,17 +124,7 @@ public class CartService implements ICartService {
   }
 
   private Optional<Cart> findUserCart(String userEmail) {
-    Optional<Cart> cartFound = this.cartRepository.findByUserEmail(userEmail);
-
-    cartFound.ifPresent(cart -> {
-      List<CartItem> unpaidItems = cart.getItems()
-          .stream()
-          .filter(item -> !item.isItemIsPaid())
-          .collect(Collectors.toList());
-      cart.setItems(unpaidItems);
-    });
-
-    return cartFound;
+    return this.cartRepository.findByUserEmail(userEmail);
   }
 
   private Cart createCart(User user) {

@@ -39,11 +39,14 @@ public class StockReservationService {
   }
 
   public void createReservation(int quantity, User user, Product product) {
-    StockReservation stockReservation = new StockReservation(quantity, user, product, Instant.now().plus(30, ChronoUnit.MINUTES));
-    product.setStock(product.getStock() - quantity);
-    productRepository.save(product);
-
-    this.stockReservationRepository.save(stockReservation);
+    StockReservation stockReservationFound = this.stockReservationRepository.findByUserEmailAndProductId(user.getEmail(), product.getId());
+    if (stockReservationFound == null) {
+      StockReservation stockReservation = new StockReservation(quantity, user, product, Instant.now().plus(30, ChronoUnit.MINUTES));
+      product.setStock(product.getStock() - quantity);
+      productRepository.save(product);
+      
+      this.stockReservationRepository.save(stockReservation);
+    }
   }
 
   public void confirmPayment(UUID reservationId) {
