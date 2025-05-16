@@ -28,7 +28,12 @@ public class UserService implements IUserService {
 
     return users;
   }
-
+  
+  @Override
+  public int countUsers() {
+    return this.userRepository.countUsersWithRoleUser();
+  }
+  
   @Override
   public User findUser(String userId) {
     Optional<User> user = this.userRepository.findById(userId);

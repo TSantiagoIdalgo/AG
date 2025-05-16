@@ -39,6 +39,14 @@ public class UserController {
     ApiResponse<List<UserDTO>> response = new ApiResponse<>(usersDTO, null);
     return ApiEntityResponse.of(HttpStatus.OK, response);
   }
+  
+  @Secured("ROLE_ADMIN")
+  @GetMapping("/count")
+  public ApiEntityResponse<Integer> countUsers() {
+    int usersCount = this.userService.countUsers();
+    ApiResponse<Integer> response = new ApiResponse<>(usersCount, null);
+    return ApiEntityResponse.of(HttpStatus.OK, response);
+  }
 
   @GetMapping("/find/{userId}")
   public ApiEntityResponse<UserWithRolesDTO> findUser(@PathVariable String userId, @AuthenticationPrincipal UserDetails user) throws BadRequestException {

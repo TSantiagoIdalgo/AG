@@ -17,4 +17,11 @@ public interface IUserRepository extends JpaRepository<User, String> {
 
   @Query("SELECT u FROM User u WHERE u.email = :email AND u.verify = true")
   Optional<User> findUserWithVerifyTrue(@Param("email") String email);
+  
+  @Query("""
+      SELECT COUNT(u) FROM User u
+      LEFT JOIN u.roles r
+      WHERE r.name = 'ROLE_USER'
+      """)
+  int countUsersWithRoleUser();
 }

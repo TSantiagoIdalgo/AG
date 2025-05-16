@@ -1,6 +1,5 @@
 package com.ancore.ancoregaming.config.configurations;
 
-import com.ancore.ancoregaming.config.filters.UserAuthorizationFilter;
 import com.ancore.ancoregaming.user.model.User;
 import com.ancore.ancoregaming.user.repositories.IUserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -24,7 +23,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity // Habilita Spring Security en el proyecto
@@ -33,7 +31,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
   private final IUserRepository userRepo;
-  private final UserAuthorizationFilter userAuthorizationFilter;
 
   @Bean // Este annotation le indica a Spring que la instancia que devuelve el metodo la
         // guarde en su contexto
@@ -45,8 +42,7 @@ public class SecurityConfig {
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
             .requestMatchers("/swagger-ui/**").permitAll()
             .requestMatchers("/v3/**").permitAll()
-            .anyRequest().authenticated())
-        .addFilterBefore(userAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
+            .anyRequest().authenticated());
     return http.build();
   }
 

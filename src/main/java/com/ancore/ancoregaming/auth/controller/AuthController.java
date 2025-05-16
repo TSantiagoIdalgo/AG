@@ -47,8 +47,8 @@ public class AuthController {
   @PostMapping("/login")
   public ApiEntityResponse<UserDTO> login(HttpServletResponse res, @Valid @RequestBody final LoginDTO login) {
     JwtResponse loginResponse = authService.login(login);
-    Cookie jwtCookie = getCookie("access_token", loginResponse.access_token());
-    Cookie refreshJwtCookie = getCookie("refresh_token", loginResponse.refresh_token());
+    Cookie jwtCookie = getCookie("access_token", loginResponse.access_token(), 7);
+    Cookie refreshJwtCookie = getCookie("refresh_token", loginResponse.refresh_token(), 30);
 
     res.addCookie(jwtCookie);
     res.addCookie(refreshJwtCookie);
@@ -78,11 +78,11 @@ public class AuthController {
     return ApiEntityResponse.of(HttpStatus.OK, response);
   }
 
-  private Cookie getCookie(String key, String value) {
+  private Cookie getCookie(String key, String value, int days) {
     Cookie cookie = new Cookie(key, value);
     cookie.setHttpOnly(true); // Aumenta la seguridad evitando acceso desde JavaScript
     cookie.setSecure(false); // Solo se enviará por HTTPS
-    cookie.setMaxAge(24 * 60 * 60); // Duración de 1 día
+    cookie.setMaxAge(24 * days * 60 * 60); // Duración de 7 día
     cookie.setPath("/");
 
     return cookie;
