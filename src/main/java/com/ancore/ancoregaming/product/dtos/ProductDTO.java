@@ -25,6 +25,7 @@ public class ProductDTO {
   public int stock;
   public BigDecimal price;
   public BigDecimal discount;
+  public String franchise;
   public List<String> images;
   public String backgroundImage;
   public String trailer;
