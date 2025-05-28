@@ -4,10 +4,7 @@ import com.ancore.ancoregaming.product.dtos.CreateProductDTO;
 import com.ancore.ancoregaming.product.dtos.FilesDTO;
 import com.ancore.ancoregaming.product.dtos.ProductFilterDTO;
 import com.ancore.ancoregaming.product.dtos.UpdateProductDTO;
-import com.ancore.ancoregaming.product.model.Genre;
-import com.ancore.ancoregaming.product.model.Platform;
-import com.ancore.ancoregaming.product.model.Product;
-import com.ancore.ancoregaming.product.model.ProductWithUserWishlistAndPurchased;
+import com.ancore.ancoregaming.product.model.*;
 import com.ancore.ancoregaming.product.repositories.IProductRepository;
 import com.ancore.ancoregaming.product.services.genre.GenreService;
 import com.ancore.ancoregaming.product.services.platform.PlatformService;
@@ -132,19 +129,16 @@ public class ProductService implements IProductService {
   @Override
   public Product updateProductFields(String productId, UpdateProductDTO updateProduct, FilesDTO filesDTO) {
     Product product = this.findProduct(productId);
-    for (Method method : updateProduct.getClass().getMethods()) {
-      if (method.getName().startsWith("get") && method.getReturnType().equals(Optional.class)) {
-        try {
-          Optional<?> value = (Optional<?>) method.invoke(updateProduct);
-          if (value.isPresent()) {
-            value.ifPresent(val -> setProductField(product, method.getName().substring(3), val));
-          }
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-          throw new RuntimeException("Error actualizando campos del producto: " + e.getMessage());
-        }
-      }
-    }
-
+    updateProduct.getName().ifPresent(product::setName);
+    updateProduct.getDescription().ifPresent(product::setDescription);
+    updateProduct.getDeveloper().ifPresent(product::setDeveloper);
+    updateProduct.getDistributor().ifPresent(product::setDistributor);
+    updateProduct.getDisabled().ifPresent(product::setDisabled);
+    updateProduct.getStock().ifPresent(product::setStock);
+    updateProduct.getPegi().ifPresent(product::setPegi);
+    updateProduct.getPrice().ifPresent(product::setPrice);
+    updateProduct.getDiscount().ifPresent(product::setDiscount);
+    updateProduct.getRelease_date().ifPresent(product::setRelease_date);
     // Actualización explícita de las listas si están presentes
     updateProduct.getTags().ifPresent(product::setTags);
     updateProduct.getPlatforms().ifPresent(platforms -> {
@@ -155,20 +149,26 @@ public class ProductService implements IProductService {
       List<Genre> genre = this.genreService.bulkCreateGenres(genres);
       product.setGenres(genre);
     });
+    updateProduct.getRequirements().ifPresent(requirements -> {
+      requirements.forEach(requirement -> {
+        Optional<Requirements> optionalRequirements = product
+            .getRequirements()
+            .stream()
+            .filter(pr -> pr.getId().equals(requirement.getId()))
+            .findFirst();
+        
+        if (optionalRequirements.isPresent()) {
+          Requirements productRequirement = optionalRequirements.get();
+          productRequirement.setOs(requirement.getOs());
+          productRequirement.setMemory(requirement.getMemory());
+          productRequirement.setGraphics(requirement.getGraphics());
+          productRequirement.setDirectx_v(requirement.getDirectx_v());
+          productRequirement.setStorage(requirement.getStorage());
+          productRequirement.setProcessor(requirement.getProcessor());
+        }
+      });
+    });
     return this.uploadProductFiles(product, filesDTO, updateProduct.getImages());
-  }
-
-  private void setProductField(Product product, String fieldName, Object value) {
-    try {
-      if (value instanceof List || value == null) {
-        return;
-      }
-      Method setter = product.getClass().getMethod("set" + fieldName, value.getClass());
-      setter.invoke(product, value);
-    } catch (IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException
-        | InvocationTargetException e) {
-      throw new RuntimeException("Error asignando el campo " + fieldName + "  " + e.getMessage());
-    }
   }
 
   private Product uploadProductFiles(Product product, FilesDTO filesDTO, Optional<List<String>> images) {
