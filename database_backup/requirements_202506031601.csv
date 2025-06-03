@@ -1,0 +1,19 @@
+"id","directx_v","os","graphics","memory","processor","storage","type"
+1352,11.0,Windows 10 64 bits,GeForce GTX 1650 (4 GB) or Radeon RX 570 (4GB) or Intel Arc 580,12.0,Intel Core i5-6600 or Ryzen 3 1200,35.0,MINIMUM
+1304,11.0,Windows 10 64 bits,Nvidia GeForce GTX 770 2GB / AMD Radeon R9 280 3GB,8.0,Intel® Core™ i5-2500K / AMD FX-6300,150.0,MINIMUM
+1303,11.0,Windows 10 64 bits,RTX 2060,16.0,Intel i9 generation,100.0,RECOMMENDED
+1353,11.0,Windows 10 64 bits,GeForce RTX 2070 (8 GB) or Radeon RX 5700 XT (8 GB),16.0,Core i7-10700K or Ryzen 5 5500GT,35.0,RECOMMENDED
+1307,11.0,Windows 10 64 bits,NVIDIA GTX 660 2 GB/AMD HD7870 2 GB.,8.0,"Intel Core i5 3470 a 3,2 GHz (4 CPU)/AMD X8 FX-8350 a 4 GHz (8 CPU).",120.0,RECOMMENDED
+1306,11.0,Windows 10 64 bits,"NVIDIA 9800 GT 1 GB/AMD HD 4870 1 GB (DX 10, 10.1, 11).",4.0,"Intel Core 2 Quad CPU Q6600 a 2,4 GHz (4 CPU)/AMD Phenom 9850 Quad-Core (4 CPU) a 2,5 GHz.",120.0,MINIMUM
+1305,11.0,Windows 10 64 bits,Nvidia GeForce GTX 1060 6GB / AMD Radeon RX 480 4GB,12.0,Intel® Core™ i7-4770K / AMD Ryzen 5 1500X,150.0,RECOMMENDED
+1302,11.0,Windows 10 64 bits,GTX 1050,8.0,Intel i5 generation,50.0,MINIMUM
+1354,11.0,Windows 10 64 bits,GeForce GTX 1650ti (4 GB) or Radeon RX 570 (4GB) or Intel Arc 580,12.0,Intel Core i5-6600 or Ryzen 3 1200,35.0,MINIMUM
+1355,11.0,Windows 10 64 bits,GeForce RTX 2070 (8 GB) or Radeon RX 5700 XT (8 GB),32.0,Core i9-10700K or Ryzen 5 5500GT,65.0,RECOMMENDED
+1402,12.0,Windows 10 64-bit,Nvidia GTX 970 or AMD RX 570,12.0,Intel Core i3-8100 or AMD Ryzen 3 3300X,20.0,MINIMUM
+1403,12.0,Windows 10 64-bit,Nvidia GTX 1070 8 GB or AMD Equivalent,16.0,Intel i7-8700K or AMD Ryzen 5 3600,20.0,RECOMMENDED
+1404,10.0,Windows 7/8/10,"NVIDIA GT 630 / 650m, AMD Radeon HD6570 or equivalent",4.0,"Intel Core i5-2300 @ 2,80 GHz, AMD FX 8120 @ 3.1 GHz",2.0,MINIMUM
+1405,11.0,Windows 7/8/10,NVIDIA GTX 1050,8.0,"Intel i7 920 @ 2.7 GHz, AMD Phenom II 945 @ 3.0 GHz",2.0,RECOMMENDED
+1406,12.0,Windows 10,NVIDIA GEFORCE GTX 1060 3 GB or AMD RADEON RX 580 4 GB,12.0,INTEL CORE I5-8400 or AMD RYZEN 3 3300X,60.0,MINIMUM
+1407,12.0,Windows 10/11,NVIDIA GEFORCE GTX 1070 8 GB or AMD RADEON RX VEGA 56 8 GB,16.0,INTEL CORE I7-8700K or AMD RYZEN 5 3600X,60.0,RECOMMENDED
+1408,10.0,Windows 7 (64bit),GeForce 9800GTX+ (1GB),4.0,Intel Core 2 Duo E5200,9.0,MINIMUM
+1409,11.0,Windows 10 (64bit),GeForce GTX 560,8.0,Intel Core i5,9.0,RECOMMENDED
