@@ -229,6 +229,15 @@ public class CheckoutService {
     return this.paymentRepository.findAllOrdered(pageRequest);
   }
   
+  public Checkout findCheckoutById(UUID checkoutId) {
+    Optional<Checkout> checkout = this.paymentRepository.findById(checkoutId);
+    if (checkout.isEmpty()) {
+      throw new EntityNotFoundException("Checkout not found");
+    }
+    
+    return checkout.get();
+  }
+  
   public List<Product> findProductsCheckout() {
     LocalDateTime now = LocalDateTime.now();
     LocalDateTime sixMonthsAgo = now.minusMonths(6);

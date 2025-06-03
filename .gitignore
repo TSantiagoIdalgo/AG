@@ -12,7 +12,6 @@ gradlew*
 # Archivos de logs
 *.log
 *.log.*
-*.properties
 
 # Archivos de configuración del IDE
 *.iml

@@ -26,6 +26,7 @@ import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/checkout")
@@ -79,6 +80,15 @@ public class CheckoutController {
     Session session = this.checkoutService.createCheckoutSession(user.getUsername());
     ApiResponse<CheckoutSessionDTO> response = new ApiResponse<>(new CheckoutSessionDTO(session.getUrl()), null);
     return ApiEntityResponse.of(HttpStatus.CREATED, response);
+  }
+  
+  @GetMapping("/find/{checkoutId}")
+  public ApiEntityResponse<CheckoutDTO> findCheckout(@PathVariable UUID checkoutId) {
+    Checkout checkout = this.checkoutService.findCheckoutById(checkoutId);
+    CheckoutDTO checkoutDTO = modelMapper.map(checkout, CheckoutDTO.class);
+    ApiResponse<CheckoutDTO> response = new ApiResponse<>(checkoutDTO, null);
+    return ApiEntityResponse.of(HttpStatus.OK, response);
+    
   }
   
   @PostMapping("/webhook")
